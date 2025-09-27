@@ -1,0 +1,2 @@
+Magenta-y color: #8e2485
+Dark teal color: #2e777e
