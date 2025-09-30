@@ -14,7 +14,7 @@
       <!-- DO NOT remove the above div tag it is needed-->
       <!-- place corresponding components in the div, or replace the div with the corresponding component and then delete this comment make sure you keep the classes the same (you can change bg) -->
       <div class="w-3/4 h-[18rem] bg-gray-200 border border-[#2e777e] border-1 drop-shadow-lg col-span-1 rounded-md">
-        <div class="w-fit mx-auto px-auto pt-6">
+        <div class="w-fit mx-auto pt-6">
           <MainChart />
         </div>
       </div>
