@@ -1,12 +1,13 @@
 <template>
   <!-- DO NOT remove the below section tag it is needed-->
   <section class="pt-20 md:pt-0 bg-[#f7feff] w-screen h-auto md:h-screen grid grid-cols-1 md:grid-cols-2 place-items-center space-y-7">
-    <div class="w-full h-full col-span-1 flex flex-col justify-center items-center space-y-5">
+      <div class="w-full h-full col-span-1 flex flex-col justify-center items-center space-y-5 min-h-0">
       <DashStudentList />
       <!-- Replace below div with proper component-->
       <!-- NOTE: The classes in the div are what gives it it's style so move this dive into the new compoenent and add your new items inside it-->
-      <div class="w-3/4 h-[30rem] lg:h-3/4 bg-gray-200 col-span-1 border border-[#2e777e] border-1 drop-shadow-lg rounded-md">
-        Student List Placeholder
+     <div class="w-3/4 h-[30rem] lg:h-[70vh] max-h-[70vh] bg-gray-200 col-span-1 border border-[#2e777e] border-1 drop-shadow-lg rounded-md overflow-hidden">
+        
+        <StudentListCard />
       </div>
     </div>
 
