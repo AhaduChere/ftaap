@@ -8,7 +8,7 @@ import { filteredStudents, scoreBorderClass, flagFillClass } from '~/composables
 
   <!-- Unordered list that will hold all student items --> 
     <ul
-      class="w-full flex-1 min-h-0 max-h-full overflow-y-auto bg-gray-200 rounded-md p-2 space-y-2"
+      class="w-full flex-1 min-h-0 max-h-full overflow-y-auto rounded-md p-2 space-y-2"
       style="scrollbar-gutter: stable;"
     >
   <!-- One list item for each student in the filtered list -->
