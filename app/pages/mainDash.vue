@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import DashStudentList from '~/components/dashStudentList.vue';
-
+import DashNotifications from '~/components/dashNotifications.vue';
 </script>
 
 <template>
@@ -18,7 +18,14 @@ import DashStudentList from '~/components/dashStudentList.vue';
             <!-- DO NOT remove the above div tag it is needed-->
             <!-- place corresponding components in the div, or replace the div with the corresponding component and then delete this comment make sure you keep the classes the same (you can change bg) -->
             <div class="w-3/4 h-[16rem] bg-gray-200 border border-[#2e777e] border-1 drop-shadow-lg col-span-1 rounded-md">Graph Placeholder</div>
-            <div class="w-3/4 h-[15rem] overflow-scroll bg-gray-200 border border-[#2e777e] border-1 drop-shadow-lg col-span-1 rounded-md">Notifications Placeholder</div>
+            <div class="w-3/4 h-[16rem] bg-gray-200 border border-[#2e777e] drop-shadow-lg rounded-md flex flex-col">
+            <div class="p-2 bg-[#2e777e] text-white font-semibold text-center rounded-t-md">
+                Notifications
+            </div>
+            <div class="flex-1 overflow-y-auto p-2">
+                <DashNotifications class="w-full h-full" />
+            </div>
+            </div>
         </div>
         
     </section>
