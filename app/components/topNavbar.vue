@@ -20,7 +20,6 @@ import SideMenu from '~/components/sideMenu.vue'
 
     <!-- Displays side menu if hamburger menu is clicked-->
     <SideMenu :isOpen="isSidebarOpen" @close="isSidebarOpen = false"/>
-    <mainDash></mainDash>
   </template>
 
 <style>
