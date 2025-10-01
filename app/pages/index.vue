@@ -18,9 +18,14 @@
           <MainChart />
         </div>
       </div>
-      <div class="w-3/4 h-[15rem] overflow-scroll bg-gray-200 border border-[#2e777e] border-1 drop-shadow-lg col-span-1 rounded-md">
-        Notifications Placeholder
-      </div>
+            <div class="w-3/4 h-[16rem] bg-gray-200 border border-[#2e777e] drop-shadow-lg rounded-md flex flex-col">
+            <div class="p-2 bg-[#2e777e] text-white font-semibold text-center rounded-t-md">
+                Notifications
+            </div>
+            <div class="flex-1 overflow-y-auto p-2">
+                <DashNotifications class="w-full h-full" />
+            </div>
+            </div>
     </div>
   </section>
 </template>
