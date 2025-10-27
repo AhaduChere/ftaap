@@ -2,22 +2,39 @@
   <div class="h-full w-max sm:mx-auto">
     <Bar ref="chartRef" :data="studentData" :options="chartOptions" class="p-4 mb-8" />
   </div>
-  <!-- <button class="bg-blue-500 px-4 py-2 text-white rounded" @click="downloadChart">Download Chart</button> -->
 </template>
 
 <script setup lang="ts">
 import { ref, computed } from 'vue';
 import { Chart as ChartJS, BarElement, CategoryScale, LinearScale, Tooltip, Legend } from 'chart.js';
 import { Bar } from 'vue-chartjs';
-import { filteredStudents, scoreToPerformance } from '../composables/useStudentListStore';
+import { students } from '../composables/useStudentListStore';
 
 ChartJS.register(BarElement, CategoryScale, LinearScale, Tooltip, Legend);
 
 const chartRef = ref();
 
-const greenStudents = computed(() => filteredStudents.value.filter((s) => scoreToPerformance(s.score) === 'Strong').length);
-const yellowStudents = computed(() => filteredStudents.value.filter((s) => scoreToPerformance(s.score) === 'Danger').length);
-const redStudents = computed(() => filteredStudents.value.filter((s) => scoreToPerformance(s.score) === 'Struggling').length);
+const greenStudents = computed(() => {
+  let count = 0;
+  for (const s of students.value) {
+    if (s.score >= 420) count++;
+  }
+  return count;
+});
+const yellowStudents = computed(() => {
+  let count = 0;
+  for (const s of students.value) {
+    if (s.score >= 406 && s.score <= 419) count++;
+  }
+  return count;
+});
+const redStudents = computed(() => {
+  let count = 0;
+  for (const s of students.value) {
+    if (s.score <= 405) count++;
+  }
+  return count;
+});
 
 const studentData = computed(() => ({
   labels: ['Struggling', 'Danger', 'Strong'],
@@ -36,14 +53,8 @@ const chartOptions = {
   maintainAspectRatio: false,
   plugins: { legend: { display: false } },
   scales: {
-    x: {
-      grid: { display: false },
-      ticks: { color: '#000' },
-    },
-    y: {
-      grid: { display: false },
-      ticks: { color: '#000', beginAtZero: true },
-    },
+    x: { grid: { display: false }, ticks: { color: '#000' } },
+    y: { grid: { display: false }, ticks: { color: '#000', beginAtZero: true } },
   },
 };
 
