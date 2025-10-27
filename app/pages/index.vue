@@ -14,11 +14,9 @@
     <div class="w-full col-span-1 flex flex-col justify-center items-center space-y-10 pb-5">
       <!-- DO NOT remove the above div tag it is needed-->
       <!-- place corresponding components in the div, or replace the div with the corresponding component and then delete this comment make sure you keep the classes the same (you can change bg) -->
-      <div class="w-3/4 h-[18rem] bg-white border border-[#2e777e] border-1 drop-shadow-lg col-span-1 rounded-md">
-        <div class="p-2 bg-[#2e777e] text-white font-semibold text-center rounded-t-md">Students</div>
-        <div class="w-fit mx-auto pt-1">
+      <div class="lg:w-2/4 sm:w-1/4 h-[18rem] bg-white border border-[#2e777e] border-1 drop-shadow-lg rounded-md">
+        <div class="p-2 bg-[#2e777e] text-white font-semibold text-center rounded-t-md">Students Chart</div>
           <MainChart />
-        </div>
       </div>
       <div
         class="w-3/4 h-[16rem] bg-gradient-to-b from-[#3b797e] to-[#81b6bb] border border-[#2e777e] drop-shadow-lg rounded-md flex flex-col">
