@@ -45,23 +45,37 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue';
-import { students } from '../composables/useStudentListStore';
+import { ref, computed, onMounted } from 'vue';
 
-const teachers = ref([
-  { id: 1, name: 'Mr. Smith', students: '12' },
-  { id: 2, name: 'Ms. Johnson', students: '9' },
-  { id: 3, name: 'Dr. Brown', students: '14' },
-  { id: 4, name: 'Mrs. Davis', students: '11' },
-  { id: 5, name: 'Mr. Lee', students: '10' },
-]);
-
-const studentSearch = ref('');
+const teachers = ref([]);
+const students = ref([]);
 const teacherSearch = ref('');
+const studentSearch = ref('');
 
-const filteredStudents = computed(() => students.value.filter((s) => s.name.toLowerCase().includes(studentSearch.value.toLowerCase())));
+onMounted(async () => {
+  try {
+    const res = await $fetch('/api/admin', { method: 'GET' });
+    teachers.value = (res.teachers || []).map((t) => ({
+      id: t.id,
+      name: t.Name ?? t.name ?? '',
+    }));
+    students.value = (res.students || []).map((s) => ({
+      id: s.id,
+      name: s.Name ?? s.name ?? '',
+      teacherId: s.TeacherID ?? s.teacherId ?? null,
+    }));
+  } catch (err) {
+    console.error('Failed to fetch admin data', err);
+  }
+});
 
-const filteredTeachers = computed(() => teachers.value.filter((t) => t.name.toLowerCase().includes(teacherSearch.value.toLowerCase())));
+const filteredTeachers = computed(() =>
+  teachers.value.filter((t) => (t.name || '').toLowerCase().includes(teacherSearch.value.toLowerCase()))
+);
+
+const filteredStudents = computed(() =>
+  students.value.filter((s) => (s.name || '').toLowerCase().includes(studentSearch.value.toLowerCase()))
+);
 </script>
 
 <style scoped>
