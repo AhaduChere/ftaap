@@ -34,16 +34,28 @@ const error = ref('');
 
 const emit = defineEmits(['login-success']);
 
-function login() {
+async function login() {
   if (!username.value || !password.value) {
     error.value = 'Please fill in all fields';
     return;
   }
-  if (username.value === 'temp123' && password.value === 'password') {
-    error.value = '';
-    emit('login-success');
-  } else {
-    error.value = 'Invalid credentials';
+  try {
+    const res = await fetch('/api/admin', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        username: username.value,
+        password: password.value,
+      }),
+    });
+    if (res.ok) {
+      emit('login-success');
+    } else {
+      error.value = 'Invalid credentials';
+    }
+  } catch (err) {
+    error.value = 'Login failed';
+    console.error(err);
   }
 }
 </script>

@@ -22,3 +22,9 @@ model Students {
   Teacher   Teachers? @relation(fields: [TeacherID], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
 }
+
+model Admins {
+  Id       Int     @id @default(autoincrement())
+  Username String
+  Password String
+}
