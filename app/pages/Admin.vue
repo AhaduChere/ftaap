@@ -1,7 +1,9 @@
 <template>
   <div class="h-screen w-screen flex justify-center items-center">
     <AdminLogin v-if="!loggedIn" @login-success="handleLoginSuccess" />
-    <div v-else class="h-screen w-screen flex justify-center items-center"><AdminDashboard /></div>
+    <div v-else class="h-screen w-screen flex justify-center items-center">
+      <AdminDashboard />
+    </div>
   </div>
 </template>
 
