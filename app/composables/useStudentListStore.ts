@@ -1,95 +1,137 @@
-import { ref, computed } from 'vue';
+// composables/useStudentListStore.ts
+import { ref, computed } from 'vue'
 
-//Define types for performance tiers and sorting modes
-export type Performance = 'All' | 'Strong' | 'Danger' | 'Struggling';
-export type SortMode = 'A - Z' | 'By color';
+/** UI tier labels */
+export type Performance = 'All' | 'Core' | 'Strategic' | 'Intensive'
+export type SortMode = 'A - Z' | 'By color'
 
-// Define the Student object structure
+/** Card list shape used by dashboard widgets */
 export interface Student {
-  id: number;
-  name: string;
-  score: number;
+  id: number
+  name: string        // "Last, First"
+  score: number       // DIBELS score
 }
 
-// The main list of students (wrapped in ref so it's reactive)
-const students = ref<Student[]>([
-  { id: 1, name: 'Adam Adams', score: 426 },
-  { id: 2, name: 'John Johnson', score: 420 },
-  { id: 3, name: 'Will Williams', score: 412 },
-  { id: 4, name: 'Joe Jones', score: 404 },
-  { id: 5, name: 'Peter Peterson', score: 398 },
-  { id: 6, name: 'Timmy Jimmy', score: 436 },
-  { id: 7, name: 'Richard Richardson', score: 430 },
-  { id: 8, name: 'Billy Bills', score: 413 },
-  { id: 9, name: 'Dan Daniels', score: 403 },
-  { id: 10, name: 'Jenny Jenson', score: 400 },
-  { id: 11, name: 'Eli Elliot', score: 401 }
-]);
+/** Backend API shape returned by /api/students */
+interface StudentApi {
+  id: number
+  firstName: string
+  lastName: string
+  grade: string
+  attendancePct: number
+  teacher: string
+  email: string
+  dibelsScore: number
+}
 
-// Reactive state for search query, performance tier filter, and sorting mode (holds the value of each input)
-export const searchQuery = ref<string>('');
-export const tierFilter  = ref<Performance>('All');
-export const sortMode    = ref<SortMode>('By color');
+/* ----------------- Reactive state ----------------- */
+export const students = ref<Student[]>([])
+export const searchQuery = ref<string>('')
+export const tierFilter  = ref<Performance>('All')
+export const sortMode    = ref<SortMode>('By color')
 
-// HELPER FUNCTIONS
-// Convert a numeric score to a performance tier
-// - 420 or higher = Strong
-// - between 406 and 419 = Danger
-// - below 406 = Struggling
+let inFlight: Promise<void> | null = null
+
+/**
+ * Refresh from /api/students and map to UI shape.
+ * - name = "Last, First"
+ * - score = dibelsScore
+ */
+export async function refreshStudentList(q?: string): Promise<void> {
+  if (typeof q === 'string') searchQuery.value = q
+  if (inFlight) return inFlight
+
+  inFlight = (async () => {
+    try {
+      const query = searchQuery.value ? { q: searchQuery.value } : undefined
+      const data = await $fetch<StudentApi[]>('/api/students', { query })
+      students.value = (data ?? []).map((s) => ({
+        id: s.id,
+        name: `${s.lastName}, ${s.firstName}`,
+        score: Number.isFinite(s.dibelsScore) ? Number(s.dibelsScore) : 0,
+      }))
+    } catch (err) {
+      console.error('Failed to fetch students:', err)
+      students.value = []
+    } finally {
+      inFlight = null
+    }
+  })()
+
+  return inFlight
+}
+
+/** Reset global filters */
+export function resetStudentFilters() {
+  searchQuery.value = ''
+  tierFilter.value  = 'All'
+  sortMode.value    = 'By color'
+}
+
+/* ----------------- DIBELS tier logic -----------------
+   Core       : score >= 420  (green)
+   Strategic  : 406–419       (yellow)
+   Intensive  : < 406         (red)
+------------------------------------------------------ */
 export function scoreToPerformance(score: number): Exclude<Performance, 'All'> {
-  if (score >= 420) return 'Strong';
-  if (score >= 406 && score <= 419) return 'Danger';
-  return 'Struggling';
+  if (score >= 420) return 'Core'
+  if (score >= 406) return 'Strategic'
+  return 'Intensive'
 }
-// Converts the performance category into a numeric rank for sorting
-// - Struggling = 0 (lowest)
-// - Danger = 1 (middle)
-// - Strong = 2 (highest)
+
 export function performanceRankByColor(score: number): number {
-  const tier = scoreToPerformance(score);
-  return tier === 'Struggling' ? 0 : tier === 'Danger' ? 1 : 2;
+  const tier = scoreToPerformance(score)
+  return tier === 'Intensive' ? 0 : tier === 'Strategic' ? 1 : 2
 }
 
-// useStudentListStore.ts
+/** Styling helpers used by cards */
 export function scoreBorderClass() {
-  return 'border-[#2e777e]';    // all items use same teal border now
+  return 'border-[#2e777e]'
 }
 
-//helper for flag color
 export function flagFillClass(score: number) {
-  const tier = scoreToPerformance(score);
-  if (tier === 'Strong') return 'fill-green-500';
-  if (tier === 'Danger') return 'fill-yellow-400';
-  return 'fill-red-500';
+  const tier = scoreToPerformance(score)
+  if (tier === 'Core')       return 'fill-green-500'
+  if (tier === 'Strategic')  return 'fill-yellow-400'
+  return 'fill-red-500'
 }
 
-// A computed value that returns the list of students after applying
-// both the search query and the selected filter/sort mode
+/** Filtered + sorted view for StudentListCard */
 export const filteredStudents = computed(() => {
-  const q = searchQuery.value.trim().toLowerCase(); //ignore case and whitespace
+  const q = searchQuery.value.trim().toLowerCase()
 
-// Step 1: Filter students based on name and performance tier
   const base = students.value.filter((s) => {
-    const matchesName = !q || s.name.toLowerCase().includes(q);
-    const matchesTier = tierFilter.value === 'All' || scoreToPerformance(s.score) === tierFilter.value;
-    return matchesName && matchesTier;
-  });
+    const matchesName = !q || s.name.toLowerCase().includes(q)
+    const matchesTier =
+      tierFilter.value === 'All' || scoreToPerformance(s.score) === tierFilter.value
+    return matchesName && matchesTier
+  })
 
-// Step 2: Sort the filtered list based on chosen sort mode
   if (sortMode.value === 'A - Z') {
     return [...base].sort((a, b) =>
       a.name.localeCompare(b.name, undefined, { sensitivity: 'base' })
-    );
+    )
   }
+
   if (sortMode.value === 'By color') {
-// Sort first by performance rank, then alphabetically
     return [...base].sort((a, b) => {
-      const diff = performanceRankByColor(a.score) - performanceRankByColor(b.score);
+      const diff = performanceRankByColor(a.score) - performanceRankByColor(b.score)
       return diff !== 0
         ? diff
-        : a.name.localeCompare(b.name, undefined, { sensitivity: 'base' });
-    });
+        : a.name.localeCompare(b.name, undefined, { sensitivity: 'base' })
+    })
   }
-// If no sort mode is selected, return the filtered list as-is
-  return base;
-});
+
+  return base
+})
+
+/* --------- Client-side bootstrap (so list shows) ---------
+   If nothing has loaded yet on the client, fetch once automatically.
+---------------------------------------------------------- */
+if (import.meta.client) {
+  queueMicrotask(() => {
+    if (students.value.length === 0 && !inFlight) {
+      refreshStudentList().catch((e) => console.error(e))
+    }
+  })
+}

@@ -2,7 +2,7 @@
   <!-- DO NOT remove the below section tag it is needed-->
   <section class="pt-20 md:pt-10 bg-[#f7feff] w-screen h-auto md:h-screen grid grid-cols-1 md:grid-cols-2 place-items-center space-y-7">
     <div class="w-full h-full col-span-1 flex flex-col justify-center items-center space-y-5 min-h-0">
-      <DashStudentList />
+      <DashStudentList :reset-on-mount="true"  />
       <!-- Replace below div with proper component-->
       <!-- NOTE: The classes in the div are what gives it it's style so move this dive into the new compoenent and add your new items inside it-->
       <div
