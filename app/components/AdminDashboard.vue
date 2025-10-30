@@ -1,5 +1,60 @@
 <template>
   <div class="h-screen w-full flex bg-gradient-to-br from-[#2e777e] to-[#81b6bb]">
+    <main class="flex-1 flex items-center justify-center text-white text-4xl font-bold">
+      <div
+        v-if="shownuser"
+        class="bg-white w-3/4 h-[70vh] max-w-3xl mx-auto rounded-2xl shadow-xl p-8 relative border-2 border-[#2e777e] transition-all duration-300">
+        <button class="absolute top-4 right-4 text-gray-400 hover:text-gray-800 text-2xl" @click="showuser(shownuser)">✕</button>
+
+        <div class="space-y-6 text-gray-800">
+          <h2 class="text-3xl font-bold text-center text-[#2e777e] border-b-4 border-[#2e777e] pb-3">
+            {{ teachers[shownuser - 1].name }}
+          </h2>
+
+          <div class="grid grid-cols-2 gap-10">
+            <div>
+              <h3 class="text-xl font-semibold text-center pb-1">Teacher Information</h3>
+              <div class="bg-gray-50 rounded-lg border border-gray-200 shadow-inner h-full p-4 space-y-2">
+                <p class="text-lg">
+                  <span class="font-semibold">Teacher ID:</span>
+                  {{ teachers[shownuser - 1].id }}
+                </p>
+                <p class="text-lg">
+                  <span class="font-semibold">Number of Students:</span>
+                  {{ filteredStudents.filter((s) => s.teacherId == shownuser).length }}
+                </p>
+              </div>
+            </div>
+
+            <div>
+              <h3 class="text-xl font-semibold text-center pb-1">Current Students</h3>
+              <ul class="bg-gray-50 rounded-lg border border-gray-200 shadow-inner h-full p-4 space-y-1">
+                <li
+                  v-for="s in filteredStudents.filter((s) => s.teacherId == shownuser)"
+                  :key="s.id"
+                  class="text-sm px-2 py-1 rounded hover:bg-[#e0f3f4] transition">
+                  {{ s.name }}
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="flex justify-between absolute bottom-4 left-0 right-0 px-8">
+            <button
+              class="bg-green-600 text-white px-5 py-2 rounded-lg hover:bg-green-700 transition font-medium w-[45%]"
+              @click="editTeacher(shownuser)">
+              Edit Teacher
+            </button>
+            <button
+              class="bg-red-600 text-white px-5 py-2 rounded-lg hover:bg-red-700 transition font-medium w-[45%]"
+              @click="removeTeacher(shownuser)">
+              Remove Teacher
+            </button>
+          </div>
+        </div>
+      </div>
+    </main>
+
     <aside class="w-96 bg-[#f0fbfc] border-r border-[#2e777e] p-6 flex flex-col shadow-lg">
       <div class="flex flex-col justify-between gap-4 h-full">
         <div class="h-1/2 min-h-[444px] relative rounded-xl shadow-md border-2 border-[#2e777e] p-4 flex flex-col">
@@ -16,7 +71,6 @@
               :class="{ 'opacity-50 cursor-not-allowed': showinguser }"
               class="px-3 py-3 bg-[#f5f9fa] text-gray-900 rounded-md hover:bg-[#e0f7f9] border-2 border-[#2e777e] transition select-none cursor-pointer">
               <span class="font-semibold text-gray-800">{{ s.name }}</span>
-              <span class="block text-sm text-gray-500">Student ID: {{ s.id }}</span>
             </li>
           </ul>
         </div>
@@ -34,46 +88,14 @@
               v-for="t in filteredTeachers"
               :key="t.id"
               :class="{ 'opacity-50 cursor-not-allowed': showinguser }"
-              class="px-3 py-3 bg-[#f5f9fa] text-gray-900 rounded-md hover:bg-[#e0f7f9] border-2 border-[#2e777e] transition select-none cursor-pointer"
+              class="px-3 py-4 bg-[#f5f9fa] text-gray-900 rounded-md hover:bg-[#e0f7f9] border-2 border-[#2e777e] transition select-none cursor-pointer"
               @click="showuser(t.id)">
               <span class="block font-semibold text-gray-800">{{ t.name }}</span>
-              <span class="block text-sm text-gray-500">Teacher ID: {{ t.id }}</span>
             </li>
           </ul>
         </div>
       </div>
     </aside>
-
-    <main class="flex-1 flex items-center justify-center text-white text-4xl font-bold">
-      <div v-if="shownuser" class="bg-white w-3/4 h-[70vh] max-w-3xl mx-auto rounded-lg shadow p-6 relative">
-        <button class="absolute top-3 right-3 text-gray-500 hover:text-gray-800 text-xl" @click="showuser(shownuser)">✕</button>
-
-        <div class="space-y-4 text-gray-800">
-          <h2 class="text-3xl font-semibold text-center">{{ teachers[shownuser - 1].name }}</h2>
-
-          <div>
-            <h3 class="text-2xl font-medium mb-2">Students</h3>
-            <ul class="space-y-1 text-base">
-              <li v-for="s in filteredStudents.filter((s) => s.teacherId == shownuser)" :key="s.id" class="text-sm">
-                {{ s.name }}
-                {{ s.teacherid }}
-              </li>
-            </ul>
-          </div>
-
-          <button
-            class="bg-red-600 text-white px-4 py-2 hover:bg-red-700 w-1/2 absolute bottom-0 right-0"
-            @click="removeTeacher(shownuser)">
-            Remove Teacher
-          </button>
-          <button
-            class="bg-green-600 text-white px-4 py-2 hover:bg-grenn-700 w-1/2 absolute bottom-0 left-0"
-            @click="removeTeacher(shownuser)">
-            Edit Teacher
-          </button>
-        </div>
-      </div>
-    </main>
   </div>
 </template>
 

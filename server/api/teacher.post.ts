@@ -10,7 +10,7 @@ export default defineEventHandler(async (event) => {
   }
 
   try {
-    const student = await prisma.students.updateMany({
+    await prisma.students.updateMany({
       where: {
         TeacherID: teacherid,
       },
@@ -19,14 +19,11 @@ export default defineEventHandler(async (event) => {
       },
     });
 
-    const teacher = await prisma.teachers.delete({
+    await prisma.teachers.delete({
       where: {
         id: teacherid,
       },
     });
-
-    console.log(student + ' ' + teacher);
-
     return { success: true };
   } catch (error) {
     return { success: false, message: 'Failed to delete teacher' + error };
