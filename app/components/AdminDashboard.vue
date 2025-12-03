@@ -55,44 +55,52 @@
       </div>
     </main>
 
-    <aside class="w-96 bg-[#f0fbfc] border-r border-[#2e777e] p-6 flex flex-col shadow-lg">
+    <aside class="w-96 border-r border-[#2e777e] p-6 flex flex-col">
       <div class="flex flex-col justify-between gap-4 h-full">
-        <div class="h-1/2 min-h-[444px] relative rounded-xl shadow-md border-2 border-[#2e777e] p-4 flex flex-col">
-          <h3 class="text-xl font-bold text-[#2e777e] mb-3 text-center">Students</h3>
-          <input
-            v-model="studentSearch"
-            type="text"
-            placeholder="Search students..."
-            class="w-full px-3 py-2 rounded-md outline-none border-2 border-[#2e777e] text-gray-900 mb-2" />
-          <ul class="space-y-2 h-fit flex-1 overflow-y-auto overflow-x-hidden">
-            <li
-              v-for="s in filteredStudents"
-              :key="s.id"
-              :class="{ 'opacity-50 cursor-not-allowed': showinguser }"
-              class="px-3 py-3 bg-[#f5f9fa] text-gray-900 rounded-md hover:bg-[#e0f7f9] border-2 border-[#2e777e] transition select-none cursor-pointer">
-              <span class="font-semibold text-gray-800">{{ s.name }}</span>
-            </li>
-          </ul>
+        <div class="h-1/2 min-h-[444px] relative rounded-xl shadow-md border-2 border-[#2e777e] bg-[#f0fbfc] flex flex-col">
+          <h3 class="p-2 bg-[#2e777e] font-bold text-white text-xl w-full font-semibold text-center rounded-t-md">Students</h3>
+          <div class="px-4 pt-2">
+            <input
+              v-model="studentSearch"
+              type="text"
+              placeholder="Search students..."
+              class="w-full p-2 rounded-md outline-none border-2 border-[#2e777e] text-gray-900 mb-2" />
+          </div>
+          <div class="overflow-y-auto p-4">
+            <ul class="space-y-2 h-fit flex-1">
+              <li
+                v-for="s in filteredStudents"
+                :key="s.id"
+                :class="{ 'opacity-50 cursor-not-allowed': showinguser }"
+                class="px-3 py-3 bg-[#f5f9fa] text-gray-900 rounded-md hover:bg-[#e0f7f9] border-2 border-[#2e777e] transition select-none cursor-pointer">
+                <span class="font-semibold text-gray-800">{{ s.name }}</span>
+              </li>
+            </ul>
+          </div>
         </div>
 
-        <div class="h-1/2 min-h-[444px] relative rounded-xl shadow-md border-2 border-[#2e777e] p-4 flex flex-col">
-          <h3 class="text-xl font-bold text-[#2e777e] mb-3 text-center">Teachers</h3>
-          <input
-            v-model="teacherSearch"
-            type="text"
-            placeholder="Search teachers..."
-            class="w-full px-3 py-2 rounded-md outline-none border-2 border-[#2e777e] text-gray-900 mb-2" />
+        <div class="h-1/2 min-h-[444px] relative rounded-xl shadow-md border-2 border-[#2e777e] bg-[#f0fbfc] flex flex-col">
+          <h3 class="p-2 bg-[#2e777e] font-bold text-white text-xl w-full font-semibold text-center rounded-t-md">Teachers</h3>
+          <div class="px-4 pt-2">
+            <input
+              v-model="teacherSearch"
+              type="text"
+              placeholder="Search teachers..."
+              class="w-full px-3 py-2 rounded-md outline-none border-2 border-[#2e777e] text-gray-900 mb-2" />
+          </div>
 
-          <ul class="space-y-2 h-fit flex-1 overflow-y-auto overflow-x-hidden">
-            <li
-              v-for="t in filteredTeachers"
-              :key="t.id"
-              :class="{ 'opacity-50 cursor-not-allowed': showinguser }"
-              class="px-3 py-4 bg-[#f5f9fa] text-gray-900 rounded-md hover:bg-[#e0f7f9] border-2 border-[#2e777e] transition select-none cursor-pointer"
-              @click="showuser(t.id)">
-              <span class="block font-semibold text-gray-800">{{ t.name }}</span>
-            </li>
-          </ul>
+          <div class="p-4 overflow-y-auto">
+            <ul class="space-y-2 h-fit flex-1 overflow-y-auto overflow-x-hidden">
+              <li
+                v-for="t in filteredTeachers"
+                :key="t.id"
+                :class="{ 'opacity-50 cursor-not-allowed': showinguser }"
+                class="px-3 py-4 bg-[#f5f9fa] text-gray-900 rounded-md hover:bg-[#e0f7f9] border-2 border-[#2e777e] transition select-none cursor-pointer"
+                @click="showuser(t.id)">
+                <span class="block font-semibold text-gray-800">{{ t.name }}</span>
+              </li>
+            </ul>
+          </div>
         </div>
       </div>
     </aside>
