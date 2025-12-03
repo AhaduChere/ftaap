@@ -1,0 +1,97 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+  schemas  = ["auth", "public"]
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+/// This model contains an expression index which requires additional setup for migrations. Visit https://pris.ly/d/expression-indexes for more info.
+model users {
+  instance_id                 String?                @db.Uuid
+  id                          String                 @id @db.Uuid
+  aud                         String?                @db.VarChar(255)
+  role                        String?                @db.VarChar(255)
+  email                       String?                @db.VarChar(255)
+  Admin                       Admin[]
+  Teacher                     Teacher[]
+
+  @@schema("auth") 
+  @@map("users") 
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model Admin {
+  admin_id   BigInt   @id @default(autoincrement())
+  student_id BigInt
+  teacher_id BigInt?
+  user_id    String?  @db.Uuid
+  Student    Student  @relation(fields: [student_id], references: [student_id], onDelete: NoAction, onUpdate: NoAction)
+  Teacher    Teacher? @relation(fields: [teacher_id], references: [teacher_id], onDelete: NoAction, onUpdate: NoAction)
+  users      users?   @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@schema("public")
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model Student {
+  student_id            BigInt              @id @default(autoincrement())
+  teacher_id            BigInt
+  student_score_id      BigInt?
+  student_attendance_id BigInt?
+  student_fname         String?             @default("") @db.VarChar
+  student_lname         String?             @default("") @db.VarChar
+  student_program       String?             @default("") @db.VarChar
+  student_grade_level   BigInt?
+  is_archived           Boolean?            @default(false)
+  Admin                 Admin[]
+  Student_Attendance    Student_Attendance? @relation(fields: [student_attendance_id], references: [student_attendance_id], onDelete: NoAction, onUpdate: NoAction)
+  Student_Score         Student_Score?      @relation(fields: [student_score_id], references: [student_score_id], onDelete: NoAction, onUpdate: NoAction)
+  Teacher               Teacher             @relation(fields: [teacher_id], references: [teacher_id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@schema("public")
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model Student_Attendance {
+  student_attendance_id BigInt    @id @default(autoincrement())
+  student_attended      Boolean
+  date_attended         DateTime? @db.Date
+  Student               Student[]
+
+  @@schema("public")
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model Student_Score {
+  student_score_id             BigInt    @id @default(autoincrement())
+  student_dibel_total          Float
+  student_dibel_ORF            Float?
+  student_dibel_MAZE           Float?
+  student_fluency_score        Float?
+  student_comprenhension_score Float?
+  student_vocab_score          Float?
+  created_date                 DateTime? @default(now()) @db.Timestamp(6)
+  Student                      Student[]
+
+  @@schema("public")
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model Teacher {
+  teacher_id    BigInt    @id @default(autoincrement())
+  teacher_fname String    @default("") @db.VarChar
+  teacher_lname String?   @default("") @db.VarChar
+  user_id       String?   @db.Uuid
+  Admin         Admin[]
+  Student       Student[]
+  users         users?    @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@schema("public")
+}
+
