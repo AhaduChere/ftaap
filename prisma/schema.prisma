@@ -1,0 +1,30 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../app/generated/prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Teachers {
+  id       Int        @id @default(autoincrement())
+  Name     String?
+  Students Students[]
+
+}
+
+model Students {
+  id        Int       @id @default(autoincrement())
+  Name      String?
+  TeacherID Int?
+  Teacher   Teachers? @relation(fields: [TeacherID], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+}
+
+model Admins {
+  Id       Int     @id @default(autoincrement())
+  Username String
+  Password String
+}

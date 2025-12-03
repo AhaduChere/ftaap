@@ -12,7 +12,7 @@ export interface Student {
 }
 
 // The main list of students (wrapped in ref so it's reactive)
-const students = ref<Student[]>([
+export const students = ref<Student[]>([
   { id: 1, name: 'Adam Adams', score: 426 },
   { id: 2, name: 'John Johnson', score: 420 },
   { id: 3, name: 'Will Williams', score: 412 },
