@@ -1,4 +1,4 @@
-import { PrismaClient } from '../../app/generated/prisma/client';
+/*import { PrismaClient } from '../../app/generated/prisma/client';
 const prisma = new PrismaClient();
 
 export default defineEventHandler(async (event) => {
@@ -18,4 +18,4 @@ export default defineEventHandler(async (event) => {
   } else {
     return { success: true };
   }
-});
+});*/
