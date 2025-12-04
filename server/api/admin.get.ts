@@ -1,4 +1,4 @@
-import { PrismaClient } from '../../app/generated/prisma/client';
+/*import { PrismaClient } from '../../app/generated/prisma/client';
 const prisma = new PrismaClient();
 
 export default defineEventHandler(async () => {
@@ -6,4 +6,4 @@ export default defineEventHandler(async () => {
   const students = await prisma.students.findMany();
 
   return { teachers, students };
-});
+});*/
