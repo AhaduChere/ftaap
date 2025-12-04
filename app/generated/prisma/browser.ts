@@ -17,12 +17,35 @@ export { Prisma }
 export * as $Enums from './enums.js'
 export * from './enums.js';
 /**
- * Model Teacher
- * 
+ * Model users
+ * This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+ * This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+ * This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+ * This model contains an expression index which requires additional setup for migrations. Visit https://pris.ly/d/expression-indexes for more info.
  */
-export type Teacher = Prisma.TeacherModel
+export type users = Prisma.usersModel
+/**
+ * Model Admin
+ * This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+ */
+export type Admin = Prisma.AdminModel
 /**
  * Model Student
- * 
+ * This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
  */
 export type Student = Prisma.StudentModel
+/**
+ * Model Student_Attendance
+ * This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+ */
+export type Student_Attendance = Prisma.Student_AttendanceModel
+/**
+ * Model Student_Score
+ * This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+ */
+export type Student_Score = Prisma.Student_ScoreModel
+/**
+ * Model Teacher
+ * This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+ */
+export type Teacher = Prisma.TeacherModel

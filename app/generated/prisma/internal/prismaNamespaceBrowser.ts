@@ -48,8 +48,12 @@ export const AnyNull = runtime.objectEnumValues.instances.AnyNull
 
 
 export const ModelName = {
-  Teacher: 'Teacher',
-  Student: 'Student'
+  users: 'users',
+  Admin: 'Admin',
+  Student: 'Student',
+  Student_Attendance: 'Student_Attendance',
+  Student_Score: 'Student_Score',
+  Teacher: 'Teacher'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -59,30 +63,82 @@ export type ModelName = (typeof ModelName)[keyof typeof ModelName]
  */
 
 export const TransactionIsolationLevel = runtime.makeStrictEnum({
+  ReadUncommitted: 'ReadUncommitted',
+  ReadCommitted: 'ReadCommitted',
+  RepeatableRead: 'RepeatableRead',
   Serializable: 'Serializable'
 } as const)
 
 export type TransactionIsolationLevel = (typeof TransactionIsolationLevel)[keyof typeof TransactionIsolationLevel]
 
 
-export const TeacherScalarFieldEnum = {
+export const UsersScalarFieldEnum = {
+  instance_id: 'instance_id',
   id: 'id',
-  email: 'email',
-  first_name: 'first_name',
-  last_name: 'last_name'
+  aud: 'aud',
+  role: 'role',
+  email: 'email'
 } as const
 
-export type TeacherScalarFieldEnum = (typeof TeacherScalarFieldEnum)[keyof typeof TeacherScalarFieldEnum]
+export type UsersScalarFieldEnum = (typeof UsersScalarFieldEnum)[keyof typeof UsersScalarFieldEnum]
+
+
+export const AdminScalarFieldEnum = {
+  admin_id: 'admin_id',
+  student_id: 'student_id',
+  teacher_id: 'teacher_id',
+  user_id: 'user_id'
+} as const
+
+export type AdminScalarFieldEnum = (typeof AdminScalarFieldEnum)[keyof typeof AdminScalarFieldEnum]
 
 
 export const StudentScalarFieldEnum = {
-  id: 'id',
-  first_name: 'first_name',
-  last_name: 'last_name',
-  t_id: 't_id'
+  student_id: 'student_id',
+  teacher_id: 'teacher_id',
+  student_score_id: 'student_score_id',
+  student_attendance_id: 'student_attendance_id',
+  student_fname: 'student_fname',
+  student_lname: 'student_lname',
+  student_program: 'student_program',
+  student_grade_level: 'student_grade_level',
+  is_archived: 'is_archived'
 } as const
 
 export type StudentScalarFieldEnum = (typeof StudentScalarFieldEnum)[keyof typeof StudentScalarFieldEnum]
+
+
+export const Student_AttendanceScalarFieldEnum = {
+  student_attendance_id: 'student_attendance_id',
+  student_attended: 'student_attended',
+  date_attended: 'date_attended'
+} as const
+
+export type Student_AttendanceScalarFieldEnum = (typeof Student_AttendanceScalarFieldEnum)[keyof typeof Student_AttendanceScalarFieldEnum]
+
+
+export const Student_ScoreScalarFieldEnum = {
+  student_score_id: 'student_score_id',
+  student_dibel_total: 'student_dibel_total',
+  student_dibel_ORF: 'student_dibel_ORF',
+  student_dibel_MAZE: 'student_dibel_MAZE',
+  student_fluency_score: 'student_fluency_score',
+  student_comprenhension_score: 'student_comprenhension_score',
+  student_vocab_score: 'student_vocab_score',
+  created_date: 'created_date'
+} as const
+
+export type Student_ScoreScalarFieldEnum = (typeof Student_ScoreScalarFieldEnum)[keyof typeof Student_ScoreScalarFieldEnum]
+
+
+export const TeacherScalarFieldEnum = {
+  teacher_id: 'teacher_id',
+  teacher_fname: 'teacher_fname',
+  teacher_lname: 'teacher_lname',
+  user_id: 'user_id'
+} as const
+
+export type TeacherScalarFieldEnum = (typeof TeacherScalarFieldEnum)[keyof typeof TeacherScalarFieldEnum]
 
 
 export const SortOrder = {
@@ -91,4 +147,20 @@ export const SortOrder = {
 } as const
 
 export type SortOrder = (typeof SortOrder)[keyof typeof SortOrder]
+
+
+export const QueryMode = {
+  default: 'default',
+  insensitive: 'insensitive'
+} as const
+
+export type QueryMode = (typeof QueryMode)[keyof typeof QueryMode]
+
+
+export const NullsOrder = {
+  first: 'first',
+  last: 'last'
+} as const
+
+export type NullsOrder = (typeof NullsOrder)[keyof typeof NullsOrder]
 
