@@ -11,29 +11,31 @@ export default defineEventHandler(async (event) => {
 
   try {
     const prisma = new PrismaClient();
+
     const user = await prisma.user.findFirst({
-      where: {
-        username,
-        encrypted_password: password,
-      },
+      where: { username, encrypted_password: password },
+      select: { user_id: true, role_id: true },
     });
 
     if (!user) {
       return { success: false, message: 'Invalid credentials' };
     }
 
-    const token = jwt.sign({ user_id: user.user_id }, process.env.JWT_SECRET || 'default-secret', { expiresIn: '7d' });
+    const numericRole = user.role_id || 0;
+
+    const token = jwt.sign({ user_id: user.user_id, role: numericRole }, process.env.JWT_SECRET!, { expiresIn: '7d' });
 
     setCookie(event, 'session_token', token, {
       httpOnly: true,
-      secure: false, //set true in prod
+      secure: false, // true in production
       sameSite: 'lax',
       path: '/',
       maxAge: 60 * 60 * 24 * 7,
     });
 
-    return { success: true };
-  } catch {
+    return { success: true, role: numericRole };
+  } catch (err) {
+    console.error(err);
     return { success: false, message: 'Server error' };
   }
 });

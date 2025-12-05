@@ -39,7 +39,7 @@ async function login() {
   }
 
   try {
-    const data = await $fetch('/api/log', {
+    const data = await $fetch('/api/login', {
       method: 'POST',
       body: {
         username: username.value,
