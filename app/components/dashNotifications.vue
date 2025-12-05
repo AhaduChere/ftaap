@@ -1,51 +1,52 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
 import { format } from 'date-fns';
-
-// Heroicons
 import { CheckIcon } from '@heroicons/vue/24/solid';
+import type { StudentNotification } from '../../types/notifications';
 
-interface StudentNotification {
-  id: number;
-  name: string;
-  level: 'red' | 'yellow' | 'green';
-  message: string;
-  timestamp: Date;
-  read: boolean;
-}
+const notifications = ref<StudentNotification[]>([]);
 
-const initialNotifications: StudentNotification[] = [
-  { id: 1, name: 'Dan Daniels', level: 'red', message: 'Dropped from Yellow to Red', timestamp: new Date(), read: false },
-  { id: 2, name: 'Eli Elliot', level: 'red', message: 'Dropped from Yellow to Red', timestamp: new Date(), read: false },
-  { id: 3, name: 'Jenny Jenson', level: 'red', message: 'Dropped from Yellow to Red', timestamp: new Date(), read: false },
-  { id: 4, name: 'Joe Jones', level: 'red', message: 'Dropped from Yellow to Red', timestamp: new Date(), read: false },
-  { id: 5, name: 'Peter Peterson', level: 'red', message: 'Dropped from Yellow to Red', timestamp: new Date(), read: false },
-];
-
-const notifications = ref<StudentNotification[]>([...initialNotifications]);
-
-// Sort by level: red → yellow → green
-const sortedNotifications = () =>
-  notifications.value
-    .filter(n => !n.read) // only show unread
-    .sort((a, b) => {
-      const order = { red: 0, yellow: 1, green: 2 };
-      return order[a.level] - order[b.level];
-    });
-
-const markAsRead = (id: number) => {
-  const notif = notifications.value.find(n => n.id === id);
-  if (notif) notif.read = true;
+/** Fetch unread notifications from the new server API */
+const fetchNotifications = async () => {
+  try {
+    const res = await fetch('/api/notifications');
+    if (!res.ok) throw new Error('Failed to fetch notifications');
+    notifications.value = await res.json();
+    console.log('📥 Loaded', notifications.value.length, 'notifications');
+  } catch (err) {
+    console.error('Failed to fetch notifications', err);
+  }
 };
 
-const formatDate = (date: Date) => format(date, 'MMM dd, yyyy HH:mm');
+/** Mark a notification as read via the new server API */
+const markAsRead = async (id: number) => {
+  try {
+    const res = await fetch(`/api/notifications/${id}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: '{}', // body required by fetch, even if empty
+    });
+    if (!res.ok) throw new Error('Failed to mark as read');
+
+    // Remove it from the local state immediately
+    notifications.value = notifications.value.filter(n => n.id !== id);
+  } catch (err) {
+    console.error('Failed to mark as read', err);
+  }
+};
+
+/** Format timestamp nicely */
+const formatDate = (date: string) => format(new Date(date), 'MMM dd, yyyy HH:mm');
+
+onMounted(() => {
+  fetchNotifications();
+});
 </script>
 
 <template>
   <div class="w-full h-full flex flex-col space-y-2 overflow-y-auto p-2">
-    <!-- Notifications list -->
     <div
-      v-for="notif in sortedNotifications()"
+      v-for="notif in notifications"
       :key="notif.id"
       class="p-3 rounded-md shadow flex flex-col gap-2 transition hover:scale-[1.01] hover:shadow-md"
       :class="{
@@ -54,7 +55,6 @@ const formatDate = (date: Date) => format(date, 'MMM dd, yyyy HH:mm');
         'bg-green-50 border border-green-400 text-green-800': notif.level === 'green'
       }"
     >
-      <!-- Header row: Name + Timestamp + Mark as Read -->
       <div class="flex justify-between items-center">
         <div class="flex items-center space-x-2">
           <span
@@ -80,15 +80,10 @@ const formatDate = (date: Date) => format(date, 'MMM dd, yyyy HH:mm');
           </button>
         </div>
       </div>
-
-      <!-- Message -->
-      <div class="text-sm">
-        {{ notif.message }}
-      </div>
+      <div class="text-sm">{{ notif.message }}</div>
     </div>
 
-    <!-- Empty state -->
-    <div v-if="sortedNotifications().length === 0" class="text-center text-gray-500 italic py-4">
+    <div v-if="notifications.length === 0" class="text-center text-gray-500 italic py-4">
       🎉 All caught up! No new notifications.
     </div>
   </div>

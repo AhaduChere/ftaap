@@ -1,8 +1,9 @@
-import { PrismaClient } from '~/../app/generated/prisma/client';
+import { PrismaClient } from '@prisma/client'
 
-const prisma = new PrismaClient();
+
 
 export default defineEventHandler(async (event) => {
+  const prisma = new PrismaClient();
     const body = await readBody(event);
 
     const { firstName, lastName, userId } = body;
