@@ -1,7 +1,7 @@
 <template>
   <div class="min-h-screen w-full flex items-center justify-center bg-gradient-to-br from-[#2e777e] to-[#81b6bb] p-4">
     <div class="w-full max-w-md h-full bg-white/90 backdrop-blur-sm rounded-2xl shadow-2xl p-8 flex flex-col gap-5">
-      <h2 class="text-3xl font-extrabold text-center text-[#2e777e]">Admin Login</h2>
+      <h2 class="text-3xl font-extrabold text-center text-[#2e777e]">Login</h2>
       <div class="flex flex-col gap-3">
         <input
           v-model="username"
@@ -26,36 +26,34 @@
 </template>
 
 <script setup>
-import { ref, defineEmits } from 'vue';
+import { ref } from 'vue';
 
 const username = ref('');
 const password = ref('');
 const error = ref('');
-
-const emit = defineEmits(['login-success']);
 
 async function login() {
   if (!username.value || !password.value) {
     error.value = 'Please fill in all fields';
     return;
   }
+
   try {
-    const res = await fetch('/api/admin', {
+    const data = await $fetch('/api/log', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
+      body: {
         username: username.value,
         password: password.value,
-      }),
+      },
     });
-    if (res.ok) {
-      emit('login-success');
+
+    if (data.success) {
+      window.location.reload();
     } else {
-      error.value = 'Invalid credentials';
+      error.value = 'Invalid Credentials';
     }
-  } catch (err) {
+  } catch {
     error.value = 'Login failed';
-    console.error(err);
   }
 }
 </script>

@@ -118,7 +118,7 @@ const showinguser = ref(false);
 const shownuser = ref(null);
 
 onMounted(async () => {
-  getdata();
+  // getdata();
 });
 
 const filteredTeachers = computed(() =>

@@ -1,8 +1,8 @@
 import { PrismaClient } from '../../app/generated/prisma/client';
-const prisma = new PrismaClient();
 
 export default defineEventHandler(async (event) => {
   const body = await readBody(event);
+  const prisma = new PrismaClient();
   const { teacherid } = body;
 
   if (!teacherid) {
@@ -10,18 +10,18 @@ export default defineEventHandler(async (event) => {
   }
 
   try {
-    await prisma.students.updateMany({
+    await prisma.student.updateMany({
       where: {
-        TeacherID: teacherid,
+        teacher_id: teacherid,
       },
       data: {
-        TeacherID: null,
+        teacher_id: null,
       },
     });
 
-    await prisma.teachers.delete({
+    await prisma.teacher.delete({
       where: {
-        id: teacherid,
+        teacher_id: teacherid,
       },
     });
     return { success: true };

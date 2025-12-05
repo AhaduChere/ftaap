@@ -1,11 +1,11 @@
 <template>
   <div>
-    <TopNavbar v-if="!isAdminPage" />
+    <TopNavbar v-if="!isAuthPage" />
     <NuxtPage />
   </div>
 </template>
 
 <script setup>
 const route = useRoute();
-const isAdminPage = computed(() => route.path.startsWith('/admin'));
+const isAuthPage = computed(() => route.path.startsWith('/login'));
 </script>

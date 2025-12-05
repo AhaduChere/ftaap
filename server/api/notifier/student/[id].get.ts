@@ -1,7 +1,7 @@
 import { PrismaClient } from '@prisma/client'
-const prisma = new PrismaClient();
 
 export default defineEventHandler(async (event) => {
+const prisma = new PrismaClient();
   const student_id = Number(event.context.params?.id);
   if (!student_id) {
    console.log('400 Bad Request');
