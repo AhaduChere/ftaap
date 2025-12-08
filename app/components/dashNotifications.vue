@@ -1,37 +1,53 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
 import { format } from 'date-fns';
-import { CheckIcon } from '@heroicons/vue/24/solid';
-import type { StudentNotification } from '../../types/notifications';
+import { CheckIcon, CheckBadgeIcon } from '@heroicons/vue/24/solid';
+import type { Student_Notification } from '../../types/notifications';
 
-const notifications = ref<StudentNotification[]>([]);
+const notifications = ref<Student_Notification[]>([]);
 
-/** Fetch unread notifications from the new server API */
+/** Fetch unread notifications from API */
 const fetchNotifications = async () => {
   try {
     const res = await fetch('/api/notifications');
-    if (!res.ok) throw new Error('Failed to fetch notifications');
-    notifications.value = await res.json();
+    const data = await res.json();
+
+    // Convert BigInt IDs to number if necessary
+    notifications.value = data.map((n: any) => ({
+      ...n,
+      id: Number(n.id),
+    }));
+
     console.log('📥 Loaded', notifications.value.length, 'notifications');
   } catch (err) {
     console.error('Failed to fetch notifications', err);
   }
 };
 
-/** Mark a notification as read via the new server API */
+/** Mark a single notification as read */
 const markAsRead = async (id: number) => {
   try {
-    const res = await fetch(`/api/notifications/${id}`, {
+    await fetch(`/api/notifications/${id}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: '{}', // body required by fetch, even if empty
+      body: '{}',
     });
-    if (!res.ok) throw new Error('Failed to mark as read');
-
-    // Remove it from the local state immediately
     notifications.value = notifications.value.filter(n => n.id !== id);
   } catch (err) {
     console.error('Failed to mark as read', err);
+  }
+};
+
+/** Mark all notifications as read */
+const markAllAsRead = async () => {
+  try {
+    await fetch('/api/notifications/markAll', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' }
+    });
+    notifications.value = [];
+  } catch (err) {
+    console.error('Failed to mark all as read', err);
   }
 };
 
@@ -45,6 +61,20 @@ onMounted(() => {
 
 <template>
   <div class="w-full h-full flex flex-col space-y-2 overflow-y-auto p-2">
+    <!-- Mark All as Read -->
+    <div class="flex justify-end mb-2">
+      <button
+        @click="markAllAsRead"
+        class="flex items-center gap-1 text-sm px-3 py-1 bg-teal-100 text-teal-700 rounded hover:bg-teal-200 transition"
+        :disabled="notifications.length === 0"
+        :class="{ 'opacity-50 cursor-not-allowed': notifications.length === 0 }"
+      >
+        <CheckBadgeIcon class="w-5 h-5" />
+        <span>Mark all as read</span>
+      </button>
+    </div>
+
+    <!-- Notifications List -->
     <div
       v-for="notif in notifications"
       :key="notif.id"
@@ -83,6 +113,7 @@ onMounted(() => {
       <div class="text-sm">{{ notif.message }}</div>
     </div>
 
+    <!-- Empty State -->
     <div v-if="notifications.length === 0" class="text-center text-gray-500 italic py-4">
       🎉 All caught up! No new notifications.
     </div>

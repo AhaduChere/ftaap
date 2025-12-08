@@ -42,6 +42,7 @@ model Student {
   Student_Score                       Student_Score?      @relation(fields: [student_score_id], references: [student_score_id])
   Teacher_Student_teacher_idToTeacher Teacher             @relation("Student_teacher_idToTeacher", fields: [teacher_id], references: [teacher_id], onDelete: NoAction, onUpdate: NoAction)
   Teacher_Teacher_student_idToStudent Teacher[]           @relation("Teacher_student_idToStudent")
+  notifications Student_Notification[]
 }
 
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
@@ -93,4 +94,16 @@ model User {
   Admin                         Admin?    @relation(fields: [admin_id], references: [admin_id])
   Role                          Role      @relation(fields: [role_id], references: [role_id], onDelete: SetNull)
   Teacher                       Teacher?  @relation(fields: [teacher_id], references: [teacher_id])
+}
+
+model Student_Notification {
+  id         BigInt  @id @default(autoincrement())
+  message    String
+  read       Boolean @default(false)
+  level      String  @default("red")        // added for red/yellow/green
+  name       String?                         // added for display purposes
+  timestamp  DateTime @default(now())        // added for ordering notifications
+
+  student_id BigInt?
+  Student    Student? @relation(fields: [student_id], references: [student_id])
 }

@@ -1,4 +1,4 @@
-export interface StudentNotification {
+export interface Student_Notification {
   id: number;
   name: string;
   level: 'red' | 'yellow' | 'green';
