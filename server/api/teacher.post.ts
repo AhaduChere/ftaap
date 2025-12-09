@@ -1,31 +1,27 @@
-import { PrismaClient } from '../../app/generated/prisma/client';
+import { PrismaClient } from '@prisma/client';
+
+const prisma = new PrismaClient();
 
 export default defineEventHandler(async (event) => {
-  const body = await readBody(event);
-  const prisma = new PrismaClient();
-  const { teacherid } = body;
+    const body = await readBody(event);
 
-  if (!teacherid) {
-    return { success: false, message: 'Missing ID' };
-  }
+    const { firstName, lastName, userId } = body;
+  
+    if (!firstName || !lastName || !userId) {
+      return { success: false, message: 'Missing fields' };
+    }
 
-  try {
-    await prisma.student.updateMany({
-      where: {
-        teacher_id: teacherid,
-      },
-      data: {
-        teacher_id: null,
-      },
-    });
+    const newTeacher = await prisma.teacher.create({
+        data: {
+          user_id: userId,
+          teacher_fname: firstName,
+          teacher_lname: lastName
+        }
+      });
 
-    await prisma.teacher.delete({
-      where: {
-        teacher_id: teacherid,
-      },
-    });
-    return { success: true };
-  } catch (error) {
-    return { success: false, message: 'Failed to delete teacher' + error };
-  }
+      if(newTeacher){
+        return { success: true };
+      }else {
+        return { success: false, message: 'Unable to Create New User' };
+      }
 });
