@@ -9,92 +9,82 @@ datasource db {
   schemas  = ["auth", "public"]
 }
 
-model Admin {
-  admin_id                  Int      @id @default(autoincrement())
-  teacher_id                Int?
-  student_id                Int
-  user_id                   String?  @db.Uuid
-  Student                   Student  @relation(fields: [student_id], references: [student_id], onDelete: NoAction)
-  Teacher                   Teacher? @relation(fields: [teacher_id], references: [teacher_id], onDelete: NoAction, onUpdate: NoAction)
-  User_Admin_user_idToUser  User?    @relation("Admin_user_idToUser", fields: [user_id], references: [user_id], onDelete: Cascade)
-  User_User_admin_idToAdmin User[]   @relation("User_admin_idToAdmin")
-}
-
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
-model Role {
-  role_id   Int    @id @default(autoincrement())
-  role_name String @default("") @db.VarChar
-  User      User[]
+/// This model contains an expression index which requires additional setup for migrations. Visit https://pris.ly/d/expression-indexes for more info.
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model Admin {
+  admin_id                  BigInt   @id @default(autoincrement())
+  teacher_id                BigInt?
+  student_id                BigInt
+  user_id                   String?  @db.Uuid
+  Student                   Student  @relation(fields: [student_id], references: [student_id], onDelete: SetNull)
+  Teacher                   Teacher? @relation(fields: [teacher_id], references: [teacher_id])
+  users                     User?    @relation(fields: [user_id], references: [user_id], onDelete: Cascade)
+  User_User_admin_idToAdmin User[]   @relation("User_admin_idToAdmin")
+
+  @@schema("public")
 }
 
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model Student {
-  student_id                                            Int                 @id @default(autoincrement())
-  teacher_id                                            Int
-  student_score_id                                      Int?
-  student_attendance_id                                 Int?
-  student_fname                                         String?             @default("") @db.VarChar
-  student_lname                                         String?             @default("") @db.VarChar
-  student_program                                       String?             @db.VarChar
-  student_grade_level                                   Int?
-  is_archived                                           Boolean?
-  Admin                                                 Admin[]
-  Student_Attendance                                    Student_Attendance? @relation(fields: [student_attendance_id], references: [student_attendance_id], onDelete: NoAction, onUpdate: NoAction)
-  Student_Score_Student_student_score_idToStudent_Score Student_Score?      @relation("Student_student_score_idToStudent_Score", fields: [student_score_id], references: [student_score_id], onDelete: NoAction, onUpdate: NoAction)
-  Teacher_Student_teacher_idToTeacher                   Teacher             @relation("Student_teacher_idToTeacher", fields: [teacher_id], references: [teacher_id], onDelete: NoAction, onUpdate: NoAction)
-  Student_Score_Student_Score_student_idToStudent       Student_Score[]     @relation("Student_Score_student_idToStudent")
-  Teacher_Teacher_student_idToStudent                   Teacher[]           @relation("Teacher_student_idToStudent")
+  student_id                          BigInt              @id @default(autoincrement())
+  teacher_id                          BigInt
+  student_score_id                    BigInt?
+  student_attendance_id               BigInt?
+  student_fname                       String?             @default("") @db.VarChar
+  student_lname                       String?             @default("") @db.VarChar
+  student_program                     String?             @db.VarChar
+  student_grade_level                 BigInt?
+  is_archived                         Boolean?
+  Admin                               Admin[]
+  Student_Attendance                  Student_Attendance? @relation(fields: [student_attendance_id], references: [student_attendance_id])
+  Student_Score                       Student_Score?      @relation(fields: [student_score_id], references: [student_score_id])
+  Teacher                             Teacher             @relation(fields: [teacher_id], references: [teacher_id], onDelete: NoAction, onUpdate: NoAction)
+  Teacher_Teacher_student_idToStudent Teacher[]           @relation("Teacher_student_idToStudent")
+
+  @@schema("public")
 }
 
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model Student_Attendance {
-  student_attendance_id Int       @id @default(autoincrement())
+  student_attendance_id BigInt    @id @default(autoincrement())
   student_attended      Boolean
   inserted_date         DateTime? @db.Date
   Student               Student[]
+
+  @@schema("public")
 }
 
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model Student_Score {
-  student_score_id                                Int       @id @default(autoincrement())
-  student_dibel_score                             Float
-  student_dibel_ORF                               Float?
-  student_dibel_MAZE                              Float?
-  student_fluency_score                           Float?
-  student_comprehension_score                     Float?
-  student_vocab_score                             Float?
-  inserted_date                                   DateTime? @db.Date
-  student_id                                      Int?
-  Student_Student_student_score_idToStudent_Score Student[] @relation("Student_student_score_idToStudent_Score")
-  Student_Student_Score_student_idToStudent       Student?  @relation("Student_Score_student_idToStudent", fields: [student_id], references: [student_id], onDelete: Cascade)
+  student_score_id            BigInt    @id @default(autoincrement())
+  student_dibel_score         Float
+  student_dibel_ORF           Float?
+  student_dibel_MAZE          Float?
+  student_fluency_score       Float?
+  student_comprehension_score Float?
+  student_vocab_score         Float?
+  inserted_date               DateTime? @db.Date
+  Student                     Student[]
+
+  @@schema("public")
 }
 
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model Teacher {
-  teacher_id                          Int       @id @default(autoincrement())
-  student_id                          Int?
+  teacher_id                          BigInt    @id @default(autoincrement())
+  student_id                          BigInt?
   teacher_fname                       String    @default("") @db.VarChar
   teacher_lname                       String?   @default("") @db.VarChar
   user_id                             String?   @db.Uuid
   Admin                               Admin[]
-  Student_Student_teacher_idToTeacher Student[] @relation("Student_teacher_idToTeacher")
-  Student_Teacher_student_idToStudent Student?  @relation("Teacher_student_idToStudent", fields: [student_id], references: [student_id], onDelete: NoAction)
-  User_Teacher_user_idToUser          User?     @relation("Teacher_user_idToUser", fields: [user_id], references: [user_id], onDelete: Cascade)
+  Student                             Student[]
+  Student_Teacher_student_idToStudent Student?  @relation("Teacher_student_idToStudent", fields: [student_id], references: [student_id])
+  users                               User?     @relation(fields: [user_id], references: [user_id], onDelete: Cascade)
   User_User_teacher_idToTeacher       User[]    @relation("User_teacher_idToTeacher")
+
+  @@schema("public")
 }
 
-/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
-model User {
-  user_id                          String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  role_id                          Int
-  teacher_id                       Int?
-  admin_id                         Int?
-  email                            String?   @default("") @db.VarChar
-  encrypted_password               String?   @default("") @db.VarChar
-  username                         String?   @default("") @db.VarChar
-  Admin_Admin_user_idToUser        Admin[]   @relation("Admin_user_idToUser")
-  Teacher_Teacher_user_idToUser    Teacher[] @relation("Teacher_user_idToUser")
-  Admin_User_admin_idToAdmin       Admin?    @relation("User_admin_idToAdmin", fields: [admin_id], references: [admin_id], onDelete: NoAction, onUpdate: NoAction)
-  Role                             Role      @relation(fields: [role_id], references: [role_id], onDelete: SetDefault)
-  Teacher_User_teacher_idToTeacher Teacher?  @relation("User_teacher_idToTeacher", fields: [teacher_id], references: [teacher_id], onDelete: NoAction, onUpdate: NoAction)
-}
