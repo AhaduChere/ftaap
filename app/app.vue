@@ -15,7 +15,6 @@ const isTeacherPage = computed(() => route.path.startsWith('/teacher'));
 const studentScoresData = useStudentScoresData();
 
 onMounted(() => {
-  console.log("hello there");
   studentScoresData.loadStudentScores();
 })
 </script>
