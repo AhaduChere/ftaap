@@ -1,6 +1,7 @@
 import { defineEventHandler, readBody, setCookie } from 'h3';
 import jwt from 'jsonwebtoken';
-import { PrismaClient } from '../../app/generated/prisma/client';
+// import { PrismaClient } from '../../app/generated/prisma/client';
+import { prisma } from '../prisma';
 
 export default defineEventHandler(async (event) => {
   const { username, password } = await readBody(event);
@@ -10,7 +11,7 @@ export default defineEventHandler(async (event) => {
   }
 
   try {
-    const prisma = new PrismaClient();
+    // const prisma = new PrismaClient();
 
     const user = await prisma.user.findFirst({
       where: { username, encrypted_password: password },
