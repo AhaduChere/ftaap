@@ -1,41 +1,31 @@
 // server/api/students.get.ts
-import { prisma } from '../utils/prisma'
-import { getQuery } from 'h3'
+import { PrismaClient } from '@prisma/client'
 
-export default defineEventHandler(async (event) => {
-  const query = getQuery(event)
-  const qRaw = (query.q as string | undefined)?.trim()
-  const q = qRaw && qRaw.length > 0 ? qRaw : undefined
+const prisma = new PrismaClient()
 
-  const takeNum = Number(query.take ?? 50)
-  const skipNum = Number(query.skip ?? 0)
-  const take = Number.isFinite(takeNum) ? takeNum : 50
-  const skip = Number.isFinite(skipNum) ? skipNum : 0
+// DB → frontend mapper
+function toFrontend(s: any) {
+  return {
+    id: Number(s.student_id),
+    firstName: s.student_fname ?? '',
+    lastName: s.student_lname ?? '',
+    gradeLevel:
+      s.student_grade_level !== null && s.student_grade_level !== undefined
+        ? Number(s.student_grade_level)
+        : null,
+    program: s.student_program ?? null,
+    isArchived: s.is_archived ?? false,
+    // no archivedAt here because we’re not changing DB
+  }
+}
 
-  return prisma.student.findMany({
-    where: q
-      ? {
-          OR: [
-            // NOTE: Remove "mode: 'insensitive'"; not supported on SQLite
-            { firstName: { contains: q } },
-            { lastName:  { contains: q } },
-            { email:     { contains: q } },
-            { teacher:   { contains: q } },
-            { grade:     { contains: q } },
-          ],
-        }
-      : undefined,
-
-    // Default alphabetical. If you prefer DIBELS first, use the alternative below.
-    orderBy: [{ lastName: 'asc' }, { firstName: 'asc' }],
-
-    // Alternative: sort by DIBELS Score, then last/first
-    // orderBy: [{ dibelsScore: 'desc' }, { lastName: 'asc' }, { firstName: 'asc' }],
-
-    take,
-    skip,
-    // If you ever use select, be sure to include dibelsScore:
-    // select: { id: true, firstName: true, lastName: true, grade: true, attendancePct: true, teacher: true, email: true, dibelsScore: true, createdAt: true, updatedAt: true }
+export default defineEventHandler(async () => {
+  const rows = await prisma.student.findMany({
+    where: {
+      OR: [{ is_archived: false }, { is_archived: null }],
+    },
+    orderBy: [{ student_lname: 'asc' }, { student_fname: 'asc' }],
   })
-})
 
+  return rows.map(toFrontend)
+})

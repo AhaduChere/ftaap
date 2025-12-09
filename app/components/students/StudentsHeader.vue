@@ -1,19 +1,32 @@
 <script setup lang="ts">
-const emit = defineEmits<{ (e: 'add'): void }>()
+const emit = defineEmits<{
+  (e: 'add'): void
+}>()
 </script>
 
 <template>
-  <div class="flex items-center justify-between px-4 py-3 bg-[#2e777e] text-white rounded-t-md">
-    <h1 class="text-xl font-semibold">Student Management</h1>
+  <!-- Clean teal header bar -->
+  <header
+    class="bg-[#2e777e] text-white px-4 py-5 flex flex-col md:flex-row md:items-center md:justify-between gap-3"
+  >
+    <!-- Title -->
+    <h1 class="text-xl md:text-2xl font-semibold tracking-wide">
+      Student Management
+    </h1>
+
+    <!-- Add Student Button (lighter teal version of header color) -->
     <button
+      type="button"
+      class="inline-flex items-center gap-2 rounded-full 
+             px-4 py-2 text-xs font-semibold text-white shadow-sm
+             transition
+             bg-[#4aa9b1] hover:bg-[#5cc3cc] 
+             focus:outline-none focus:ring-2 focus:ring-offset-2 
+             focus:ring-[#5cc3cc]"
       @click="emit('add')"
-      class="flex items-center gap-2 px-4 py-2 rounded-md bg-white/10 hover:bg-white/20 ring-2 ring-white/50"
-      title="Add New Student"
     >
-      <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" viewBox="0 0 24 24" fill="currentColor">
-        <path d="M11 11V5h2v6h6v2h-6v6h-2v-6H5v-2h6Z" />
-      </svg>
-      <span class="font-medium">Add New Student</span>
+      <span class="text-base leading-none">＋</span>
+      <span>Add Student</span>
     </button>
-  </div>
+  </header>
 </template>

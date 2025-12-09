@@ -1,6 +1,9 @@
 <script setup lang="ts">
-import { filteredStudents, scoreBorderClass, flagFillClass } from '~/composables/useStudentListStore'
+import { useStudentListStore } from '~/composables/useStudentListStore'
+
+const { filteredStudents } = useStudentListStore()
 </script>
+
 
 <template>
   <div class="h-full p-4 flex flex-col min-h-0">
@@ -11,19 +14,47 @@ import { filteredStudents, scoreBorderClass, flagFillClass } from '~/composables
       <li
         v-for="s in filteredStudents"
         :key="s.id"
-        class="px-4 py-3 border-2 rounded-md bg-white hover:bg-gray-50
+        class="px-4 py-3 border rounded-md bg-white hover:bg-gray-50
                flex items-center justify-between"
-        :class="scoreBorderClass()"
       >
-        <div>
-          <div class="font-semibold">{{ s.name }}</div>
-          <div class="text-sm text-gray-600">DIBELS: {{ s.score }}</div>
+        <div class="flex flex-col">
+          <div class="font-semibold text-gray-900">
+            {{ s.lastName }}, {{ s.firstName }}
+          </div>
+
+          <div class="text-xs text-gray-600 mt-0.5">
+            <span v-if="s.gradeLevel !== null && s.gradeLevel !== undefined">
+              Grade: {{ s.gradeLevel }}
+            </span>
+            <span v-else>
+              Grade: N/A
+            </span>
+          </div>
+
+          <div class="text-xs text-gray-600 mt-0.5">
+            <span v-if="(s.program || '').trim()">
+              Program: {{ s.program }}
+            </span>
+            <span v-else>
+              Program: N/A
+            </span>
+          </div>
         </div>
 
-        <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6"
-             viewBox="0 0 24 24" :class="flagFillClass(s.score)">
-          <path d="M5 3v18h2v-6h9l-1.5-4L16 7H7V3H5Z" />
-        </svg>
+        <div>
+          <span
+            v-if="s.isArchived"
+            class="inline-flex items-center px-2 py-1 rounded-full text-[10px] font-semibold bg-gray-200 text-gray-700"
+          >
+            Archived
+          </span>
+          <span
+            v-else
+            class="inline-flex items-center px-2 py-1 rounded-full text-[10px] font-semibold bg-emerald-100 text-emerald-800"
+          >
+            Active
+          </span>
+        </div>
       </li>
 
       <li

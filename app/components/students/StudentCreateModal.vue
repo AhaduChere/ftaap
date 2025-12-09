@@ -4,89 +4,142 @@ const props = defineProps<{
   form: {
     firstName: string
     lastName: string
-    grade: string
-    attendancePct: number | string
-    teacher: string
-    email: string
-    dibelsScore: number | string
+    gradeLevel: number | null
+    program: string | null
+    isArchived: boolean | null
   }
   errors: Record<string, string>
-  errorText?: string | null
+  errorText: string | null
 }>()
 
-const emit = defineEmits<{ (e: 'close'): void; (e: 'save'): void }>()
+const emit = defineEmits<{
+  (e: 'close'): void
+  (e: 'save'): void
+}>()
 </script>
 
 <template>
-  <transition name="fade">
-    <div v-if="open" class="fixed inset-0 z-50 flex items-center justify-center" @click.self="emit('close')">
-      <div class="absolute inset-0 bg-black/40"></div>
-      <div class="relative w-[95%] max-w-2xl bg-white border border-[#2e777e] rounded-md p-6 z-10">
-        <h2 class="text-lg font-semibold mb-4 text-center text-[#2e777e]">Add New Student</h2>
+  <Teleport to="body">
+    <div
+      v-if="open"
+      class="fixed inset-0 z-40 flex items-center justify-center bg-black/40"
+    >
+      <div class="bg-white rounded-lg shadow-xl w-full max-w-lg mx-4">
+        <header class="px-4 py-3 border-b border-slate-200 flex items-center justify-between">
+          <h2 class="text-base font-semibold text-slate-800">
+            Add Student
+          </h2>
+          <button
+            type="button"
+            class="text-slate-500 hover:text-slate-800"
+            @click="emit('close')"
+          >
+            ✕
+          </button>
+        </header>
 
-        <div class="grid gap-4 md:grid-cols-2">
-          <div>
-            <label class="block text-sm font-semibold text-gray-700 mb-1">First Name</label>
-            <input v-model="props.form.firstName"
-              :class="['w-full border p-2 rounded', props.errors.firstName ? 'border-red-500 focus:ring-red-200' : '']"/>
-            <p v-if="props.errors.firstName" class="text-red-600 text-sm mt-1">{{ props.errors.firstName }}</p>
+        <div class="px-4 py-4 space-y-3 max-h-[70vh] overflow-y-auto">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs font-semibold text-slate-600 mb-1">
+                First Name
+              </label>
+              <input
+                v-model="form.firstName"
+                type="text"
+                class="w-full rounded-md border border-slate-300 px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#2e777e]"
+              />
+              <p
+                v-if="errors.firstName"
+                class="text-xs text-red-600 mt-0.5"
+              >
+                {{ errors.firstName }}
+              </p>
+            </div>
+
+            <div>
+              <label class="block text-xs font-semibold text-slate-600 mb-1">
+                Last Name
+              </label>
+              <input
+                v-model="form.lastName"
+                type="text"
+                class="w-full rounded-md border border-slate-300 px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#2e777e]"
+              />
+              <p
+                v-if="errors.lastName"
+                class="text-xs text-red-600 mt-0.5"
+              >
+                {{ errors.lastName }}
+              </p>
+            </div>
           </div>
 
-          <div>
-            <label class="block text-sm font-semibold text-gray-700 mb-1">Last Name</label>
-            <input v-model="props.form.lastName"
-              :class="['w-full border p-2 rounded', props.errors.lastName ? 'border-red-500 focus:ring-red-200' : '']"/>
-            <p v-if="props.errors.lastName" class="text-red-600 text-sm mt-1">{{ props.errors.lastName }}</p>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs font-semibold text-slate-600 mb-1">
+                Grade Level
+              </label>
+              <input
+                v-model.number="form.gradeLevel"
+                type="number"
+                min="0"
+                class="w-full rounded-md border border-slate-300 px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#2e777e]"
+              />
+            </div>
+
+            <div>
+              <label class="block text-xs font-semibold text-slate-600 mb-1">
+                Program
+              </label>
+              <input
+                v-model="form.program"
+                type="text"
+                class="w-full rounded-md border border-slate-300 px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#2e777e]"
+              />
+            </div>
           </div>
 
-          <div>
-            <label class="block text-sm font-semibold text-gray-700 mb-1">Grade</label>
-            <input v-model="props.form.grade"
-              :class="['w-full border p-2 rounded', props.errors.grade ? 'border-red-500 focus:ring-red-200' : '']"/>
-            <p v-if="props.errors.grade" class="text-red-600 text-sm mt-1">{{ props.errors.grade }}</p>
+          <div class="flex items-center gap-2 mt-2">
+            <input
+              id="create-archived"
+              v-model="form.isArchived"
+              type="checkbox"
+              class="w-4 h-4 border-slate-300 rounded"
+            />
+            <label
+              for="create-archived"
+              class="text-xs text-slate-700"
+            >
+              Mark as archived
+            </label>
           </div>
 
-          <div>
-            <label class="block text-sm font-semibold text-gray-700 mb-1">Teacher</label>
-            <input v-model="props.form.teacher"
-              :class="['w-full border p-2 rounded', props.errors.teacher ? 'border-red-500 focus:ring-red-200' : '']"/>
-            <p v-if="props.errors.teacher" class="text-red-600 text-sm mt-1">{{ props.errors.teacher }}</p>
-          </div>
-
-          <div class="md:col-span-2">
-            <label class="block text-sm font-semibold text-gray-700 mb-1">Email</label>
-            <input v-model="props.form.email" type="email"
-              :class="['w-full border p-2 rounded', props.errors.email ? 'border-red-500 focus:ring-red-200' : '']"/>
-            <p v-if="props.errors.email" class="text-red-600 text-sm mt-1">{{ props.errors.email }}</p>
-          </div>
-
-          <div>
-            <label class="block text-sm font-semibold text-gray-700 mb-1">Attendance</label>
-            <input v-model="props.form.attendancePct" type="number" min="0" max="100"
-              :class="['w-full border p-2 rounded', props.errors.attendancePct ? 'border-red-500 focus:ring-red-200' : '']"/>
-            <p v-if="props.errors.attendancePct" class="text-red-600 text-sm mt-1">{{ props.errors.attendancePct }}</p>
-          </div>
-
-          <div>
-            <label class="block text-sm font-semibold text-gray-700 mb-1">DIBELS Score</label>
-            <input v-model="props.form.dibelsScore" type="number" min="0" max="500"
-              :class="['w-full border p-2 rounded', props.errors.dibelsScore ? 'border-red-500 focus:ring-red-200' : '']"/>
-            <p v-if="props.errors.dibelsScore" class="text-red-600 text-sm mt-1">{{ props.errors.dibelsScore }}</p>
-          </div>
+          <p
+            v-if="errorText"
+            class="text-xs text-red-600 mt-2"
+          >
+            {{ errorText }}
+          </p>
         </div>
 
-        <div class="flex gap-3 mt-6 justify-center">
-          <button @click="emit('save')" class="px-4 py-2 bg-[#2e777e] text-white rounded">Save</button>
-          <button @click="emit('close')" class="px-4 py-2 border rounded">Cancel</button>
-        </div>
-
-        <p v-if="props.errorText" class="text-red-600 text-center mt-2">{{ props.errorText }}</p>
+        <footer class="px-4 py-3 border-t border-slate-200 flex justify-end gap-2">
+          <button
+            type="button"
+            class="px-3 py-1.5 text-xs rounded border border-slate-300 text-slate-700 hover:bg-slate-100"
+            @click="emit('close')"
+          >
+            Cancel
+          </button>
+          <button
+            type="button"
+            class="px-3 py-1.5 text-xs rounded bg-[#2e777e] text-white font-medium hover:bg-[#245e64]"
+            @click="emit('save')"
+          >
+            Save
+          </button>
+        </footer>
       </div>
     </div>
-  </transition>
+  </Teleport>
 </template>
-
-<style scoped>
-.fade-enter-active, .fade-leave-active { transition: opacity .15s ease; }
-.fade-enter-from, .fade-leave-to { opacity: 0; }
-</style>

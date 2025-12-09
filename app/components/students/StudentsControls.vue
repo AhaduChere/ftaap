@@ -1,76 +1,112 @@
 <script setup lang="ts">
-const props = withDefaults(defineProps<{
-  modelValueSearch?: string
-  modelValueSortMode?: 'name' | 'grade_desc' | 'grade_asc' | 'dibels_desc' | 'dibels_asc'
-  modelValueGradeFilter?: string
-  modelValueTeacherFilter?: string
+const props = defineProps<{
+  search: string
+  sortMode: string
+  gradeFilter: string
+  programFilter: string
   grades: string[]
-  teachers: string[]
-}>(), {
-  modelValueSearch: '',
-  modelValueSortMode: 'name',
-  modelValueGradeFilter: 'All',
-  modelValueTeacherFilter: 'All'
-})
-
-const emit = defineEmits<{
-  (e: 'update:search', v: string): void
-  (e: 'update:sortMode', v: 'name' | 'grade_desc' | 'grade_asc' | 'dibels_desc' | 'dibels_asc'): void
-  (e: 'update:gradeFilter', v: string): void
-  (e: 'update:teacherFilter', v: string): void
+  programs: string[]
 }>()
 
-const searchProxy = computed({
-  get: () => props.modelValueSearch,
-  set: (v: string) => emit('update:search', v ?? '')
-})
-const sortModeProxy = computed({
-  get: () => props.modelValueSortMode,
-  set: (v) => emit('update:sortMode', v ?? 'name')
-})
-const gradeProxy = computed({
-  get: () => props.modelValueGradeFilter,
-  set: (v: string) => emit('update:gradeFilter', v ?? 'All')
-})
-const teacherProxy = computed({
-  get: () => props.modelValueTeacherFilter,
-  set: (v: string) => emit('update:teacherFilter', v ?? 'All')
-})
+const emit = defineEmits([
+  'update:search',
+  'update:sortMode',
+  'update:gradeFilter',
+  'update:programFilter',
+])
+
+function onSearchInput(event: Event) {
+  emit('update:search', (event.target as HTMLInputElement).value)
+}
+
+function onSortChange(event: Event) {
+  emit('update:sortMode', (event.target as HTMLSelectElement).value)
+}
+
+function onGradeChange(event: Event) {
+  emit('update:gradeFilter', (event.target as HTMLSelectElement).value)
+}
+
+function onProgramChange(event: Event) {
+  emit('update:programFilter', (event.target as HTMLSelectElement).value)
+}
 </script>
 
 <template>
-  <div class="px-4 py-3 bg-white">
-    <div class="grid md:grid-cols-4 gap-4 items-center">
+  <section
+    class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between px-4 py-3 bg-white"
+  >
+    <!-- Search box -->
+    <div class="flex-1">
+      <label class="block text-xs font-semibold text-slate-600 mb-1">
+        Search
+      </label>
+      <input
+        type="text"
+        class="w-full max-w-md rounded-md border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#2e777e]/70 focus:border-[#2e777e]"
+        :value="props.search"
+        placeholder="Search by name, program, or grade level…"
+        @input="onSearchInput"
+      />
+    </div>
+
+    <!-- Filters + Sort -->
+    <div class="flex flex-wrap gap-3 md:justify-end">
+      <!-- Grade filter -->
       <div>
-        <label class="block text-sm font-semibold text-gray-700 mb-1">🔍 Search Students</label>
-        <input v-model="searchProxy" type="text" placeholder="Name, teacher, email, or grade"
-          class="w-full px-3 py-2 rounded-md outline-none focus:ring focus:ring-cyan-200 bg-white text-gray-900 placeholder-gray-500 border"/>
+        <label class="block text-xs font-semibold text-slate-600 mb-1">
+          Grade Level
+        </label>
+        <select
+          class="rounded-md border border-slate-300 px-2 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-[#2e777e]/70 focus:border-[#2e777e]"
+          :value="props.gradeFilter"
+          @change="onGradeChange"
+        >
+          <option
+            v-for="g in props.grades"
+            :key="g"
+            :value="g"
+          >
+            {{ g }}
+          </option>
+        </select>
       </div>
 
+      <!-- Program filter -->
       <div>
-        <label class="block text-sm font-semibold text-gray-700 mb-1">⚙️ Sort By</label>
-        <select v-model="sortModeProxy" class="w-full px-3 py-2 rounded-md outline-none focus:ring focus:ring-cyan-200 bg-white text-gray-900 border">
-          <option value="name">Name (A–Z)</option>
-          <option value="grade_desc">Grade (High → Low)</option>
+        <label class="block text-xs font-semibold text-slate-600 mb-1">
+          Program
+        </label>
+        <select
+          class="rounded-md border border-slate-300 px-2 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-[#2e777e]/70 focus:border-[#2e777e]"
+          :value="props.programFilter"
+          @change="onProgramChange"
+        >
+          <option
+            v-for="p in props.programs"
+            :key="p"
+            :value="p"
+          >
+            {{ p }}
+          </option>
+        </select>
+      </div>
+
+      <!-- Sort mode -->
+      <div>
+        <label class="block text-xs font-semibold text-slate-600 mb-1">
+          Sort by
+        </label>
+        <select
+          class="rounded-md border border-slate-300 px-2 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-[#2e777e]/70 focus:border-[#2e777e]"
+          :value="props.sortMode"
+          @change="onSortChange"
+        >
+          <option value="name">Name (A → Z)</option>
           <option value="grade_asc">Grade (Low → High)</option>
-          <option value="dibels_desc">DIBELS (High → Low)</option>
-          <option value="dibels_asc">DIBELS (Low → High)</option>
-        </select>
-      </div>
-
-      <div>
-        <label class="block text-sm font-semibold text-gray-700 mb-1">🏫 Filter by Grade</label>
-        <select v-model="gradeProxy" class="w-full px-3 py-2 rounded-md outline-none focus:ring focus:ring-cyan-200 bg-white text-gray-900 border">
-          <option v-for="g in props.grades" :key="g" :value="g">{{ g }}</option>
-        </select>
-      </div>
-
-      <div>
-        <label class="block text-sm font-semibold text-gray-700 mb-1">👤 Filter by Teacher</label>
-        <select v-model="teacherProxy" class="w-full px-3 py-2 rounded-md outline-none focus:ring focus:ring-cyan-200 bg-white text-gray-900 border">
-          <option v-for="t in props.teachers" :key="t" :value="t">{{ t }}</option>
+          <option value="grade_desc">Grade (High → Low)</option>
         </select>
       </div>
     </div>
-  </div>
+  </section>
 </template>

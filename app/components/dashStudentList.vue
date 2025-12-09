@@ -1,44 +1,21 @@
 <script setup lang="ts">
-import { computed, onMounted } from 'vue'
-import {
-  searchQuery,
-  sortMode,
-  tierFilter,
-  resetStudentFilters,
-  refreshStudentList,
-} from '~/composables/useStudentListStore'
+import { computed } from 'vue'
+import { useStudentListStore, type SortMode } from '~/composables/useStudentListStore'
 
-// Import the actual types from the store so they never drift out of sync
-import type {
-  Performance as StorePerformance,
-  SortMode as StoreSortMode,
-} from '~/composables/useStudentListStore'
+const { searchQuery, sortMode } = useStudentListStore()
 
-// Optional: allow dashboard to request a clean slate on mount
-const props = defineProps<{ resetOnMount?: boolean }>()
-
-onMounted(() => {
-  if (props.resetOnMount) resetStudentFilters()
-  // Ensure we have data even if nothing else has triggered a fetch yet
-  refreshStudentList().catch(() => {})
-})
-
-// Computed bindings for v-model
-const search = computed<string>({
+const search = computed({
   get: () => searchQuery.value,
-  set: (v: string) => (searchQuery.value = (v ?? '').trimStart()),
+  set: (v: string) => (searchQuery.value = v),
 })
 
-const sort = computed<StoreSortMode>({
+const sort = computed<SortMode>({
   get: () => sortMode.value,
-  set: (v: StoreSortMode) => (sortMode.value = v ?? 'By color'),
-})
-
-const tier = computed<StorePerformance>({
-  get: () => tierFilter.value,
-  set: (v: StorePerformance) => (tierFilter.value = v ?? 'All'),
+  set: (v: SortMode) => (sortMode.value = v),
 })
 </script>
+
+
 
 <template>
   <div
@@ -46,7 +23,7 @@ const tier = computed<StorePerformance>({
            flex flex-col gap-3 text-white"
   >
     <div class="flex flex-col sm:flex-row gap-3">
-      <!-- Search -->
+      <!-- Search box -->
       <input
         v-model="search"
         type="text"
@@ -55,26 +32,14 @@ const tier = computed<StorePerformance>({
                bg-white text-gray-900 placeholder-gray-500 border"
       />
 
-      <!-- Sort -->
+      <!-- Sort selector -->
       <select
         v-model="sort"
         class="px-3 py-2 rounded-md outline-none focus:ring focus:ring-cyan-200
                bg-white text-gray-900 border"
       >
-        <option value="By color">By color</option>
-        <option value="A - Z">A - Z</option>
-      </select>
-
-      <!-- Tier Filter -->
-      <select
-        v-model="tier"
-        class="px-3 py-2 rounded-md outline-none focus:ring focus:ring-cyan-200
-               bg-white text-gray-900 border"
-      >
-        <option value="All">All</option>
-        <option value="Intensive">Intensive</option>
-        <option value="Strategic">Strategic</option>
-        <option value="Core">Core</option>
+        <option value="A - Z">Name (A – Z)</option>
+        <option value="By color">Grade level</option>
       </select>
     </div>
   </div>

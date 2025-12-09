@@ -1,137 +1,102 @@
-// composables/useStudentListStore.ts
-import { ref, computed } from 'vue'
+// app/composables/useStudentListStore.ts
+import { ref, computed, watch } from 'vue'
+import { useStudents } from '~/composables/useStudents'
 
-/** UI tier labels */
-export type Performance = 'All' | 'Core' | 'Strategic' | 'Intensive'
+// Keep the same sort mode strings so existing UI still works
 export type SortMode = 'A - Z' | 'By color'
 
-/** Card list shape used by dashboard widgets */
-export interface Student {
-  id: number
-  name: string        // "Last, First"
-  score: number       // DIBELS score
-}
-
-/** Backend API shape returned by /api/students */
-interface StudentApi {
-  id: number
-  firstName: string
-  lastName: string
-  grade: string
-  attendancePct: number
-  teacher: string
-  email: string
-  dibelsScore: number
-}
-
-/* ----------------- Reactive state ----------------- */
-export const students = ref<Student[]>([])
-export const searchQuery = ref<string>('')
-export const tierFilter  = ref<Performance>('All')
-export const sortMode    = ref<SortMode>('By color')
-
-let inFlight: Promise<void> | null = null
-
 /**
- * Refresh from /api/students and map to UI shape.
- * - name = "Last, First"
- * - score = dibelsScore
+ * SHARED STATE (safe at module scope)
+ * These do NOT use Nuxt composables, so they are safe to define here.
  */
-export async function refreshStudentList(q?: string): Promise<void> {
-  if (typeof q === 'string') searchQuery.value = q
-  if (inFlight) return inFlight
 
-  inFlight = (async () => {
-    try {
-      const query = searchQuery.value ? { q: searchQuery.value } : undefined
-      const data = await $fetch<StudentApi[]>('/api/students', { query })
-      students.value = (data ?? []).map((s) => ({
-        id: s.id,
-        name: `${s.lastName}, ${s.firstName}`,
-        score: Number.isFinite(s.dibelsScore) ? Number(s.dibelsScore) : 0,
-      }))
-    } catch (err) {
-      console.error('Failed to fetch students:', err)
-      students.value = []
-    } finally {
-      inFlight = null
-    }
-  })()
+// This is the shared reactive list used by the dashboard
+const studentsRef = ref<any[]>([])
 
-  return inFlight
-}
+// Old-style imports like `import { students } ...` will now work again ✅
+export const students = studentsRef
 
-/** Reset global filters */
-export function resetStudentFilters() {
-  searchQuery.value = ''
-  tierFilter.value  = 'All'
-  sortMode.value    = 'By color'
-}
+// Dashboard UI state (search + sort)
+export const searchQuery = ref<string>('')
+export const sortMode = ref<SortMode>('A - Z')
 
-/* ----------------- DIBELS tier logic -----------------
-   Core       : score >= 420  (green)
-   Strategic  : 406–419       (yellow)
-   Intensive  : < 406         (red)
------------------------------------------------------- */
-export function scoreToPerformance(score: number): Exclude<Performance, 'All'> {
-  if (score >= 420) return 'Core'
-  if (score >= 406) return 'Strategic'
-  return 'Intensive'
-}
-
-export function performanceRankByColor(score: number): number {
-  const tier = scoreToPerformance(score)
-  return tier === 'Intensive' ? 0 : tier === 'Strategic' ? 1 : 2
-}
-
-/** Styling helpers used by cards */
-export function scoreBorderClass() {
-  return 'border-[#2e777e]'
-}
-
-export function flagFillClass(score: number) {
-  const tier = scoreToPerformance(score)
-  if (tier === 'Core')       return 'fill-green-500'
-  if (tier === 'Strategic')  return 'fill-yellow-400'
-  return 'fill-red-500'
-}
-
-/** Filtered + sorted view for StudentListCard */
+// Filter + sort against the new DB fields
 export const filteredStudents = computed(() => {
   const q = searchQuery.value.trim().toLowerCase()
 
-  const base = students.value.filter((s) => {
-    const matchesName = !q || s.name.toLowerCase().includes(q)
-    const matchesTier =
-      tierFilter.value === 'All' || scoreToPerformance(s.score) === tierFilter.value
-    return matchesName && matchesTier
+  let baseList = studentsRef.value.filter((s: any) => {
+    const fullName = `${s.lastName}, ${s.firstName}`.toLowerCase()
+    const program = (s.program || '').toLowerCase()
+    const gradeStr =
+      s.gradeLevel !== null && s.gradeLevel !== undefined
+        ? String(s.gradeLevel)
+        : ''
+
+    const matchesQ =
+      !q ||
+      fullName.includes(q) ||
+      program.includes(q) ||
+      gradeStr.toLowerCase().includes(q)
+
+    return matchesQ
   })
 
   if (sortMode.value === 'A - Z') {
-    return [...base].sort((a, b) =>
-      a.name.localeCompare(b.name, undefined, { sensitivity: 'base' })
+    baseList = [...baseList].sort((a: any, b: any) =>
+      `${a.lastName}${a.firstName}`.localeCompare(
+        `${b.lastName}${b.firstName}`,
+        undefined,
+        { sensitivity: 'base' },
+      ),
     )
-  }
+  } else if (sortMode.value === 'By color') {
+    // Reuse "By color" as "by gradeLevel, then name"
+    baseList = [...baseList].sort((a: any, b: any) => {
+      const ag =
+        a.gradeLevel !== null && a.gradeLevel !== undefined
+          ? a.gradeLevel
+          : Number.POSITIVE_INFINITY
+      const bg =
+        b.gradeLevel !== null && b.gradeLevel !== undefined
+          ? b.gradeLevel
+          : Number.POSITIVE_INFINITY
 
-  if (sortMode.value === 'By color') {
-    return [...base].sort((a, b) => {
-      const diff = performanceRankByColor(a.score) - performanceRankByColor(b.score)
-      return diff !== 0
-        ? diff
-        : a.name.localeCompare(b.name, undefined, { sensitivity: 'base' })
+      if (ag !== bg) return ag - bg
+
+      return `${a.lastName}${a.firstName}`.localeCompare(
+        `${b.lastName}${b.firstName}`,
+        undefined,
+        { sensitivity: 'base' },
+      )
     })
   }
 
-  return base
+  return baseList
 })
 
-/* --------- Client-side bootstrap (so list shows) ---------
-   If nothing has loaded yet on the client, fetch once automatically.
----------------------------------------------------------- */
-if (import.meta.client) {
-  queueMicrotask(() => {
-    if (students.value.length === 0 && !inFlight) {
-      refreshStudentList().catch((e) => console.error(e))
-    }
-  })
+/**
+ * COMPOSABLE API
+ * This is what you should use in new code:
+ *
+ *   const { students, searchQuery, sortMode, filteredStudents } = useStudentListStore()
+ */
+export function useStudentListStore() {
+  // ✅ SAFE: called inside a composable, so we can use Nuxt composables here
+  const { students } = useStudents()
+
+  // Sync the `useStudents().students` array into the shared `studentsRef`
+  watch(
+    students,
+    (val) => {
+      studentsRef.value = val ?? []
+    },
+    { immediate: true },
+  )
+
+  return {
+    students: studentsRef,
+    searchQuery,
+    sortMode,
+    filteredStudents,
+  }
 }

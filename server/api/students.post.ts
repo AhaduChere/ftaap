@@ -1,54 +1,72 @@
-import { prisma } from '../utils/prisma'
-import { Prisma } from '@prisma/client'
+import { PrismaClient } from '@prisma/client'
+import { readBody, createError } from 'h3'
 
-type Body = {
-  firstName: string
-  lastName: string
-  grade: string
-  attendancePct: number
-  teacher: string
-  email: string
-  dibelsScore?: number  // ✅ optional on create; default to 0
+const prisma = new PrismaClient()
+
+// Same mapper (useful if you want to return the created student)
+function toFrontend(s: any) {
+  return {
+    id: Number(s.student_id),
+    firstName: s.student_fname ?? '',
+    lastName: s.student_lname ?? '',
+    gradeLevel:
+      s.student_grade_level !== null && s.student_grade_level !== undefined
+        ? Number(s.student_grade_level)
+        : null,
+    program: s.student_program ?? null,
+    isArchived: s.is_archived ?? false,
+  }
 }
 
 export default defineEventHandler(async (event) => {
+  type Body = {
+    firstName?: string
+    lastName?: string
+    gradeLevel?: number | null
+    program?: string | null
+    isArchived?: boolean | null
+    teacherId?: number | null
+  }
+
   const body = await readBody<Body>(event)
 
-  // Required text fields
-  const required = ['firstName', 'lastName', 'grade', 'teacher', 'email'] as const
-  for (const k of required) {
-    if (!(body as any)?.[k]) {
-      throw createError({ statusCode: 400, statusMessage: `Missing field: ${k}` })
-    }
-  }
-
-  // attendancePct validation (0–100)
-  if (typeof body.attendancePct !== 'number' || body.attendancePct < 0 || body.attendancePct > 100) {
-    throw createError({ statusCode: 400, statusMessage: 'attendancePct must be a number from 0 to 100' })
-  }
-
-  // dibelsScore validation (0–500 is your dashboard scale)
-  const ds = body.dibelsScore ?? 0
-  if (typeof ds !== 'number' || ds < 0 || ds > 500) {
-    throw createError({ statusCode: 400, statusMessage: 'dibelsScore must be a number from 0 to 500' })
-  }
-
-  try {
-    return await prisma.student.create({
-      data: {
-        firstName: body.firstName.trim(),
-        lastName: body.lastName.trim(),
-        grade: body.grade.trim(),
-        attendancePct: Math.round(body.attendancePct),
-        teacher: body.teacher.trim(),
-        email: body.email.trim(),
-        dibelsScore: Math.round(ds), // ✅
-      },
+  if (!body.firstName || !body.lastName) {
+    throw createError({
+      statusCode: 400,
+      statusMessage: 'firstName and lastName are required.',
     })
-  } catch (e: any) {
-    if (e instanceof Prisma.PrismaClientKnownRequestError && e.code === 'P2002') {
-      throw createError({ statusCode: 409, statusMessage: 'Email must be unique' })
-    }
-    throw createError({ statusCode: 500, statusMessage: 'Failed to create student' })
   }
+
+  // teacher_id is NOT nullable in your schema → must set it.
+  let teacherIdBigInt: bigint
+
+  if (body.teacherId !== undefined && body.teacherId !== null) {
+    teacherIdBigInt = BigInt(body.teacherId)
+  } else {
+    const defaultTeacher = await prisma.teacher.findFirst()
+    if (!defaultTeacher) {
+      throw createError({
+        statusCode: 500,
+        statusMessage:
+          'No teacher available to assign to new students (teacher_id is required).',
+      })
+    }
+    teacherIdBigInt = defaultTeacher.teacher_id
+  }
+
+  const created = await prisma.student.create({
+    data: {
+      teacher_id: teacherIdBigInt,
+      student_fname: body.firstName,
+      student_lname: body.lastName,
+      student_grade_level:
+        body.gradeLevel !== undefined && body.gradeLevel !== null
+          ? BigInt(body.gradeLevel)
+          : null,
+      student_program: body.program ?? null,
+      is_archived: body.isArchived ?? false,
+    },
+  })
+
+  return toFrontend(created)
 })

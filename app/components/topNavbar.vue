@@ -12,7 +12,7 @@ import SideMenu from '~/components/sideMenu.vue'
 
 <template>
     <!-- This creates the top navigation bar -->
-    <div class="fixed w-screen h-16 bg-[#2e777e] flex items-center justify-end justify-between navBarDropShadow border-b border-1 border-[#16383b]" title="Menu">
+    <div class="fixed w-screen h-16 bg-[#2e777e] flex items-center justify-between navBarDropShadow border-b border-1 border-[#16383b]" title="Menu">
         <Icon @click="toggleSidebar" name="arcticons:hamburger-menu" class="h-10 w-10 text-[#e2fafc] cursor-pointer ml-2"></Icon>
         <h1 class="text-[#e2fafc] text-center">FAST Track Academy Student Progress Tracking</h1>
         <Icon name="material-symbols-light:logout" class="h-10 w-10 text-[#e2fafc] cursor-pointer mr-2" title="Logout" />

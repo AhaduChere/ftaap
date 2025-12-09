@@ -4,14 +4,10 @@ const props = defineProps<{
     id: number
     firstName: string
     lastName: string
-    grade: string
-    attendancePct: number
-    teacher: string
-    email: string
-    dibelsScore?: number
+    gradeLevel: number | null
+    program: string | null
+    isArchived: boolean | null
   }>
-  flagFillClass: (score?: number) => string
-  dibelsTier: (score?: number) => 'Core' | 'Strategic' | 'Intensive'
 }>()
 
 const emit = defineEmits<{
@@ -21,44 +17,79 @@ const emit = defineEmits<{
 </script>
 
 <template>
-  <table class="min-w-full border">
-    <thead class="bg-gray-50">
-      <tr>
-        <th class="p-2 text-left">Name</th>
-        <th class="p-2 text-left">Grade</th>
-        <th class="p-2 text-left">Attendance</th>
-        <th class="p-2 text-left">Tier</th>
-        <th class="p-2 text-left">DIBELS</th>
-        <th class="p-2 text-left">Teacher</th>
-        <th class="p-2 text-left">Email</th>
-        <th class="p-2 text-left">Actions</th>
+  <table class="min-w-full text-sm border-collapse">
+    <thead>
+      <tr class="border-b border-slate-200 bg-slate-50">
+        <!-- Removed ID column completely -->
+
+        <th class="text-left py-2 px-3 font-semibold text-slate-700">
+          Name
+        </th>
+
+        <th class="text-left py-2 px-3 font-semibold text-slate-700">
+          Grade
+        </th>
+
+        <th class="text-left py-2 px-3 font-semibold text-slate-700">
+          Program
+        </th>
+
+        <th class="text-right py-2 px-3 font-semibold text-slate-700">
+          Actions
+        </th>
       </tr>
     </thead>
-    <tbody>
-      <tr v-for="s in props.rows" :key="s.id" class="border-t">
-        <td class="p-2">{{ s.lastName }}, {{ s.firstName }}</td>
-        <td class="p-2">{{ s.grade }}</td>
-        <td class="p-2">{{ s.attendancePct }}</td>
 
-        <td class="p-2">
-          <span class="sr-only">Tier: {{ props.dibelsTier(s.dibelsScore) }}</span>
-          <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6"
-            viewBox="0 0 24 24" :class="props.flagFillClass(s.dibelsScore)" aria-hidden="true">
-            <path d="M5 3v18h2v-6h9l-1.5-4L16 7H7V3H5Z" />
-          </svg>
+    <tbody>
+      <tr
+        v-for="row in rows"
+        :key="row.id"
+        class="border-b border-slate-100 hover:bg-slate-50/60 transition"
+      >
+        <!-- NAME -->
+        <td class="py-2 px-3 text-slate-900">
+          {{ row.lastName }}, {{ row.firstName }}
         </td>
 
-        <td class="p-2">{{ s.dibelsScore }}</td>
-        <td class="p-2">{{ s.teacher }}</td>
-        <td class="p-2">{{ s.email }}</td>
-        <td class="p-2">
-          <button @click="emit('edit', s)" class="text-blue-600 underline mr-2">Edit</button>
-          <button @click="emit('delete', s.id)" class="text-red-600 underline">Delete</button>
+        <!-- GRADE -->
+        <td class="py-2 px-3 text-slate-700">
+          <span v-if="row.gradeLevel !== null && row.gradeLevel !== undefined">
+            Grade {{ row.gradeLevel }}
+          </span>
+          <span v-else class="text-slate-400 italic">—</span>
+        </td>
+
+        <!-- PROGRAM -->
+        <td class="py-2 px-3 text-slate-700">
+          <span v-if="(row.program || '').trim()">
+            {{ row.program }}
+          </span>
+          <span v-else class="text-slate-400 italic">—</span>
+        </td>
+
+        <!-- ACTION BUTTONS -->
+        <td class="py-2 px-3 text-right">
+          <button
+            class="inline-flex items-center px-2.5 py-1 text-xs font-medium rounded-md border border-[#2e777e] text-[#2e777e] hover:bg-[#e7f5f6] mr-2"
+            @click="emit('edit', row)"
+          >
+            Edit
+          </button>
+
+          <button
+            class="inline-flex items-center px-2.5 py-1 text-xs font-medium rounded-md border border-red-500 text-red-600 hover:bg-red-50"
+            @click="emit('delete', row.id)"
+          >
+            Archive
+          </button>
         </td>
       </tr>
 
-      <tr v-if="props.rows.length === 0">
-        <td colspan="8" class="p-4 text-center text-gray-600 italic">No students found.</td>
+      <!-- EMPTY STATE -->
+      <tr v-if="rows.length === 0">
+        <td colspan="4" class="py-6 px-3 text-center text-xs text-slate-500 italic">
+          No students match your filters.
+        </td>
       </tr>
     </tbody>
   </table>
