@@ -1,3 +1,16 @@
+<script setup lang="ts">
+import { onMounted, onServerPrefetch } from 'vue'
+import { useStudents } from '~/composables/useStudents'
+
+// use the same composable the manage-students page uses
+const { refresh } = useStudents()
+
+// SSR: fetch before render
+onServerPrefetch(() => refresh())
+// Client: fetch after mount (for SPA nav)
+onMounted(() => refresh())
+</script>
+
 <template>
   <!-- DO NOT remove the below section tag it is needed-->
   <section class="pt-20 md:pt-10 bg-[#f7feff] w-screen h-auto md:h-screen grid grid-cols-1 md:grid-cols-2 place-items-center space-y-7">
