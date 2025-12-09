@@ -19,10 +19,29 @@ model Admin {
   teacher_id                BigInt?
   student_id                BigInt
   user_id                   String?  @db.Uuid
+
   Student                   Student  @relation(fields: [student_id], references: [student_id], onDelete: SetNull)
   Teacher                   Teacher? @relation(fields: [teacher_id], references: [teacher_id])
-  users                     user?    @relation(fields: [user_id], references: [user_id], onDelete: Cascade)
-  User_User_admin_idToAdmin user[]   @relation("User_admin_idToAdmin")
+
+  users                     User?    @relation(fields: [user_id], references: [user_id], onDelete: Cascade)
+  User_User_admin_idToAdmin User[]   @relation("User_admin_idToAdmin")
+
+  @@schema("public")
+}
+
+model Teacher {
+  teacher_id                          BigInt    @id @default(autoincrement())
+  student_id                          BigInt?
+  teacher_fname                       String    @default("") @db.VarChar
+  teacher_lname                       String?   @default("") @db.VarChar
+  user_id                             String?   @db.Uuid
+
+  Admin                               Admin[]
+  Student                             Student[]
+  Student_Teacher_student_idToStudent Student?  @relation("Teacher_student_idToStudent", fields: [student_id], references: [student_id])
+
+  users                               User?     @relation(fields: [user_id], references: [user_id], onDelete: Cascade)
+  User_User_teacher_idToTeacher       User[]    @relation("User_teacher_idToTeacher")
 
   @@schema("public")
 }
@@ -72,21 +91,6 @@ model Student_Score {
   @@schema("public")
 }
 
-/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
-model Teacher {
-  teacher_id                          BigInt    @id @default(autoincrement())
-  student_id                          BigInt?
-  teacher_fname                       String    @default("") @db.VarChar
-  teacher_lname                       String?   @default("") @db.VarChar
-  user_id                             String?   @db.Uuid
-  Admin                               Admin[]
-  Student                             Student[]
-  Student_Teacher_student_idToStudent Student?  @relation("Teacher_student_idToStudent", fields: [student_id], references: [student_id])
-  users                               user?     @relation(fields: [user_id], references: [user_id], onDelete: Cascade)
-  User_User_teacher_idToTeacher       user[]    @relation("User_teacher_idToTeacher")
-
-  @@schema("public")
-}
 
 model User {
   user_id                          String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
