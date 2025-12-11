@@ -9,7 +9,7 @@
 import { useStudentScoresData } from './composables/studentScores.js';
 
 const route = useRoute();
-const isAdminPage = computed(() => route.path.startsWith('/admin'));
+const isAdminPage = computed(() => route.path.startsWith('/login'));
 const isTeacherPage = computed(() => route.path.startsWith('/teacher'));
 
 const studentScoresData = useStudentScoresData();
