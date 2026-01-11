@@ -13,8 +13,11 @@ const isAdminPage = computed(() => route.path.startsWith('/admin'));
 const isTeacherPage = computed(() => route.path.startsWith('/teacher'));
 
 const studentScoresData = useStudentScoresData();
+const studentAttendanceData = useStudentAttendanceData();
+
 
 onMounted(() => {
   studentScoresData.loadStudentScores();
+  studentAttendanceData.loadStudentAttendance();
 })
 </script>

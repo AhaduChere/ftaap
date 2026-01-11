@@ -103,8 +103,7 @@ const loadStudentScores = async () => {
     }
     try{
       const result = await $fetch(`/api/notifier/teacher/${teacher_id}`);
-      console.log(result);
-      return result;;
+      return result;
     }catch(err){
       console.error('Unable to Download Teacher Email');
       return null;
@@ -128,7 +127,6 @@ const loadStudentScores = async () => {
       }
     })
     
-    console.log(decreased);
     return decreased
   }
   
