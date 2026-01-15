@@ -30,7 +30,7 @@ export default defineEventHandler(async (event) => {
   }
 
   const where: Prisma.StudentWhereUniqueInput = {
-    student_id: id, // ✅ Int, not BigInt
+    student_id: id, 
   }
 
   const existing = await prisma.student.findUnique({ where })

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { onMounted, onServerPrefetch } from 'vue'
-import { useStudents } from '~/composables/useStudents'
+import { useStudents } from '../composables/useStudents'
 
 // use the same composable the manage-students page uses
 const { refresh } = useStudents()

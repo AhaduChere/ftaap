@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import IndividualChart from '~/components/individualChart.vue';
+import IndividualChart from '../components/individualChart.vue'
 
 </script>
 
