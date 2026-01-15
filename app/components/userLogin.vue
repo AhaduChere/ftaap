@@ -57,8 +57,6 @@ const props = defineProps({
   }
 });
 
-console.log(props.userRole);
-
 if(props.userRole == 'admin'){
     roleId = 1;
   }else {
