@@ -14,6 +14,7 @@ function toFrontend(s: any) {
         ? Number(s.student_grade_level)
         : null,
     program: s.student_program ?? null,
+    notes: s.student_notes ?? null,
     isArchived: s.is_archived ?? false,
     // no archivedAt here because we’re not changing DB
   }
