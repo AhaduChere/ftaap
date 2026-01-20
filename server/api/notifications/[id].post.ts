@@ -4,9 +4,9 @@ export default defineEventHandler(async (event) => {
   const idParam = event.context.params?.id;
   if (!idParam) throw createError({ statusCode: 400, statusMessage: 'Missing ID' });
 
-  const id = BigInt(idParam); // parse string to BigInt
+  const id = Number(idParam); 
   try {
-    await prisma.student_Notification.update({
+    await prisma.studentNotification.update({
       where: { id },
       data: { read: true },
     });

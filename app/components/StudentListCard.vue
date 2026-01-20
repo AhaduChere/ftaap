@@ -12,8 +12,9 @@ import { filteredStudents, scoreBorderClass, flagFillClass } from '~/composables
         :class="scoreBorderClass()"
       >
         <div>
-          <div class="font-semibold">{{ s.name }}</div>
-          <div class="text-sm text-gray-600">Score: {{ s.score }}</div>
+          <!-- Use firstName + lastName instead of s.name -->
+          <div class="font-semibold">{{ s.firstName }} {{ s.lastName }}</div>
+          <div class="text-sm text-gray-600">Score: {{ s.score ?? 'N/A' }}</div>
         </div>
         <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" viewBox="0 0 24 24" :class="flagFillClass(s.score)">
           <path d="M5 3v18h2v-6h9l-1.5-4L16 7H7V3H5Z" />

@@ -2,22 +2,22 @@ import { prisma } from '../prisma';
 
 export default defineEventHandler(async () => {
   try {
-    const notifications = await prisma.student_Notification.findMany({
+    const notifications = await prisma.studentNotification.findMany({
       where: { read: false },
       orderBy: { timestamp: 'desc' },
       include: {
-        Student: true, // optional, if you want student info like name
+        Student: true,
       },
     });
 
-    // Convert BigInt fields to strings
+
     const serialized = notifications.map((n) => ({
-      id: n.id?.toString?.() ?? null,
+      id: n.id,
       student_id: n.student_id?.toString?.() ?? null,
       message: n.message,
       read: n.read,
       timestamp: n.timestamp?.toISOString?.() ?? null,
-      level: 'red', // if you don’t have a level column, you can hardcode for now
+      level: 'red', 
       name: n.Student ? `${n.Student.student_fname ?? ''} ${n.Student.student_lname ?? ''}`.trim() : 'Unknown',
     }));
 

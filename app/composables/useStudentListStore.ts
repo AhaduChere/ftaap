@@ -25,34 +25,37 @@ export const fetchStudents = async () => {
     const res = await fetch('/api/students');
     const data = await res.json();
 
-    students.value = data.map((s: any) => ({
-      id: Number(s.student_id),
-      name: `${s.student_fname} ${s.student_lname}`,
-      score: s.Student_Score?.student_dibel_score || 0,
-    }));
+  students.value = data.map((s: any) => ({
+    id: s.id,
+    firstName: s.firstName,
+    lastName: s.lastName,
+    gradeLevel: s.gradeLevel,
+    program: s.program,
+    notes: s.notes,
+    isArchived: s.isArchived,
+    score: s.score ?? null,
+  }));
   } catch (err) {
     console.error('Failed to fetch students', err);
   }
 };
-
 // Filtered and sorted students
 export const filteredStudents = computed(() => {
   let filtered = students.value.filter((s) =>
-    s.name.toLowerCase().includes(searchQuery.value.toLowerCase())
+    `${s.firstName} ${s.lastName}`.toLowerCase().includes(searchQuery.value.toLowerCase())
   );
 
   if (tierFilter.value !== 'All') {
-    filtered = filtered.filter(
-      (s) => scoreToPerformance(s.score) === tierFilter.value
-    );
+    filtered = filtered.filter((s) => scoreToPerformance(s.score) === tierFilter.value);
   }
 
   if (sortMode.value === 'A - Z') {
-    filtered.sort((a, b) => a.name.localeCompare(b.name));
+    filtered.sort((a, b) => a.lastName.localeCompare(b.lastName));
   } else if (sortMode.value === 'By color') {
     filtered.sort(
       (a, b) =>
-        performanceRank(b.score) - performanceRank(a.score) || a.name.localeCompare(b.name)
+        performanceRank(b.score) - performanceRank(a.score) ||
+        a.lastName.localeCompare(b.lastName)
     );
   }
 
