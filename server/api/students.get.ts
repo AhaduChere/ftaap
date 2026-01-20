@@ -1,7 +1,5 @@
 // server/api/students.get.ts
-import { PrismaClient } from '@prisma/client'
-
-const prisma = new PrismaClient()
+import { prisma } from '../prisma';
 
 // DB → frontend mapper
 function toFrontend(s: any) {

@@ -1,8 +1,8 @@
 // server/api/students/[id]/unarchive.post.ts
-import { PrismaClient, Prisma } from '@prisma/client'
+import { Prisma } from '@prisma/client'
+import { prisma } from '../../../prisma';
 import { createError } from 'h3'
 
-const prisma = new PrismaClient()
 
 export default defineEventHandler(async (event) => {
   // dynamic route param :id

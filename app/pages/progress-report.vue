@@ -25,6 +25,7 @@ watch(selectedStudent, (student) => {
 
 onMounted(async () => {
   students.value = await getStudents()
+  console.log(students.value);
 })
 
 async function getStudents(): Promise<Student[]> {

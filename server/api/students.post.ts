@@ -1,7 +1,5 @@
-import { PrismaClient } from '@prisma/client'
+import { prisma } from '../prisma';
 import { readBody, createError } from 'h3'
-
-const prisma = new PrismaClient()
 
 // Same mapper (useful if you want to return the created student)
 function toFrontend(s: any) {
@@ -51,17 +49,17 @@ export default defineEventHandler(async (event) => {
           'No teacher available to assign to new students (teacher_id is required).',
       })
     }
-    teacherIdBigInt = defaultTeacher.teacher_id
+    teacherIdBigInt = BigInt(defaultTeacher.teacher_id)
   }
 
   const created = await prisma.student.create({
     data: {
-      teacher_id: teacherIdBigInt,
+      teacher_id: Number(teacherIdBigInt),
       student_fname: body.firstName,
       student_lname: body.lastName,
       student_grade_level:
         body.gradeLevel !== undefined && body.gradeLevel !== null
-          ? BigInt(body.gradeLevel)
+          ? Number(body.gradeLevel)
           : null,
       student_program: body.program ?? null,
       is_archived: body.isArchived ?? false,
