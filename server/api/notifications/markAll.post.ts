@@ -2,7 +2,7 @@ import { prisma } from '../../prisma';
 
 export default defineEventHandler(async () => {
   try {
-    const info = await prisma.student_Notification.updateMany({
+    const info = await prisma.studentNotification.updateMany({
       where: { read: false },
       data: { read: true },
     });

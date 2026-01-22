@@ -42,7 +42,7 @@ model Student {
   Student_Attendance                                    Student_Attendance?    @relation(fields: [student_attendance_id], references: [student_attendance_id], onDelete: NoAction, onUpdate: NoAction)
   Student_Score_Student_student_score_idToStudent_Score Student_Score?         @relation("Student_student_score_idToStudent_Score", fields: [student_score_id], references: [student_score_id], onDelete: NoAction, onUpdate: NoAction)
   Teacher_Student_teacher_idToTeacher                   Teacher                @relation("Student_teacher_idToTeacher", fields: [teacher_id], references: [teacher_id], onDelete: NoAction, onUpdate: NoAction)
-  Student_Notification                                  Student_Notification[]
+  notifications                                         StudentNotification[]
   Student_Score_Student_Score_student_idToStudent       Student_Score[]        @relation("Student_Score_student_idToStudent")
   Teacher_Teacher_student_idToStudent                   Teacher[]              @relation("Teacher_student_idToStudent")
 }
@@ -56,7 +56,7 @@ model Student_Attendance {
 }
 
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
-model Student_Notification {
+model StudentNotification {
   id         Int       @id(map: "StudentNotification_pkey")
   message    String
   read       Boolean?  @default(false)
@@ -65,6 +65,8 @@ model Student_Notification {
   name       String?
   timestamp  DateTime? @default(now()) @db.Timestamptz(6)
   Student    Student?  @relation(fields: [student_id], references: [student_id], onDelete: NoAction, onUpdate: NoAction, map: "StudentNotification_student_id_fkey")
+  
+  @@map("Student_Notification")
 }
 
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
