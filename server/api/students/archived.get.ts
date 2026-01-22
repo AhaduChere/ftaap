@@ -1,7 +1,5 @@
 // server/api/students/archived.get.ts
-import { PrismaClient } from '@prisma/client'
-
-const prisma = new PrismaClient()
+import { prisma } from '../../prisma';
 
 function toFrontend(s: any) {
   return {

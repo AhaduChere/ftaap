@@ -1,8 +1,8 @@
 // server/api/students/[id].put.ts
-import { PrismaClient, Prisma } from '@prisma/client'
+import { Prisma } from '@prisma/client'
 import { readBody, createError } from 'h3'
+import { prisma } from '../../prisma';
 
-const prisma = new PrismaClient()
 
 function toFrontend(s: any) {
   return {
