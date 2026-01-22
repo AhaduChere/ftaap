@@ -43,7 +43,9 @@ async function logout() {
               Dashboard
             </div>
             <div class="text-[#e2fafc]">
-              <div class="px-8 py-2 border-b border-white/20 hover:bg-[#205a5f] cursor-pointer">Overview</div>
+              <NuxtLink to="/" class="block px-8 py-2 border-b border-white/20 hover:bg-[#205a5f] cursor-pointer">
+                Overview
+              </NuxtLink>
               <div class="px-8 py-2 border-b border-white/20 hover:bg-[#205a5f] cursor-pointer">Reports</div>
               <div class="px-8 py-2 border-b border-white/20 hover:bg-[#205a5f] cursor-pointer">Analytics</div>
             </div>
@@ -58,7 +60,9 @@ async function logout() {
               <NuxtLink to="/manage-students" class="block px-8 py-2 border-b border-white/20 hover:bg-[#205a5f] cursor-pointer">
                 Manage Students
               </NuxtLink>
-              <div class="px-8 py-2 border-b border-white/20 hover:bg-[#205a5f] cursor-pointer">Progress Tracker</div>
+              <NuxtLink to="/progress-report" class="block px-8 py-2 border-b border-white/20 hover:bg-[#205a5f] cursor-pointer">
+                Progress Tracker
+              </NuxtLink>
               <div class="px-8 py-2 border-b border-white/20 hover:bg-[#205a5f] cursor-pointer">Attendance</div>
               <div class="px-8 py-2 border-b border-white/20 hover:bg-[#205a5f] cursor-pointer">Gradebook</div>
             </div>
