@@ -1,7 +1,6 @@
-import { prisma } from '../prisma';
-import { readBody, createError } from 'h3'
+import { supabase } from '../supabase.js';
+import { readBody, createError } from 'h3';
 
-// Same mapper (useful if you want to return the created student)
 function toFrontend(s: any) {
   return {
     id: Number(s.student_id),
@@ -13,48 +12,55 @@ function toFrontend(s: any) {
         : null,
     program: s.student_program ?? null,
     isArchived: s.is_archived ?? false,
-  }
+  };
 }
 
 export default defineEventHandler(async (event) => {
   type Body = {
-    firstName?: string
-    lastName?: string
-    gradeLevel?: number | null
-    program?: string | null
-    isArchived?: boolean | null
-    teacherId?: number | null
-  }
+    firstName?: string;
+    lastName?: string;
+    gradeLevel?: number | null;
+    program?: string | null;
+    isArchived?: boolean | null;
+    teacherId?: number | null;
+  };
 
-  const body = await readBody<Body>(event)
+  const body = await readBody<Body>(event);
 
   if (!body.firstName || !body.lastName) {
     throw createError({
       statusCode: 400,
       statusMessage: 'firstName and lastName are required.',
-    })
+    });
   }
 
-  // teacher_id is NOT nullable in your schema → must set it.
-  let teacherIdBigInt: bigint
+  // Determine teacher_id
+  let teacherId: number;
 
   if (body.teacherId !== undefined && body.teacherId !== null) {
-    teacherIdBigInt = BigInt(body.teacherId)
+    teacherId = Number(body.teacherId);
   } else {
-    const defaultTeacher = await prisma.teacher.findFirst()
-    if (!defaultTeacher) {
+    const { data: defaultTeacher, error } = await supabase
+      .from('Teacher')
+      .select('teacher_id')
+      .limit(1)
+      .single();
+
+    if (error || !defaultTeacher) {
       throw createError({
         statusCode: 500,
         statusMessage:
           'No teacher available to assign to new students (teacher_id is required).',
-      })
+      });
     }
-    teacherIdBigInt = BigInt(defaultTeacher.teacher_id)
+
+    teacherId = Number(defaultTeacher.teacher_id);
   }
 
-  const created = await prisma.student.create({
-    data: {
-      teacher_id: Number(teacherIdBigInt),
+  const { data: created, error: insertError } = await supabase
+    .from('Student')
+    .insert({
+      teacher_id: teacherId,
       student_fname: body.firstName,
       student_lname: body.lastName,
       student_grade_level:
@@ -63,8 +69,17 @@ export default defineEventHandler(async (event) => {
           : null,
       student_program: body.program ?? null,
       is_archived: body.isArchived ?? false,
-    },
-  })
+    })
+    .select()
+    .single();
 
-  return toFrontend(created)
-})
+  if (insertError || !created) {
+    console.error('Error creating student:', insertError);
+    throw createError({
+      statusCode: 500,
+      statusMessage: 'Failed to create student.',
+    });
+  }
+
+  return toFrontend(created);
+});

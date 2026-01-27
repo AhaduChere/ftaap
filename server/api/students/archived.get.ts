@@ -1,5 +1,5 @@
-// server/api/students/archived.get.ts
-import { prisma } from '../../prisma';
+import { supabase } from '../../supabase.js';
+import { defineEventHandler } from 'h3';
 
 function toFrontend(s: any) {
   return {
@@ -12,21 +12,21 @@ function toFrontend(s: any) {
         : null,
     program: s.student_program ?? null,
     isArchived: s.is_archived ?? false,
-    // still no archivedAt
-  }
+  };
 }
 
 export default defineEventHandler(async () => {
-  const rows = await prisma.student.findMany({
-    where: {
-      is_archived: true,
-    },
-    orderBy: [
-      // Just sort by name; no archive date field available
-      { student_lname: 'asc' },
-      { student_fname: 'asc' },
-    ],
-  })
+  const { data: rows, error } = await supabase
+    .from('Student')
+    .select('*')
+    .eq('is_archived', true)
+    .order('student_lname', { ascending: true })
+    .order('student_fname', { ascending: true });
 
-  return rows.map(toFrontend)
-})
+  if (error) {
+    console.error('Error fetching archived students:', error);
+    return [];
+  }
+
+  return rows.map(toFrontend);
+});

@@ -1,41 +1,44 @@
-// server/api/students/[id]/unarchive.post.ts
-import { Prisma } from '@prisma/client'
-import { prisma } from '../../../prisma';
-import { createError } from 'h3'
-
+import { supabase } from '../../../supabase.js';
+import { defineEventHandler, createError } from 'h3';
 
 export default defineEventHandler(async (event) => {
-  // dynamic route param :id
-  const idParam = event.context.params?.id
-  const id = Number(idParam)
+  const idParam = event.context.params?.id;
+  const id = Number(idParam);
 
   if (!id || Number.isNaN(id)) {
     throw createError({
       statusCode: 400,
       statusMessage: 'Invalid student id.',
-    })
+    });
   }
 
-  // IMPORTANT: this should match whatever you use in server/api/students/[id].delete.ts
-  const where: Prisma.StudentWhereUniqueInput = {
-    student_id: id, // <- same as your delete/GET/update handlers
-  }
+  // Check if student exists
+  const { data: existing, error: fetchError } = await supabase
+    .from('Student')
+    .select('student_id')
+    .eq('student_id', id)
+    .single();
 
-  const existing = await prisma.student.findUnique({ where })
-  if (!existing) {
+  if (fetchError || !existing) {
     throw createError({
       statusCode: 404,
       statusMessage: 'Student not found.',
-    })
+    });
   }
 
-  // Un-archive the student (put them back into active roster)
-  await prisma.student.update({
-    where,
-    data: {
-      is_archived: false,
-    },
-  })
+  // Un-archive the student
+  const { error: updateError } = await supabase
+    .from('Student')
+    .update({ is_archived: false })
+    .eq('student_id', id);
 
-  return { success: true }
-})
+  if (updateError) {
+    console.error('Error unarchiving student:', updateError);
+    throw createError({
+      statusCode: 500,
+      statusMessage: 'Failed to unarchive student',
+    });
+  }
+
+  return { success: true };
+});

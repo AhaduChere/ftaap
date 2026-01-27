@@ -1,8 +1,5 @@
-// server/api/students/[id].put.ts
-import { Prisma } from '@prisma/client'
-import { readBody, createError } from 'h3'
-import { prisma } from '../../prisma';
-
+import { supabase } from '../../supabase.js';
+import { readBody, createError, defineEventHandler } from 'h3';
 
 function toFrontend(s: any) {
   return {
@@ -15,64 +12,66 @@ function toFrontend(s: any) {
         : null,
     program: s.student_program ?? null,
     isArchived: s.is_archived ?? false,
-  }
+  };
 }
 
 export default defineEventHandler(async (event) => {
-  const idParam = event.context.params?.id
-  const id = Number(idParam)
+  const idParam = event.context.params?.id;
+  const id = Number(idParam);
 
   if (!id || Number.isNaN(id)) {
     throw createError({
       statusCode: 400,
       statusMessage: 'Invalid student id.',
-    })
+    });
   }
 
-  // 🔹 student_id is Int in Prisma, use plain number
-  const where: Prisma.StudentWhereUniqueInput = {
-    student_id: id,
-  }
+  const { data: existing, error: fetchError } = await supabase
+    .from('Student')
+    .select('*')
+    .eq('student_id', id)
+    .single();
 
-  const existing = await prisma.student.findUnique({ where })
-  if (!existing) {
+  if (fetchError || !existing) {
     throw createError({
       statusCode: 404,
       statusMessage: 'Student not found.',
-    })
+    });
   }
 
   type Body = {
-    firstName?: string
-    lastName?: string
-    gradeLevel?: number | null
-    program?: string | null
-    isArchived?: boolean | null
+    firstName?: string;
+    lastName?: string;
+    gradeLevel?: number | null;
+    program?: string | null;
+    isArchived?: boolean | null;
+  };
+
+  const body = await readBody<Body>(event);
+
+  const updateData: any = {
+    student_fname: body.firstName ?? existing.student_fname,
+    student_lname: body.lastName ?? existing.student_lname,
+    student_grade_level:
+      body.gradeLevel !== undefined ? body.gradeLevel : existing.student_grade_level,
+    student_program: body.program ?? existing.student_program,
+    is_archived: body.isArchived ?? existing.is_archived,
+  };
+
+  const { data: updated, error: updateError } = await supabase
+    .from('Student')
+    .update(updateData)
+    .eq('student_id', id)
+    .select()
+    .single();
+
+  if (updateError || !updated) {
+    console.error('Error updating student:', updateError);
+    throw createError({
+      statusCode: 500,
+      statusMessage: 'Failed to update student',
+    });
   }
 
-  const body = await readBody<Body>(event)
-
-  const updated = await prisma.student.update({
-    where,
-    data: {
-      student_fname:
-        body.firstName !== undefined ? body.firstName : existing.student_fname,
-      student_lname:
-        body.lastName !== undefined ? body.lastName : existing.student_lname,
-      student_grade_level:
-        body.gradeLevel !== undefined
-          ? body.gradeLevel !== null
-            ? Number(body.gradeLevel)
-            : null
-          : existing.student_grade_level,
-      student_program:
-        body.program !== undefined ? body.program : existing.student_program,
-      is_archived:
-        body.isArchived !== undefined
-          ? body.isArchived
-          : existing.is_archived,
-    },
-  })
-
-  return toFrontend(updated)
-})
+  return toFrontend(updated);
+});

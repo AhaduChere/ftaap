@@ -1,4 +1,5 @@
-import { prisma } from '../../../prisma';
+import { supabase } from '../../../supabase.js';
+import { defineEventHandler } from 'h3';
 
 function bigIntToNumberOrString(obj: any) {
   return Object.fromEntries(
@@ -18,15 +19,16 @@ export default defineEventHandler(async (event) => {
     return { error: 'Invalid student_id' };
   }
 
-  const student = await prisma.student.findUnique({
-    where: { student_id },
-  });
+  const { data: student, error } = await supabase
+    .from('Student')
+    .select('*')
+    .eq('student_id', student_id)
+    .single();
 
-  if (!student) {
-    console.error('404 Error, student Id not found');
+  if (error || !student) {
+    console.error('Error fetching student:', error);
     return { error: 'Student not found' };
   }
 
-  // Convert any BigInt to number
   return bigIntToNumberOrString(student);
 });

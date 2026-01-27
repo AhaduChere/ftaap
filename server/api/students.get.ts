@@ -1,7 +1,5 @@
-// server/api/students.get.ts
-import { prisma } from '../prisma';
+import { supabase } from '../supabase.js';
 
-// DB → frontend mapper
 function toFrontend(s: any) {
   return {
     id: Number(s.student_id),
@@ -14,17 +12,26 @@ function toFrontend(s: any) {
     program: s.student_program ?? null,
     notes: s.student_notes ?? null,
     isArchived: s.is_archived ?? false,
-    // no archivedAt here because we’re not changing DB
-  }
+  };
 }
 
 export default defineEventHandler(async () => {
-  const rows = await prisma.student.findMany({
-    where: {
-      OR: [{ is_archived: false }, { is_archived: null }],
-    },
-    orderBy: [{ student_lname: 'asc' }, { student_fname: 'asc' }],
-  })
+  try {
+    const { data: rows, error } = await supabase
+      .from('Student')
+      .select('*')
+      .or('is_archived.eq.false,is_archived.is.null')
+      .order('student_lname', { ascending: true })
+      .order('student_fname', { ascending: true });
 
-  return rows.map(toFrontend)
-})
+    if (error) throw error;
+
+    return rows.map(toFrontend);
+  } catch (err) {
+    console.error('Error fetching students:', err);
+    throw createError({
+      statusCode: 500,
+      statusMessage: 'Failed to fetch students',
+    });
+  }
+});

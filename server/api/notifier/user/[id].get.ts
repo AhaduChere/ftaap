@@ -1,4 +1,5 @@
-import { prisma } from '../../../prisma';
+import { supabase } from '../../../supabase.js';
+import { defineEventHandler } from 'h3';
 
 export default defineEventHandler(async (event) => {
   const user_id = event.context.params?.id as string;
@@ -7,13 +8,15 @@ export default defineEventHandler(async (event) => {
     return { error: 'Invalid user_id' };
   }
 
-  const user = await prisma.user.findUnique({
-    where: { user_id },
-  });
+  const { data: user, error } = await supabase
+    .from('User')
+    .select('*')
+    .eq('user_id', user_id)
+    .single();
 
-  if (!user) {
-    console.log('404 Error, student Id not found');
-    return { error: 'Student not found' };
+  if (error || !user) {
+    console.log('404 Error, user not found:', error);
+    return { error: 'User not found' };
   }
 
   return user;

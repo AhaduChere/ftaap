@@ -1,8 +1,5 @@
-// server/api/students/[id].get.ts
-import { Prisma } from '@prisma/client'
-import { createError } from 'h3'
-import { prisma } from '../../prisma';
-
+import { supabase } from '../../supabase.js';
+import { defineEventHandler, createError } from 'h3';
 
 function toFrontend(s: any) {
   return {
@@ -15,31 +12,32 @@ function toFrontend(s: any) {
         : null,
     program: s.student_program ?? null,
     isArchived: s.is_archived ?? false,
-  }
+  };
 }
 
 export default defineEventHandler(async (event) => {
-  const idParam = event.context.params?.id
-  const id = Number(idParam)
+  const idParam = event.context.params?.id;
+  const id = Number(idParam);
 
   if (!id || Number.isNaN(id)) {
     throw createError({
       statusCode: 400,
       statusMessage: 'Invalid student id.',
-    })
+    });
   }
 
-  const where: Prisma.StudentWhereUniqueInput = {
-    student_id: id, 
-  }
+  const { data: student, error } = await supabase
+    .from('Student')
+    .select('*')
+    .eq('student_id', id)
+    .single();
 
-  const existing = await prisma.student.findUnique({ where })
-  if (!existing) {
+  if (error || !student) {
     throw createError({
       statusCode: 404,
       statusMessage: 'Student not found.',
-    })
+    });
   }
 
-  return toFrontend(existing)
-})
+  return toFrontend(student);
+});

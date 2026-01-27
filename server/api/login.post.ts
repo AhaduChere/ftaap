@@ -1,6 +1,6 @@
 import { defineEventHandler, readBody, setCookie } from 'h3';
 import jwt from 'jsonwebtoken';
-import { prisma } from '../prisma';
+import { supabase } from '../supabase.js';
 
 export default defineEventHandler(async (event) => {
   const { username, password } = await readBody(event);
@@ -10,12 +10,14 @@ export default defineEventHandler(async (event) => {
   }
 
   try {
-    const user = await prisma.user.findFirst({
-      where: { username, encrypted_password: password },
-      select: { user_id: true, role_id: true },
-    });
+    const { data: user, error } = await supabase
+      .from('User')
+      .select('user_id, role_id')
+      .eq('username', username)
+      .eq('encrypted_password', password)
+      .single();
 
-    if (!user) {
+    if (error || !user) {
       return { success: false, message: 'Invalid credentials' };
     }
 
