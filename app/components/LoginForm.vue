@@ -4,8 +4,9 @@
       <h2 class="text-3xl font-extrabold text-center text-[#2e777e]">Login</h2>
       <div class="flex flex-col gap-3">
         <input
-          v-model="username"
-          placeholder="Username"
+          v-model="email"
+          type="enail"
+          placeholder="Email"
           class="px-4 py-3 border rounded-lg focus:outline-none ring-2 ring-[#2e777e] transition" />
         <input
           v-model="password"
@@ -28,12 +29,12 @@
 <script setup>
 import { ref } from 'vue';
 
-const username = ref('');
+const email = ref('');
 const password = ref('');
 const error = ref('');
 
 async function login() {
-  if (!username.value || !password.value) {
+  if (!email.value || !password.value) {
     error.value = 'Please fill in all fields';
     return;
   }
@@ -42,7 +43,7 @@ async function login() {
     const data = await $fetch('/api/login', {
       method: 'POST',
       body: {
-        username: username.value,
+        email: email.value,
         password: password.value,
       },
     });
