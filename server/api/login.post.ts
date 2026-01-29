@@ -1,31 +1,23 @@
-import { defineEventHandler, readBody, setCookie } from 'h3';
-import jwt from 'jsonwebtoken';
+import { defineEventHandler, readBody } from 'h3';
 import { supabase } from '../supabase.js';
 
 export default defineEventHandler(async (event) => {
-  const { username, password } = await readBody(event);
+  const { email, password } = await readBody(event);
 
-  if (!username || !password) {
+  if (!email || !password) {
     return { success: false, message: 'Missing fields' };
   }
-
   try {
-    const { data: user, error } = await supabase
-      .from('User')
-      .select('user_id, role_id')
-      .eq('username', username)
-      .eq('encrypted_password', password)
-      .single();
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email: email,
+      password: password,
+    });
 
-    if (error || !user) {
+    if (error) {
       return { success: false, message: 'Invalid credentials' };
     }
 
-    const numericRole = user.role_id || 0;
-
-    const token = jwt.sign({ user_id: user.user_id, role: numericRole }, process.env.JWT_SECRET!, { expiresIn: '7d' });
-
-    setCookie(event, 'session_token', token, {
+    setCookie(event, 'session_token', data.session.access_token, {
       httpOnly: true,
       secure: true,
       sameSite: 'lax',
@@ -33,9 +25,26 @@ export default defineEventHandler(async (event) => {
       maxAge: 60 * 60 * 24 * 7,
     });
 
-    return { success: true, role: numericRole };
-  } catch (err) {
-    console.error(err);
+    const { role } = await supabase
+      .from('User')
+      .select('role_id')
+      .eq('auth_id', data.user.id)
+      .single();
+
+      console.log(role.role_id);
+      console.log(data.user.id);
+      
+
+    setCookie(event, 'user_role', role, {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'lax',
+      path: '/',
+      maxAge: 60 * 60 * 24 * 7,
+    });
+
+    return { success: true };
+  } catch {
     return { success: false, message: 'Server error' };
   }
 });
