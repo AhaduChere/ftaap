@@ -1,13 +1,18 @@
-export default defineNuxtRouteMiddleware((to) => {
+export default defineNuxtRouteMiddleware(async (to) => {
   if (import.meta.client) return;
 
-  const token = useCookie('session_token').value;
   const path = to.path.toLowerCase();
+  const token = useCookie('session_token').value;
 
-  if (!token) {
+  const { success } = await $fetch<{ success: boolean }>('/api/auth', {
+    method: 'POST',
+    body: { token },
+  });
+
+  if (!success) {
+    useCookie('session_token').value = '';
     if (path !== '/login') return navigateTo('/login');
-    return;
+  } else if (path === '/login') {
+    return navigateTo('/');
   }
-
-  if (path === '/login') return navigateTo('/');
 });

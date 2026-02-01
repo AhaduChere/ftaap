@@ -25,26 +25,8 @@ export default defineEventHandler(async (event) => {
       maxAge: 60 * 60 * 24 * 7,
     });
 
-    const { role } = await supabase
-      .from('User')
-      .select('role_id')
-      .eq('auth_id', data.user.id)
-      .single();
-
-      console.log(role.role_id);
-      console.log(data.user.id);
-      
-
-    setCookie(event, 'user_role', role, {
-      httpOnly: true,
-      secure: true,
-      sameSite: 'lax',
-      path: '/',
-      maxAge: 60 * 60 * 24 * 7,
-    });
-
     return { success: true };
-  } catch {
-    return { success: false, message: 'Server error' };
+  } catch (err) {
+    return { success: false, message: 'Server error:', err };
   }
 });

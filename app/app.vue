@@ -15,9 +15,8 @@ const isTeacherPage = computed(() => route.path.startsWith('/teacher'));
 const studentScoresData = useStudentScoresData();
 const studentAttendanceData = useStudentAttendanceData();
 
-
-onMounted(() => {
+onMounted(async () => {
   studentScoresData.loadStudentScores();
   studentAttendanceData.loadStudentAttendance();
-})
+});
 </script>
