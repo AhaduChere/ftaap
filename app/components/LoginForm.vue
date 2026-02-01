@@ -54,7 +54,7 @@ async function login() {
       error.value = 'Invalid Credentials';
     }
   } catch {
-    error.value = 'Login failed';
+    error.value = 'Server Error';
   }
 }
 </script>
