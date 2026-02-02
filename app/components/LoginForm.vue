@@ -5,7 +5,7 @@
       <div class="flex flex-col gap-3">
         <input
           v-model="email"
-          type="enail"
+          type="email"
           placeholder="Email"
           class="px-4 py-3 border rounded-lg focus:outline-none ring-2 ring-[#2e777e] transition" />
         <input

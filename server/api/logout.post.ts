@@ -6,6 +6,13 @@ export default defineEventHandler(async (event) => {
     path: '/',
   });
 
+  deleteCookie(event, 'admin_id', {
+    path: '/',
+  });
+
+  deleteCookie(event, 'teacher_id', {
+    path: '/',
+  });
   const { error } = await supabase.auth.signOut();
 
   if (error) {
