@@ -10,13 +10,17 @@ const notifications = ref<Student_Notification[]>([]);
 const fetchNotifications = async () => {
   try {
     const res = await fetch('/api/notifications');
+    if(!res.ok){
+      console.error('Error getting notifications ', res.status, res.statusText);
+    }
     const data = await res.json();
+    console.log(data);
 
     // Convert BigInt IDs to number if necessary
-    notifications.value = data.map((n: any) => ({
-      ...n,
+     notifications.value = data.map((n: any) => ({
+       ...n,
       id: Number(n.id),
-    }));
+     }));
 
     console.log('📥 Loaded', notifications.value.length, 'notifications');
   } catch (err) {
