@@ -4,5 +4,5 @@
 </template>
 
 <script setup>
-const admin = true;
+const admin = false;
 </script>
