@@ -58,7 +58,7 @@
     <aside class="w-96 border-r border-[#2e777e] p-6 flex flex-col">
       <div class="flex flex-col justify-between gap-4 h-full">
         <div class="h-1/2 min-h-[444px] relative rounded-xl shadow-md border-2 border-[#2e777e] bg-[#f0fbfc] flex flex-col">
-          <h3 class="p-2 bg-[#2e777e] font-bold text-white text-xl w-full font-semibold text-center rounded-t-md">Students</h3>
+          <h3 class="p-2 bg-[#2e777e] text-white text-xl w-full font-semibold text-center rounded-t-md">Students</h3>
           <div class="px-4 pt-2">
             <input
               v-model="studentSearch"
@@ -80,7 +80,7 @@
         </div>
 
         <div class="h-1/2 min-h-[444px] relative rounded-xl shadow-md border-2 border-[#2e777e] bg-[#f0fbfc] flex flex-col">
-          <h3 class="p-2 bg-[#2e777e] font-bold text-white text-xl w-full font-semibold text-center rounded-t-md">Teachers</h3>
+          <h3 class="p-2 bg-[#2e777e] text-white text-xl w-full font-semibold text-center rounded-t-md">Teachers</h3>
           <div class="px-4 pt-2">
             <input
               v-model="teacherSearch"
