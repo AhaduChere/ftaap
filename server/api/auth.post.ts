@@ -6,12 +6,9 @@ export default defineEventHandler(async (event) => {
 
   if (!token) return { success: false };
 
-  const {
-    data: { user },
-    error,
-  } = await supabase.auth.getUser(token);
+  const { error } = await supabase.auth.getUser(token);
 
-  if (error || !user) return { success: false };
+  if (error) return { success: false };
 
-  return { success: true, user };
+  return { success: true };
 });
