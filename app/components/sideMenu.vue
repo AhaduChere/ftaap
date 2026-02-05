@@ -36,7 +36,7 @@ onBeforeUnmount(() => {
 });
 
 async function logout() {
-  await $fetch('/api/logout', { method: 'POST' });
+  await $supabase.auth.signOut();
   window.location.reload();
 }
 </script>
