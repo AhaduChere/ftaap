@@ -1,5 +1,6 @@
 <script setup>
 import { watch, onMounted } from 'vue';
+const { $supabase } = useNuxtApp();
 
 const emit = defineEmits(['close']);
 const props = defineProps({
@@ -19,8 +20,9 @@ onMounted(() => {
     { immediate: true }
   );
 });
+
 async function logout() {
-  await $fetch('/api/logout', { method: 'POST' });
+  await $supabase.auth.signOut();
   window.location.reload();
 }
 </script>
@@ -43,9 +45,7 @@ async function logout() {
               Dashboard
             </div>
             <div class="text-[#e2fafc]">
-              <NuxtLink to="/" class="block px-8 py-2 border-b border-white/20 hover:bg-[#205a5f] cursor-pointer">
-                Overview
-              </NuxtLink>
+              <NuxtLink to="/" class="block px-8 py-2 border-b border-white/20 hover:bg-[#205a5f] cursor-pointer"> Overview </NuxtLink>
               <div class="px-8 py-2 border-b border-white/20 hover:bg-[#205a5f] cursor-pointer">Reports</div>
               <div class="px-8 py-2 border-b border-white/20 hover:bg-[#205a5f] cursor-pointer">Analytics</div>
             </div>
