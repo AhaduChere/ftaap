@@ -1,28 +1,42 @@
-<script setup>
-import { watch, onMounted } from 'vue';
-const { $supabase } = useNuxtApp();
+<script setup lang="ts">
+import { watch, onMounted, onBeforeUnmount } from 'vue';
 
 const emit = defineEmits(['close']);
-const props = defineProps({
-  isOpen: Boolean,
-});
+const props = defineProps({ isOpen: Boolean });
 
 const closeMenu = () => emit('close');
 
-onMounted(() => {
-  watch(
-    () => props.isOpen,
-    (open) => {
-      if (typeof document !== 'undefined') {
-        document.body.style.overflow = open ? 'hidden' : '';
-      }
-    },
-    { immediate: true }
-  );
+function handleOutsideClick(e: MouseEvent) {
+  const menu = document.querySelector('.sideMenuDropShadow');
+  if (menu && !menu.contains(e.target as Node)) {
+    closeMenu();
+  }
+}
+
+watch(
+  () => props.isOpen,
+  (open) => {
+    if (typeof document === 'undefined') return;
+
+    if (open) {
+      document.addEventListener('click', handleOutsideClick, true);
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.removeEventListener('click', handleOutsideClick, true);
+      document.body.style.overflow = '';
+    }
+  },
+  { immediate: true }
+);
+
+onBeforeUnmount(() => {
+  if (typeof document !== 'undefined') {
+    document.removeEventListener('click', handleOutsideClick, true);
+  }
 });
 
 async function logout() {
-  await $supabase.auth.signOut();
+  await $fetch('/api/logout', { method: 'POST' });
   window.location.reload();
 }
 </script>
@@ -45,35 +59,37 @@ async function logout() {
               Dashboard
             </div>
             <div class="text-[#e2fafc]">
-              <NuxtLink to="/" class="block px-8 py-2 border-b border-white/20 hover:bg-[#205a5f] cursor-pointer"> Overview </NuxtLink>
-              <div class="px-8 py-2 border-b border-white/20 hover:bg-[#205a5f] cursor-pointer">Reports</div>
-              <div class="px-8 py-2 border-b border-white/20 hover:bg-[#205a5f] cursor-pointer">Analytics</div>
+              <NuxtLink to="/" class="block px-8 py-2 border-b border-white/20 hover:bg-[#205a5f] cursor-pointer" @click="closeMenu">
+                Overview
+              </NuxtLink>
+              <div class="px-8 py-2 border-b border-white/20 hover:bg-[#205a5f] cursor-pointer" @click="closeMenu">Reports</div>
+              <div class="px-8 py-2 border-b border-white/20 hover:bg-[#205a5f] cursor-pointer" @click="closeMenu">Analytics</div>
             </div>
           </li>
 
           <!-- Students -->
           <li>
-            <div class="px-4 py-3 font-semibold text-lg text-[#e2fafc] border-b border-white/30 hover:bg-[#205a5f] no-select">
-              Dashboard
+            <div class="px-4 py-3 font-semibold text-lg text-[#e2fafc] border-b border-white/30 hover:bg-[#205a5f] no-select" >
+              Students
             </div>
             <div class="text-[#e2fafc]">
-              <NuxtLink to="/manage-students" class="block px-8 py-2 border-b border-white/20 hover:bg-[#205a5f] cursor-pointer">
+              <NuxtLink to="/manage-students" class="block px-8 py-2 border-b border-white/20 hover:bg-[#205a5f] cursor-pointer" @click="closeMenu">
                 Manage Students
               </NuxtLink>
-              <NuxtLink to="/progress-report" class="block px-8 py-2 border-b border-white/20 hover:bg-[#205a5f] cursor-pointer">
+              <NuxtLink to="/progress-report" class="block px-8 py-2 border-b border-white/20 hover:bg-[#205a5f] cursor-pointer" @click="closeMenu">
                 Progress Tracker
               </NuxtLink>
-              <div class="px-8 py-2 border-b border-white/20 hover:bg-[#205a5f] cursor-pointer">Attendance</div>
-              <div class="px-8 py-2 border-b border-white/20 hover:bg-[#205a5f] cursor-pointer">Gradebook</div>
+              <div class="px-8 py-2 border-b border-white/20 hover:bg-[#205a5f] cursor-pointer" @click="closeMenu">Attendance </div>
+              <div class="px-8 py-2 border-b border-white/20 hover:bg-[#205a5f] cursor-pointer" @click="closeMenu">Gradebook</div>
             </div>
           </li>
 
           <!-- Settings -->
           <li>
-            <div class="px-4 py-3 font-semibold text-lg text-[#e2fafc] border-b border-white/30 hover:bg-[#205a5f] no-select">Settings</div>
+            <div class="px-4 py-3 font-semibold text-lg text-[#e2fafc] border-b border-white/30 hover:bg-[#205a5f] no-select" >Settings</div>
             <div class="text-[#e2fafc]">
-              <div class="px-8 py-2 border-b border-white/20 hover:bg-[#205a5f] cursor-pointer">Account</div>
-              <div class="px-8 py-2 border-b border-white/20 hover:bg-[#205a5f] cursor-pointer">Notifications</div>
+              <div class="px-8 py-2 border-b border-white/20 hover:bg-[#205a5f] cursor-pointer" @click="closeMenu">Account</div>
+              <div class="px-8 py-2 border-b border-white/20 hover:bg-[#205a5f] cursor-pointer" @click="closeMenu">Notifications</div>
             </div>
           </li>
         </ul>
