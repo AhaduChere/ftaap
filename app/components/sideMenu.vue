@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { watch, onMounted, onBeforeUnmount } from 'vue';
-
+const { $supabase } = useNuxtApp();
+  
 const emit = defineEmits(['close']);
 const props = defineProps({ isOpen: Boolean });
 
