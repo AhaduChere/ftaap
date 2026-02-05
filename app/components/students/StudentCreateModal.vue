@@ -6,8 +6,17 @@ const props = defineProps<{
     lastName: string
     gradeLevel: number | null
     program: string | null
+
+    //  FK to Organization.id
+    organizationId: number | null
+
+    //  maps to student_notes
+    notes: string | null
+
+    // Keep if your page still uses it (you can also remove entirely)
     isArchived: boolean | null
   }
+  organizations: { id: number; organization_name: string }[] 
   errors: Record<string, string>
   errorText: string | null
 }>()
@@ -39,6 +48,7 @@ const emit = defineEmits<{
         </header>
 
         <div class="px-4 py-4 space-y-3 max-h-[70vh] overflow-y-auto">
+          <!-- Names -->
           <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
             <div>
               <label class="block text-xs font-semibold text-slate-600 mb-1">
@@ -75,6 +85,7 @@ const emit = defineEmits<{
             </div>
           </div>
 
+          <!-- Grade / Program -->
           <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
             <div>
               <label class="block text-xs font-semibold text-slate-600 mb-1">
@@ -100,6 +111,53 @@ const emit = defineEmits<{
             </div>
           </div>
 
+          <!-- Organization select -->
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 mb-1">
+              Organization
+            </label>
+
+            <select
+              v-model="form.organizationId"
+              class="w-full rounded-md border border-slate-300 px-2 py-1.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-[#2e777e]"
+            >
+              <option :value="null" disabled>
+                Select an organization…
+              </option>
+
+              <option
+                v-for="org in organizations"
+                :key="org.id"
+                :value="org.id"
+              >
+                {{ org.organization_name }}
+              </option>
+            </select>
+
+            <p
+              v-if="errors.organizationId"
+              class="text-xs text-red-600 mt-0.5"
+            >
+              {{ errors.organizationId }}
+            </p>
+          </div>
+
+          <!-- ✅ NEW: Notes -->
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 mb-1">
+              Notes (optional)
+            </label>
+            <textarea
+              v-model="form.notes"
+              rows="3"
+              class="w-full rounded-md border border-slate-300 px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#2e777e]"
+              placeholder="Add any helpful notes about this student…"
+            />
+          </div>
+
+          <!-- If you want to keep archived on create, uncomment this section.
+               But normally create should default to not archived. -->
+          <!--
           <div class="flex items-center gap-2 mt-2">
             <input
               id="create-archived"
@@ -114,6 +172,7 @@ const emit = defineEmits<{
               Mark as archived
             </label>
           </div>
+          -->
 
           <p
             v-if="errorText"

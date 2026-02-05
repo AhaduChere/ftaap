@@ -1,4 +1,9 @@
 <script setup lang="ts">
+type OrganizationOption = {
+  id: number
+  organization_name: string
+}
+
 const props = defineProps<{
   open: boolean
   draft: {
@@ -7,8 +12,16 @@ const props = defineProps<{
     lastName: string
     gradeLevel: number | null
     program: string | null
+
+    //  allow editing org
+    organizationId: number | null
+
     isArchived: boolean | null
   }
+
+  // options passed from manage-students page
+  organizations: OrganizationOption[]
+
   errorText?: string | null
 }>()
 
@@ -90,17 +103,28 @@ const emit = defineEmits<{
             />
           </div>
 
-          <!-- Archived -->
-          <div class="flex items-center space-x-2">
-            <input
-              id="edit-is-archived"
-              v-model="props.draft.isArchived"
-              type="checkbox"
-              class="h-4 w-4 text-[#2e777e] border-gray-300 rounded"
-            />
-            <label for="edit-is-archived" class="text-sm text-gray-700">
-              Archived
+          <!-- ✅ NEW: Organization -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">
+              Organization
             </label>
+
+            <select
+              v-model="props.draft.organizationId"
+              class="w-full border rounded px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-[#2e777e]"
+            >
+              <option :value="null" disabled>
+                Select an organization…
+              </option>
+
+              <option
+                v-for="org in props.organizations"
+                :key="org.id"
+                :value="org.id"
+              >
+                {{ org.organization_name }}
+              </option>
+            </select>
           </div>
 
           <!-- Error text -->

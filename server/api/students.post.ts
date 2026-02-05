@@ -1,5 +1,6 @@
-import { supabase } from '../supabase.js';
-import { readBody, createError } from 'h3';
+
+import { supabase } from '../supabase.js'
+import { readBody, createError } from 'h3'
 
 function toFrontend(s: any) {
   return {
@@ -11,50 +12,80 @@ function toFrontend(s: any) {
         ? Number(s.student_grade_level)
         : null,
     program: s.student_program ?? null,
+
+    
+    organizationId:
+      s.organization_id !== null && s.organization_id !== undefined
+        ? Number(s.organization_id)
+        : null,
+
+    
+    notes: s.student_notes ?? null,
+
     isArchived: s.is_archived ?? false,
-  };
+    teacherId:
+      s.teacher_id !== null && s.teacher_id !== undefined
+        ? Number(s.teacher_id)
+        : null,
+  }
 }
 
 export default defineEventHandler(async (event) => {
   type Body = {
-    firstName?: string;
-    lastName?: string;
-    gradeLevel?: number | null;
-    program?: string | null;
-    isArchived?: boolean | null;
-    teacherId?: number | null;
-  };
+    firstName?: string
+    lastName?: string
+    gradeLevel?: number | null
+    program?: string | null
 
-  const body = await readBody<Body>(event);
+   
+    organizationId?: number | null
 
+
+    notes?: string | null
+
+    isArchived?: boolean | null
+    teacherId?: number | null
+  }
+
+  const body = await readBody<Body>(event)
+
+  // Require names
   if (!body.firstName || !body.lastName) {
     throw createError({
       statusCode: 400,
       statusMessage: 'firstName and lastName are required.',
-    });
+    })
+  }
+
+  // Require organizationId (Student.organization_id is required)
+  if (body.organizationId === undefined || body.organizationId === null) {
+    throw createError({
+      statusCode: 400,
+      statusMessage: 'organizationId is required.',
+    })
   }
 
   // Determine teacher_id
-  let teacherId: number;
+  let teacherId: number
 
   if (body.teacherId !== undefined && body.teacherId !== null) {
-    teacherId = Number(body.teacherId);
+    teacherId = Number(body.teacherId)
   } else {
     const { data: defaultTeacher, error } = await supabase
       .from('Teacher')
       .select('teacher_id')
       .limit(1)
-      .single();
+      .single()
 
     if (error || !defaultTeacher) {
       throw createError({
         statusCode: 500,
         statusMessage:
           'No teacher available to assign to new students (teacher_id is required).',
-      });
+      })
     }
 
-    teacherId = Number(defaultTeacher.teacher_id);
+    teacherId = Number(defaultTeacher.teacher_id)
   }
 
   const { data: created, error: insertError } = await supabase
@@ -68,18 +99,25 @@ export default defineEventHandler(async (event) => {
           ? Number(body.gradeLevel)
           : null,
       student_program: body.program ?? null,
+
+
+      organization_id: Number(body.organizationId),
+
+
+      student_notes: body.notes ?? null,
+
       is_archived: body.isArchived ?? false,
     })
     .select()
-    .single();
+    .single()
 
   if (insertError || !created) {
-    console.error('Error creating student:', insertError);
+    console.error('Error creating student:', insertError)
     throw createError({
       statusCode: 500,
       statusMessage: 'Failed to create student.',
-    });
+    })
   }
 
-  return toFrontend(created);
-});
+  return toFrontend(created)
+})

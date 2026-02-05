@@ -1,12 +1,13 @@
-// app/composables/useArchivedStudents.ts
-
 export type ArchivedStudent = {
   id: number
   firstName: string
   lastName: string
   gradeLevel: number | null
   program: string | null
-  isArchived: boolean
+  organizationId: number | null
+  organization: string | null
+  notes: string | null
+  isArchived: boolean | null
 }
 
 export function useArchivedStudents() {
@@ -22,8 +23,8 @@ export function useArchivedStudents() {
       error.value = null
     } catch (e: any) {
       console.error('Failed to load archived students', e)
-      error.value =
-        e?.data?.message ?? e?.message ?? 'Failed to load archived students.'
+      error.value = e?.data?.message ?? e?.message ?? 'Failed to load archived students.'
+      students.value = []
     } finally {
       pending.value = false
     }
