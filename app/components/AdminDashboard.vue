@@ -1,5 +1,6 @@
 <template>
   <section class="pt-20 bg-[#f7feff] w-full min-h-screen grid grid-cols-1 lg:grid-cols-3 gap-1 place-items-center">
+
     <div class="flex justify-center w-full">
       <div
         class="h-[30rem] lg:h-[70vh] max-h-[70vh] bg-gradient-to-b from-[#3b797e] to-[#81b6bb] border border-[#2e777e] drop-shadow-lg rounded-md overflow-hidden">

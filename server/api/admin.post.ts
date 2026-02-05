@@ -1,21 +1,20 @@
-/*import { PrismaClient } from '../../app/generated/prisma/client';
-const prisma = new PrismaClient();
+import { supabase } from '../supabase.js';
 
 export default defineEventHandler(async (event) => {
-  const body = await readBody(event);
+  const { userId } = await readBody(event);
+  let isAdmin;
 
-  const { username, password } = body;
-  if (!username || !password) {
-    return { success: false, message: 'Missing fields' };
+  try {
+    const { data } = await supabase.from('User').select('admin_id').eq('auth_id', userId).single();
+
+    if (data?.admin_id == 2) {
+      isAdmin = true;
+    } else {
+      isAdmin = false;
+    }
+
+    return { success: true, isAdmin };
+  } catch (err) {
+    return { success: false, message: 'Server error:', err };
   }
-
-  const admin = await prisma.admins.findFirst({
-    where: { Username: username, Password: password },
-  });
-
-  if (!admin) {
-    return { success: false, message: 'Invalid credentials' };
-  } else {
-    return { success: true };
-  }
-});*/
+});
