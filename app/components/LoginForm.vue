@@ -31,8 +31,11 @@ const email = ref('');
 const password = ref('');
 const error = ref('');
 
+const { $supabase } = useNuxtApp();
+
 async function login() {
   error.value = '';
+
   if (!email.value || !password.value) {
     error.value = 'Please fill in all fields';
     return;
@@ -43,22 +46,16 @@ async function login() {
     return;
   }
 
-  try {
-    const data = await $fetch('/api/login', {
-      method: 'POST',
-      body: {
-        email: email.value,
-        password: password.value,
-      },
-    });
+  const { error: authError } = await $supabase.auth.signInWithPassword({
+    email: email.value,
+    password: password.value,
+  });
 
-    if (data.success) {
-      window.location.reload();
-    } else {
-      error.value = 'Invalid Credentials';
-    }
-  } catch {
-    error.value = 'Server Error';
+  if (authError) {
+    error.value = 'Invalid Credentials';
+    return;
   }
+
+  window.location.reload();
 }
 </script>

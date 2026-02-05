@@ -1,18 +1,19 @@
 export default defineNuxtRouteMiddleware(async (to) => {
-  if (import.meta.client) return;
+  const { $supabase } = useNuxtApp();
 
-  const path = to.path.toLowerCase();
-  const token = useCookie('session_token').value;
+  if (!$supabase) {
+    return;
+  }
 
-  const { success } = await $fetch<{ success: boolean }>('/api/auth', {
-    method: 'POST',
-    body: { token },
-  });
+  const {
+    data: { user },
+  } = await ($supabase as any).auth.getUser();
 
-  if (!success) {
-    useCookie('session_token').value = '';
-    if (path !== '/login') return navigateTo('/login');
-  } else if (path === '/login') {
+  if (!user && to.path !== '/login') {
+    return navigateTo('/login');
+  }
+
+  if (user && to.path === '/login') {
     return navigateTo('/');
   }
 });
