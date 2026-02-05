@@ -41,10 +41,10 @@ async function login() {
     return;
   }
 
-  if (!email.value.includes('forehandconsulting')) {
-    error.value = 'Invalid Email Domain';
-    return;
-  }
+  // if (!email.value.includes('forehandconsulting')) {
+  //   error.value = 'Invalid Email Domain';
+  //   return;
+  // }
 
   const { error: authError } = await $supabase.auth.signInWithPassword({
     email: email.value,
