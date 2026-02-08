@@ -1,19 +1,19 @@
-import { prisma } from '../../prisma';
+import { supabase } from '../../supabase.js';
 
 export default defineEventHandler(async (event) => {
   const idParam = event.context.params?.id;
   if (!idParam) throw createError({ statusCode: 400, statusMessage: 'Missing ID' });
 
   const id = Number(idParam); 
-  try {
-    await prisma.studentNotification.update({
-      where: { id },
-      data: { read: true },
-    });
+  const {data, error} = await supabase
+  .from('Student_Notification')
+  .delete()
+  .eq('id', id)
 
-    return { success: true };
-  } catch (err) {
-    console.error('Error marking notification as read:', err);
-    throw createError({ statusCode: 500, statusMessage: 'Failed to mark as read' });
+  if(error){
+    throw createError({statusCode: error.statusCode, message: error.message});
+    return {success: false};
   }
+
+  return { success: true};
 });

@@ -19,8 +19,6 @@ export default defineEventHandler(async (event) => {
     })
   } catch (e) {
     console.error('Email send failed', e)
-    // optionally handle error
   }
-  // Return something so Nitro knows the route is done
   return { success: true }
 })

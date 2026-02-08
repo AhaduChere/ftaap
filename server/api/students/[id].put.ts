@@ -1,8 +1,7 @@
-// server/api/students/[id].put.ts
 import { supabase } from '../../supabase.js'
 import { readBody, createError, defineEventHandler } from 'h3'
 
-function toFrontend(s: any) {
+function toFrontend(s: Student) {
   return {
     id: Number(s.student_id),
     firstName: s.student_fname ?? '',
@@ -72,7 +71,7 @@ export default defineEventHandler(async (event) => {
 
   const body = await readBody<Body>(event)
 
-  const updateData: any = {
+  const updateData: Student = {
     student_fname: body.firstName ?? existing.student_fname,
     student_lname: body.lastName ?? existing.student_lname,
     student_grade_level:

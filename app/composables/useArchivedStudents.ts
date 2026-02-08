@@ -21,7 +21,7 @@ export function useArchivedStudents() {
       const data = await $fetch<ArchivedStudent[]>('/api/students/archived')
       students.value = Array.isArray(data) ? data : []
       error.value = null
-    } catch (e: any) {
+    } catch (e: error) {
       console.error('Failed to load archived students', e)
       error.value = e?.data?.message ?? e?.message ?? 'Failed to load archived students.'
       students.value = []

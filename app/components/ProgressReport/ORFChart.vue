@@ -5,7 +5,7 @@
   </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onBeforeUnmount, defineProps, watch } from 'vue'
+import { ref, onMounted, onBeforeUnmount, watch } from 'vue'
 import Chart from 'chart.js/auto'
 import type { Chart as ChartType, LegendItem, ChartDataset, ChartOptions } from 'chart.js'
 import type { StudentScore } from '~/types/studentScore';
@@ -121,11 +121,11 @@ onMounted(() => {
           },
           onClick(e, legendItem: LegendItem, legend) {
             const chart = legend.chart
-            const clickedDataset = chart.data.datasets[legendItem.datasetIndex as number] as any
+            const clickedDataset = chart.data.datasets[legendItem.datasetIndex as number] as ChartDataset
             const group = clickedDataset.group
             const visible = chart.isDatasetVisible(legendItem.datasetIndex as number)
 
-            chart.data.datasets.forEach((ds: any, i) => {
+            chart.data.datasets.forEach((ds: ChartDataset, i) => {
               if (ds.group === group) {
                 chart.setDatasetVisibility(i, !visible)
               }

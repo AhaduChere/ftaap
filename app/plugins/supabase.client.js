@@ -1,4 +1,3 @@
-// plugins/supabase.client.js
 import { defineNuxtPlugin } from '#app'
 import { createClient } from '@supabase/supabase-js'
 

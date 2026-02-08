@@ -1,8 +1,8 @@
 
-import { supabase } from '../supabase.js'
+import { supabase } from '../../supabase.js'
 import { readBody, createError } from 'h3'
 
-function toFrontend(s: any) {
+function toFrontend(s: Student) {
   return {
     id: Number(s.student_id),
     firstName: s.student_fname ?? '',

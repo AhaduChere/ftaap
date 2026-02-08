@@ -18,7 +18,7 @@ const loadStudentAttendance = async () => {
   .select('*')
 
   if(error){
-    console.log(error);
+    console.error(error);
   }
 
     if (data) {
@@ -35,7 +35,6 @@ const loadStudentAttendance = async () => {
     }
   
     attendanceChannel = supabase.channel('topic:student_attendance');
-    console.log(attendanceChannel);
   
     attendanceChannel.on(
       'postgres_changes',
@@ -48,8 +47,6 @@ const loadStudentAttendance = async () => {
     attendanceChannel.subscribe((status) => {
       console.log("Realtime subscription status:", status);
     });
-  
-    console.log("Realtime listener subscribed.");
   };
   
   async function getStudent(student_id){
@@ -68,12 +65,10 @@ const loadStudentAttendance = async () => {
 
   async function getTeacherEmail(teacher_id){
     if(!teacher_id){
-      console.log('No teacher, skipping...');
       return null;;
     }
     try{
       const result = await $fetch(`/api/notifier/teacher/${teacher_id}`);
-      console.log(result);
       return result;;
     }catch(err){
       console.error('Unable to Download Teacher Email');

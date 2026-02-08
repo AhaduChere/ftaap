@@ -1,4 +1,4 @@
-import { supabase } from '../supabase.js'
+import { supabase } from '../../supabase.js'
 import { defineEventHandler, createError } from 'h3'
 
 export default defineEventHandler(async () => {
@@ -45,10 +45,10 @@ export default defineEventHandler(async () => {
 
   const orgMap = new Map<number, string>()
   for (const o of orgRows ?? []) {
-    orgMap.set(Number((o as any).id), (o as any).organization_name ?? '')
+    orgMap.set(Number((o as Organization).id), (o as Organization).organization_name ?? '')
   }
 
-  return students.map((s: any) => {
+  return students.map((s: Student) => {
     const orgId =
       s.organization_id !== null && s.organization_id !== undefined
         ? Number(s.organization_id)

@@ -1,7 +1,7 @@
 import { ref, computed } from 'vue';
 
 // Reactive state
-export const students = ref<any[]>([]); // fetched from API
+export const students = ref<Student[]>([]);
 export const searchQuery = ref('');
 export const sortMode = ref<'A - Z' | 'By color'>('A - Z');
 export const tierFilter = ref<'All' | 'Strong' | 'Danger' | 'Struggling'>('All');
@@ -22,10 +22,10 @@ export function performanceRank(score: number) {
 // Fetch students from API
 export const fetchStudents = async () => {
   try {
-    const res = await fetch('/api/students');
+    const res = await fetch('/api/students/students');
     const data = await res.json();
 
-  students.value = data.map((s: any) => ({
+  students.value = data.map((s: Student) => ({
     id: s.id,
     firstName: s.firstName,
     lastName: s.lastName,

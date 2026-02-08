@@ -4,7 +4,6 @@ import { defineEventHandler } from 'h3';
 export default defineEventHandler(async (event) => {
   const student_id = Number(event.context.params?.id);
   if (!student_id) {
-    console.log('400 Bad Request');
     return { error: 'Invalid student_id' };
   }
 

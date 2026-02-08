@@ -17,7 +17,6 @@
         </div>
       </div>
       <textarea v-model="newNotes" class="p-2 w-full h-full overflow-scroll"></textarea>
-      <!-- <textarea class="p-2 w-full h-full overflow-scroll">{{ props.studentNotes }}</textarea> -->
     </div>
   </div>
 </template>
@@ -25,7 +24,7 @@
 <script setup lang="ts">
 const emit = defineEmits(['close']);
 const props = defineProps<{ studentNotes: string | undefined; studentScoreId: number | undefined }>();
-// eslint-disable-next-line prefer-const
+
 let newNotes = props.studentNotes;
 
 async function postStudentNotes() {
@@ -39,6 +38,7 @@ async function postStudentNotes() {
     const data = await response.json();
 
     if (data) {
+      props.studentNotes = newNotes;
       emit('close');
     }
   } catch (err) {

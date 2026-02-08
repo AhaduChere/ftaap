@@ -6,7 +6,6 @@ export default defineEventHandler(async (event) => {
   const updatedNotes = await readBody(event);
 
   if (!student_id) {
-    console.log('400 Bad Request');
     return { error: 'Invalid student_id' };
   }
 

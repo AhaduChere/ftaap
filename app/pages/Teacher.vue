@@ -23,7 +23,7 @@
   () => loggedIn.value,
   (isLoggedIn) => {
     if (isLoggedIn && userRole === 'teacher') {
-      router.push('/'); // redirect to index
+      router.push('/'); 
     }
   }
 );
