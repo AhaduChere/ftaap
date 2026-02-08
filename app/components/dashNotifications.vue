@@ -14,15 +14,12 @@ const fetchNotifications = async () => {
       console.error('Error getting notifications ', res.status, res.statusText);
     }
     const data = await res.json();
-    console.log(data);
 
-    // Convert BigInt IDs to number if necessary
-     notifications.value = data.map((n: any) => ({
+     notifications.value = data.map((n: Notifications) => ({
        ...n,
       id: Number(n.id),
      }));
 
-    console.log('📥 Loaded', notifications.value.length, 'notifications');
   } catch (err) {
     console.error('Failed to fetch notifications', err);
   }

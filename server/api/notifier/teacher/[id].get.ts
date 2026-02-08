@@ -35,8 +35,7 @@ export default defineEventHandler(async (event) => {
   }
 
   if (!teacher.user_id) {
-    console.log('Teacher has no user_id');
-    return null;
+    return 'Teacher has no user_id';
   }
 
   const teacherEmail = await getTeacherEmail(teacher.user_id);

@@ -19,7 +19,7 @@ const props = defineProps<{
     isArchived: boolean | null
   }
 
-  // options passed from manage-students page
+  // options passed from manageStudents page
   organizations: OrganizationOption[]
 
   errorText?: string | null

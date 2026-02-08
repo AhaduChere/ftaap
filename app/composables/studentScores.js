@@ -18,7 +18,7 @@ const loadStudentScores = async () => {
   .select('*')
 
   if(error){
-    console.log(error);
+    console.error(error);
   }
 
     if (data) {
@@ -78,8 +78,6 @@ const loadStudentScores = async () => {
     channel.subscribe((status) => {
       console.log("Realtime subscription status:", status);
     });
-  
-    console.log("Realtime listener subscribed.");
   };
   
   async function getStudent(student_id){
@@ -98,7 +96,6 @@ const loadStudentScores = async () => {
 
   async function getTeacherEmail(teacher_id){
     if(!teacher_id){
-      console.log('No teacher, skipping...');
       return null;;
     }
     try{

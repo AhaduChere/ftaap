@@ -107,7 +107,7 @@ async function permanentlyDeleteStudent(s: { id: number; firstName: string; last
   try {
     await purge(s.id)
     await refresh()
-  } catch (e: any) {
+  } catch (e: error) {
     console.error('Failed to permanently delete student', e)
     alert(e?.data?.message ?? e?.message ?? 'Failed to permanently delete this student.')
   } finally {
@@ -120,7 +120,7 @@ async function permanentlyDeleteStudent(s: { id: number; firstName: string; last
   <!-- Spacer so content clears the fixed header -->
   <div class="h-24 md:h-16"></div>
 
-  <!-- Match manage-students background + padding -->
+  <!-- Match manageStudents background + padding -->
   <div class="p-6 space-y-6 bg-[#f7feff] min-h-screen">
     <div class="w-full bg-white border border-[#2e777e] drop-shadow-lg rounded-md overflow-visible">
       <!-- Teal header bar -->

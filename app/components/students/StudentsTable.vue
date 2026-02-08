@@ -1,10 +1,10 @@
 <script setup lang="ts">
 const props = defineProps<{
-  rows: any[]
+  rows: Student[]
 }>()
 
 const emit = defineEmits<{
-  (e: 'edit', row: any): void
+  (e: 'edit', row: Student): void
   (e: 'delete', id: number): void
 }>()
 </script>

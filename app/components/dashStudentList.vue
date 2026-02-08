@@ -2,7 +2,6 @@
 import { computed, onMounted } from 'vue';
 import { students, fetchStudents, searchQuery, sortMode, tierFilter } from '~/composables/useStudentListStore';
 
-// Computed properties for v-model
 const search = computed({
   get: () => searchQuery.value,
   set: (v: string) => (searchQuery.value = v),
@@ -18,7 +17,6 @@ const tier = computed({
   set: (v: 'All' | 'Strong' | 'Danger' | 'Struggling') => (tierFilter.value = v),
 });
 
-// Fetch students when component mounts
 onMounted(() => {
   fetchStudents();
 });

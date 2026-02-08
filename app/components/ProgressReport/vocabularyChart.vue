@@ -13,7 +13,7 @@
   </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onBeforeUnmount, defineProps, watch } from 'vue'
+import { ref, onMounted, onBeforeUnmount, watch } from 'vue'
 import Chart from 'chart.js/auto'
 import type { Chart as ChartType, LegendItem, ChartDataset, ChartOptions } from 'chart.js'
 import type { StudentScore } from '~/types/studentScore';

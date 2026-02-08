@@ -16,8 +16,7 @@ export default defineEventHandler(async () => {
     })
   }
 
-  // Ensure consistent types (id as number)
-  return (data ?? []).map((o: any) => ({
+  return (data ?? []).map((o: Organization) => ({
     id: Number(o.id),
     organization_name: o.organization_name ?? '',
   }))

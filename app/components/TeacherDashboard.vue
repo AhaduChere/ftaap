@@ -2,7 +2,7 @@
 import { onMounted, onServerPrefetch } from 'vue'
 import { useStudents } from '../composables/useStudents'
 
-// use the same composable the manage-students page uses
+// use the same composable the manageStudents page uses
 const { refresh } = useStudents()
 
 // SSR: fetch before render

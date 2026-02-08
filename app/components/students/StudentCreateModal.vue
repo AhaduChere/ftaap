@@ -6,14 +6,8 @@ const props = defineProps<{
     lastName: string
     gradeLevel: number | null
     program: string | null
-
-    //  FK to Organization.id
     organizationId: number | null
-
-    //  maps to student_notes
     notes: string | null
-
-    // Keep if your page still uses it (you can also remove entirely)
     isArchived: boolean | null
   }
   organizations: { id: number; organization_name: string }[] 
@@ -154,25 +148,6 @@ const emit = defineEmits<{
               placeholder="Add any helpful notes about this student…"
             />
           </div>
-
-          <!-- If you want to keep archived on create, uncomment this section.
-               But normally create should default to not archived. -->
-          <!--
-          <div class="flex items-center gap-2 mt-2">
-            <input
-              id="create-archived"
-              v-model="form.isArchived"
-              type="checkbox"
-              class="w-4 h-4 border-slate-300 rounded"
-            />
-            <label
-              for="create-archived"
-              class="text-xs text-slate-700"
-            >
-              Mark as archived
-            </label>
-          </div>
-          -->
 
           <p
             v-if="errorText"

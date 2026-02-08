@@ -40,7 +40,7 @@ async function loadOrganizations() {
   try {
     const rows = await $fetch<OrganizationOption[]>('/api/organizations')
     organizations.value = Array.isArray(rows) ? rows : []
-  } catch (e: any) {
+  } catch (e: error) {
     orgsError.value = e?.data?.message ?? e?.message ?? 'Failed to load organizations.'
     organizations.value = []
   } finally {
@@ -145,7 +145,7 @@ async function add() {
     })
 
     closeCreate()
-  } catch (e: any) {
+  } catch (e: error) {
     createError.value = e?.data?.message ?? e?.message ?? 'Failed to create student.'
   }
 }
@@ -170,7 +170,7 @@ const draft = reactive({
   isArchived: false as boolean | null,
 })
 
-function openEdit(s: any) {
+function openEdit(s: Student) {
   editError.value = null
 
   Object.assign(draft, {
@@ -229,7 +229,7 @@ async function saveEdit() {
     })
 
     closeEdit()
-  } catch (e: any) {
+  } catch (e: error) {
     editError.value = e?.data?.message ?? e?.message ?? 'Failed to save changes.'
   }
 }
@@ -259,7 +259,7 @@ const organizationFilter = ref('All')
 
 const grades = computed(() => {
   const set = new Set<string>()
-  students.value.forEach((s: any) => {
+  students.value.forEach((s: Student) => {
     if (s.gradeLevel !== null && s.gradeLevel !== undefined) {
       set.add(String(s.gradeLevel))
     }
@@ -269,7 +269,7 @@ const grades = computed(() => {
 
 const programs = computed(() => {
   const set = new Set<string>()
-  students.value.forEach((s: any) => {
+  students.value.forEach((s: Student) => {
     const p = (s.program || '').trim()
     if (p) set.add(p)
   })
@@ -283,7 +283,7 @@ const programs = computed(() => {
  * - search + filters include "None"
  */
 const normalizedStudents = computed(() => {
-  return students.value.map((s: any) => {
+  return students.value.map((s: Student) => {
     const org =
       s.organization && String(s.organization).trim() !== ''
         ? String(s.organization).trim()
@@ -298,7 +298,7 @@ const normalizedStudents = computed(() => {
 
 const organizationNames = computed(() => {
   const set = new Set<string>()
-  normalizedStudents.value.forEach((s: any) => {
+  normalizedStudents.value.forEach((s: Student) => {
     const o = (s.organization || '').trim()
     if (o) set.add(o)
   })
@@ -308,7 +308,7 @@ const organizationNames = computed(() => {
 const visibleStudents = computed(() => {
   const q = search.value.trim().toLowerCase()
 
-  let base = normalizedStudents.value.filter((s: any) => {
+  let base = normalizedStudents.value.filter((s: Student) => {
     const fullName = `${s.lastName}, ${s.firstName}`.toLowerCase()
     const program = (s.program || '').toLowerCase()
     const organization = (s.organization || '').toLowerCase()
@@ -338,17 +338,17 @@ const visibleStudents = computed(() => {
   })
 
   if (sortMode.value === 'name') {
-    base.sort((a: any, b: any) =>
+    base.sort((a: Student, b: Student) =>
       `${a.lastName}${a.firstName}`.localeCompare(`${b.lastName}${b.firstName}`),
     )
   } else if (sortMode.value === 'grade_desc') {
     base.sort(
-      (a: any, b: any) =>
+      (a: Student, b: Student) =>
         (b.gradeLevel ?? Number.NEGATIVE_INFINITY) - (a.gradeLevel ?? Number.NEGATIVE_INFINITY),
     )
   } else if (sortMode.value === 'grade_asc') {
     base.sort(
-      (a: any, b: any) =>
+      (a: Student, b: Student) =>
         (a.gradeLevel ?? Number.POSITIVE_INFINITY) - (b.gradeLevel ?? Number.POSITIVE_INFINITY),
     )
   }

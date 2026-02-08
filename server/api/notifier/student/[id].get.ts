@@ -1,11 +1,11 @@
 import { supabase } from '../../../supabase.js';
 import { defineEventHandler } from 'h3';
 
-function bigIntToNumberOrString(obj: any) {
+function bigIntToNumberOrString(obj: bigint) {
   return Object.fromEntries(
     Object.entries(obj).map(([key, value]) => {
       if (typeof value === 'bigint') {
-        return [key, Number(value)]; // or value.toString() if number might overflow
+        return [key, Number(value)]; 
       }
       return [key, value];
     })
@@ -15,7 +15,6 @@ function bigIntToNumberOrString(obj: any) {
 export default defineEventHandler(async (event) => {
   const student_id = Number(event.context.params?.id);
   if (!student_id) {
-    console.log('400 Bad Request');
     return { error: 'Invalid student_id' };
   }
 

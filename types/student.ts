@@ -8,4 +8,5 @@ export type Student = {
   gradeLevel:number,
   notes:string,
   isArchived:boolean,
+  organization:string
 }
