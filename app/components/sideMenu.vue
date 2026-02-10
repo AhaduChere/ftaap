@@ -10,11 +10,10 @@ const closeMenu = () => emit('close');
 
 function handleOutsideClick(e: MouseEvent) {
   const menu = document.querySelector('.sideMenuDropShadow');
-  const navbar = document.querySelector('#icon');
-  if (navbar) {
+  const navbarIcon = document.querySelector('#icon');
+  if (navbarIcon && navbarIcon.contains(e.target as Node)) {
     return;
-  }
-  if (menu && !menu.contains(e.target as Node)) {
+  } else if (menu && !menu.contains(e.target as Node)) {
     closeMenu();
   }
 }

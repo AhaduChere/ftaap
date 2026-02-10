@@ -7,7 +7,7 @@ export default defineNuxtRouteMiddleware(async (to) => {
 
   const {
     data: { user },
-  } = await ($supabase as any).auth.getUser();
+  } = await $supabase.auth.getUser();
 
   if (!user && to.path !== '/login') {
     return navigateTo('/login');
