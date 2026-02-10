@@ -13,6 +13,7 @@ export default defineEventHandler(async (event) => {
       isAdmin = false;
     }
 
+
     return { success: true, isAdmin };
   } catch (err) {
     return { success: false, message: 'Server error:', err };

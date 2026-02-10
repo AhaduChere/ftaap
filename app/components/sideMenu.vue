@@ -1,15 +1,19 @@
 <script setup lang="ts">
 import { watch, onMounted, onBeforeUnmount } from 'vue';
 const { $supabase } = useNuxtApp();
-  
+
 const emit = defineEmits(['close']);
 const props = defineProps({ isOpen: Boolean });
+const admin = ref(false);
 
 const closeMenu = () => emit('close');
 
 function handleOutsideClick(e: MouseEvent) {
   const menu = document.querySelector('.sideMenuDropShadow');
-  if (menu && !menu.contains(e.target as Node)) {
+  const navbarIcon = document.querySelector('#icon');
+  if (navbarIcon && navbarIcon.contains(e.target as Node)) {
+    return;
+  } else if (menu && !menu.contains(e.target as Node)) {
     closeMenu();
   }
 }
@@ -40,6 +44,21 @@ async function logout() {
   await $supabase.auth.signOut();
   window.location.reload();
 }
+
+onMounted(async () => {
+  const { data: userdata } = await $supabase.auth.getUser();
+  const data = await $fetch('/api/admin', {
+    method: 'POST',
+    body: {
+      userId: userdata.user.id,
+    },
+  });
+  if (data.isAdmin) {
+    admin.value = !!data.isAdmin;
+  } else {
+    admin.value = false;
+  }
+});
 </script>
 
 <template>
@@ -56,9 +75,7 @@ async function logout() {
         <ul class="py-2">
           <!-- Dashboard -->
           <li>
-            <div class="px-4 py-3 font-semibold text-lg text-[#e2fafc] border-b border-white/30 no-select">
-              Dashboard
-            </div>
+            <div class="px-4 py-3 font-semibold text-lg text-[#e2fafc] border-b border-white/30 no-select">Dashboard</div>
             <div class="text-[#e2fafc]">
               <NuxtLink to="/" class="block px-8 py-2 border-b border-white/20 hover:bg-[#205a5f] cursor-pointer" @click="closeMenu">
                 Overview
@@ -70,30 +87,51 @@ async function logout() {
 
           <!-- Students -->
           <li>
-            <div class="px-4 py-3 font-semibold text-lg text-[#e2fafc] border-b border-white/30 no-select" >
-              Students
-            </div>
+            <div class="px-4 py-3 font-semibold text-lg text-[#e2fafc] border-b border-white/30 no-select">Students</div>
             <div class="text-[#e2fafc]">
-              <NuxtLink to="/manageStudents" class="block px-8 py-2 border-b border-white/20 hover:bg-[#205a5f] cursor-pointer" @click="closeMenu">
+              <NuxtLink
+                to="/manageStudents"
+                class="block px-8 py-2 border-b border-white/20 hover:bg-[#205a5f] cursor-pointer"
+                @click="closeMenu">
                 Manage Students
               </NuxtLink>
-              <NuxtLink to="/archivedStudents" class="block px-8 py-2 border-b border-white/20 hover:bg-[#205a5f] cursor-pointer" @click="closeMenu">
+              <NuxtLink
+                to="/archivedStudents"
+                class="block px-8 py-2 border-b border-white/20 hover:bg-[#205a5f] cursor-pointer"
+                @click="closeMenu">
                 Archived Students
               </NuxtLink>
-              <NuxtLink to="/progressReport/report" class="block px-8 py-2 border-b border-white/20 hover:bg-[#205a5f] cursor-pointer" @click="closeMenu">
+              <NuxtLink
+                to="/progressReport/report"
+                class="block px-8 py-2 border-b border-white/20 hover:bg-[#205a5f] cursor-pointer"
+                @click="closeMenu">
                 Progress Tracker
               </NuxtLink>
-              <div class="px-8 py-2 border-b border-white/20 hover:bg-[#205a5f] cursor-pointer" @click="closeMenu">Attendance </div>
+              <div class="px-8 py-2 border-b border-white/20 hover:bg-[#205a5f] cursor-pointer" @click="closeMenu">Attendance</div>
+            </div>
+          </li>
+
+          <!-- Teachers -->
+          <li v-if="admin">
+            <div class="px-4 py-3 font-semibold text-lg text-[#e2fafc] border-b border-white/30 no-select">Teachers</div>
+            <div class="text-[#e2fafc]">
+              <NuxtLink
+                to="/manageTeachers"
+                class="block px-8 py-2 border-b border-white/20 hover:bg-[#205a5f] cursor-pointer"
+                @click="closeMenu">
+                Manage Teachers
+              </NuxtLink>
             </div>
           </li>
 
           <!--Students' Scores-->
           <li>
-            <div class="px-4 py-3 font-semibold text-lg text-[#e2fafc] border-b border-white/30 no-select" >
-              Grades
-            </div>
+            <div class="px-4 py-3 font-semibold text-lg text-[#e2fafc] border-b border-white/30 no-select">Grades</div>
             <div class="text-[#e2fafc]">
-              <NuxtLink to="/manageScores" class="block px-8 py-2 border-b border-white/20 hover:bg-[#205a5f] cursor-pointer" @click="closeMenu">
+              <NuxtLink
+                to="/manageScores"
+                class="block px-8 py-2 border-b border-white/20 hover:bg-[#205a5f] cursor-pointer"
+                @click="closeMenu">
                 Manage Scores
               </NuxtLink>
             </div>
@@ -101,7 +139,7 @@ async function logout() {
 
           <!-- Settings -->
           <li>
-            <div class="px-4 py-3 font-semibold text-lg text-[#e2fafc] border-b border-white/30 no-select" >Settings</div>
+            <div class="px-4 py-3 font-semibold text-lg text-[#e2fafc] border-b border-white/30 no-select">Settings</div>
             <div class="text-[#e2fafc]">
               <div class="px-8 py-2 border-b border-white/20 hover:bg-[#205a5f] cursor-pointer" @click="closeMenu">Account</div>
               <div class="px-8 py-2 border-b border-white/20 hover:bg-[#205a5f] cursor-pointer" @click="closeMenu">Notifications</div>
