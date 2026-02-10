@@ -1,6 +1,6 @@
 <template>
   <div>
-    <TopNavbar v-if="!isAdminPage && !isTeacherPage" />
+    <TopNavbar v-if="!isAdminPage" />
     <NuxtPage />
   </div>
 </template>
@@ -10,7 +10,6 @@ import { useStudentScoresData } from './composables/studentScores.js';
 
 const route = useRoute();
 const isAdminPage = computed(() => route.path.startsWith('/login'));
-const isTeacherPage = computed(() => route.path.startsWith('/teacher'));
 
 const studentScoresData = useStudentScoresData();
 const studentAttendanceData = useStudentAttendanceData();

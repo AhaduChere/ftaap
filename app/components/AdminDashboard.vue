@@ -177,7 +177,7 @@ async function createTeacher() {
   };
 
   try {
-    const data = await $fetch('/api/teacher', {
+    const data = await $fetch('/api/teacher/teacher', {
       method: 'POST',
       body: payload,
     });
