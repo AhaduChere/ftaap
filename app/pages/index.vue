@@ -1,15 +1,13 @@
 <template>
-  <div>
-    <ClientOnly>
-      <div v-if="loading">
-        <Loader />
-      </div>
-      <div v-else>
-        <div v-if="admin"><AdminDashboard /></div>
-        <div v-else><TeacherDashboard /></div>
-      </div>
-    </ClientOnly>
-  </div>
+  <main>
+    <div v-if="loading">
+      <Loader />
+    </div>
+    <div v-else>
+      <div v-if="admin"><AdminDashboard /></div>
+      <div v-else><TeacherDashboard /></div>
+    </div>
+  </main>
 </template>
 
 <script setup>

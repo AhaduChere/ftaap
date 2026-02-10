@@ -1,5 +1,8 @@
 <template>
-  <div class="min-h-screen bg-gradient-to-b from-[#f7feff] to-slate-100 flex flex-col items-center pt-24">
+  <div v-if="loading">
+    <loader />
+  </div>
+  <div v-else class="min-h-screen bg-gradient-to-b from-[#f7feff] to-slate-100 flex flex-col items-center pt-24">
     <main class="w-full max-w-6xl px-4 pb-10 space-y-6 flex flex-col items-center">
       <section class="w-full bg-white border border-[#2e777e] shadow-lg rounded-xl overflow-hidden p-6 flex justify-center gap-2">
         <button class="px-4 py-2 bg-[#2e777e] text-white rounded-md hover:bg-[#3b797e]" @click="toggleTeacherForm()">Add Teacher</button>
@@ -7,14 +10,14 @@
         <button class="px-4 py-2 bg-[#2e777e] text-white rounded-md hover:bg-[#3b797e]">Generate Report</button>
       </section>
 
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 w-full">
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 w-full max-h-[60em]">
         <section class="bg-white border border-[#2e777e] shadow-lg rounded-xl overflow-hidden flex flex-col">
-          <div class="p-4 bg-[#3b797e]/80 text-white font-semibold text-center rounded-t-lg">Students</div>
+          <div class="p-4 bg-[#3b797e] text-white font-semibold text-center rounded-t-lg">Students</div>
           <div class="flex flex-col sm:flex-row gap-4 p-4">
             <input
               v-model="search_S"
               type="text"
-              placeholder="Search students…"
+              placeholder="Search students"
               class="flex-1 px-3 py-2 rounded-md outline-none ring-1 ring-[#2e777e] bg-white text-gray-900" />
           </div>
           <div class="flex-1 overflow-y-auto p-4 flex flex-col gap-3 h-[60vh] max-h-[60vh]">
@@ -29,12 +32,12 @@
         </section>
 
         <section class="bg-white border border-[#2e777e] shadow-lg rounded-xl overflow-hidden flex flex-col">
-          <div class="p-4 bg-[#3b797e]/80 text-white font-semibold text-center rounded-t-lg">Teachers</div>
+          <div class="p-4 bg-[#3b797e] text-white font-semibold text-center rounded-t-lg">Teachers</div>
           <div class="flex flex-col sm:flex-row gap-4 p-4">
             <input
               v-model="search_T"
               type="text"
-              placeholder="Search teachers…"
+              placeholder="Search teachers"
               class="flex-1 px-3 py-2 rounded-md outline-none ring-1 ring-[#2e777e] bg-white text-gray-900" />
           </div>
           <div class="flex-1 overflow-y-auto p-4 flex flex-col gap-3 min-h-[60vh] max-h-[60vh]">
@@ -113,6 +116,7 @@
 const students = ref([]);
 const teachers = ref([]);
 const organizations = ref([]);
+const loading = ref(true);
 
 onMounted(async () => {
   try {
@@ -129,6 +133,7 @@ onMounted(async () => {
   } catch (error) {
     console.error('IDK man:', error);
   }
+  loading.value = false;
 });
 
 // search stuff
@@ -194,12 +199,3 @@ async function createTeacher() {
 }
 </script>
 
-<style scoped>
-::-webkit-scrollbar {
-  display: none;
-}
-* {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
-}
-</style>
