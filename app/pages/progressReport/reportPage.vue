@@ -86,6 +86,7 @@
           <div class="p-2 bg-[#2e777e] text-white font-semibold text-center rounded-t-md">Student Overview</div>
           <StudentOverviewChart :student-score-id="selectedStudent?.id" />
         </div>
+
         <div class="col-span-1 md:col-span-2 flex items-center justify-center md:flex-row flex-col md:w-3/4 w-full gap-3">
           <div v-if="selectedStudent" class="md:w-1/2 w-7/8 h-[18rem] bg-white border border-[#2e777e] border-1 drop-shadow-lg rounded-md">
             <div class="p-2 bg-[#2e777e] text-white font-semibold text-center rounded-t-md">ORF Score</div>
@@ -100,6 +101,7 @@
             <h1 class="font-semibold text-[#2e777e]">Please Select a Student to view Progress</h1>
           </div>
         </div>
+
       </section>
     </template>
     

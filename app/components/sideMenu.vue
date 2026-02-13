@@ -113,13 +113,19 @@ onMounted(async () => {
 
           <!-- Teachers -->
           <li v-if="admin">
-            <div class="px-4 py-3 font-semibold text-lg text-[#e2fafc] border-b border-white/30 no-select">Teachers</div>
+            <div class="px-4 py-3 font-semibold text-lg text-[#e2fafc] border-b border-white/30 no-select">Admin</div>
             <div class="text-[#e2fafc]">
               <NuxtLink
                 to="/manageTeachers"
                 class="block px-8 py-2 border-b border-white/20 hover:bg-[#205a5f] cursor-pointer"
                 @click="closeMenu">
                 Manage Teachers
+              </NuxtLink>
+              <NuxtLink
+                to="/manageOrgs"
+                class="block px-8 py-2 border-b border-white/20 hover:bg-[#205a5f] cursor-pointer"
+                @click="closeMenu">
+                Manage Organizations
               </NuxtLink>
             </div>
           </li>

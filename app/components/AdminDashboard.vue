@@ -112,7 +112,7 @@
 </template>
 
 <script setup>
-// basic stuff
+//NOTE: basic stuff
 const students = ref([]);
 const teachers = ref([]);
 const organizations = ref([]);
@@ -136,7 +136,7 @@ onMounted(async () => {
   loading.value = false;
 });
 
-// search stuff
+//NOTE: search stuff
 const search_T = ref('');
 const search_S = ref('');
 
@@ -152,7 +152,7 @@ const filteredTeachers = computed(() => {
   );
 });
 
-// teacher form stuff
+// NOTE: teacher form stuff
 const teacherform = ref(false);
 const firstName = ref('');
 const lastName = ref('');
