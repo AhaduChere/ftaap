@@ -9,11 +9,14 @@ export default defineEventHandler(async (event) => {
     const { data: teacherOrganization } = await supabase
       .from('Organization')
       .select('organization_name')
-      .eq('organization_id', teacherData.organization_id);
+      .eq('id', teacherData.organization_id);
+
+    const { data: teacherEmail } = await supabase.from('User').select('email').eq('teacher_id', teacherData.teacher_id).single();
 
     const teacherInfo = {
       ...teacherData,
       Organization: teacherOrganization,
+      Email: teacherEmail.email,
     };
 
     const { data: studentInfo } = await supabase.from('Student').select(`*, Student_Score!student_score_id (*)`).eq('teacher_id', id);

@@ -44,7 +44,7 @@
             <NuxtLink
               v-for="(teacher, t) in filteredTeachers"
               :key="t"
-              :to="`/teacher/${teacher.teacher_id}`"
+              :to="`/teacherProfile/${teacher.teacher_id}`"
               class="px-4 py-3 border border-[#2e777e] rounded-md bg-white text-black hover:bg-gray-50 transition-transform hover:scale-[1.01]">
               {{ teacher.teacher_fname }} {{ teacher.teacher_lname }}
             </NuxtLink>
@@ -198,4 +198,3 @@ async function createTeacher() {
   }
 }
 </script>
-

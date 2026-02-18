@@ -1,0 +1,26 @@
+{
+  "session_name": "ftaap",
+  "windows": [
+    {
+      "window_name": "Dev",
+      "layout": "even-horizontal",
+      "panes": [
+        {
+          "shell_command": ["nvim app/"],
+          "focus": true
+        },
+        {
+          "shell_command": ["nvim server/"]
+        }
+      ]
+    },
+    {
+      "window_name": "Server",
+      "panes": [
+        {
+          "shell_command": ["npm run dev"]
+        }
+      ]
+    }
+  ]
+}
