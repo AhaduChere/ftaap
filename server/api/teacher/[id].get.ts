@@ -11,12 +11,19 @@ export default defineEventHandler(async (event) => {
       .select('organization_name')
       .eq('id', teacherData.organization_id);
 
-    const { data: teacherEmail } = await supabase.from('User').select('email').eq('teacher_id', teacherData.teacher_id).single();
+    const { data: teacherID } = await supabase.from('User').select('auth_id').eq('teacher_id', teacherData.teacher_id).single();
+
+    const { data: userstuff } = await supabase.auth.admin.getUserById(teacherID?.auth_id);
+
+    const rawlogin = userstuff.user?.last_sign_in_at;
+    const lastlogin = rawlogin ? new Date(rawlogin).toLocaleDateString('en-US') : null;
+    const teacherEmail = userstuff.user?.email || 'No Email';
 
     const teacherInfo = {
       ...teacherData,
       Organization: teacherOrganization,
-      Email: teacherEmail.email,
+      Email: teacherEmail,
+      Lastlogin: lastlogin,
     };
 
     const { data: studentInfo } = await supabase.from('Student').select(`*, Student_Score!student_score_id (*)`).eq('teacher_id', id);
