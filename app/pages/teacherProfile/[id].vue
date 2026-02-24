@@ -2,11 +2,11 @@
 <template>
   <section v-if="loading"><Loader /></section>
 
-  <section v-else class="fixed inset-0 flex items-center justify-center bg-gray-100 mt-20">
+  <section v-else class="fixed inset-0 flex items-center justify-center bg-gray-100 mt-20 gap-2">
     <!-- <div class="fixed left-8"> -->
     <div class="flex flex-col gap-6">
       <!-- NOTE:Teacher card -->
-      <div class="w-[30rem] h-fit rounded-2xl shadow-xl bg-white border border-[#2e777e]/30 p-8 flex flex-col items-center">
+      <div class="w-[30rem] h-fit min-h-[35rem] rounded-2xl shadow-xl bg-white border border-[#2e777e]/30 p-8 flex flex-col items-center">
         <div class="w-20 h-20 rounded-full bg-[#2e777e] text-white flex items-center justify-center text-2xl font-bold">
           {{ teacher.teacher_fname?.[0] }}{{ teacher.teacher_lname?.[0] }}
         </div>
@@ -14,43 +14,53 @@
         <h2 class="text-2xl font-semibold text-center">{{ teacher.teacher_fname }} {{ teacher.teacher_lname }}</h2>
 
         <p class="text-gray-500 text-sm">{{ teacher.Email }}</p>
+        <!-- <p class="text-gray-500 text-sm">Last login: {{ teacher.Lastlogin }}</p> -->
 
-        <div class="w-full text-center bg-gray-50 rounded-lg px-4 pb-2">
+        <div class="w-full text-center bg-gray-50 rounded-lg px-4">
           <p class="text-xl font-semibold text-center">Organizations</p>
-          <div v-for="org in teacher.Organization" :key="org.organization_name" class="text-md font-bold text-gray-500 flex flex-col gap-1">
+          <div v-for="org in teacher.Organization" :key="org.organization_name" class="text-md font-bold text-gray-500 flex flex-col">
             {{ org.organization_name }}
           </div>
         </div>
+
         <div class="w-full text-center bg-gray-50 rounded-lg px-4">
-          <p class="text-xl font-semibold text-center">Account Information</p>
-          <p class="text-md font-bold text-gray-500">Last login: {{ teacher.Lastlogin }}</p>
-          <p class="text-md font-bold text-gray-500">Total Students: {{ students.length }}</p>
+          <p class="text-xl font-semibold text-center">Last login</p>
+          <div class="text-md font-bold text-gray-500 flex flex-col">
+            {{ teacher.Lastlogin }}
+          </div>
         </div>
+
         <div class="w-full text-center bg-gray-50 rounded-lg">
           <Bar :data="makeTeacherChartData(avgScores)" :options="makeTeacherChartOptions()" />
         </div>
+        <button
+          class="w-full mt-2 px-4 py-3 bg-[#2e777e] text-white font-semibold rounded-lg hover:bg-[#256166] active:scale-95 transition"
+          @click="console.log('Tried to edit teacher, not functional yet')">
+          Edit Teacher
+        </button>
       </div>
     </div>
 
     <!-- NOTE:Student panel -->
 
-    <!-- <div class="w-fit bg-gray-50 rounded-lg"> -->
-    <!--   <p class="text-2xl font-semibold text-center">Students</p> -->
-    <!---->
-    <!--   <div class="rounded-2xl shadow-xl p-6 max-w-[50rem] flex flex-col overflow-x-auto max-h-[30rem]"> -->
-    <!--     <div class="flex flex-col gap-4 row-col-2"> -->
-    <!--       <NuxtLink -->
-    <!--         v-for="student in students" -->
-    <!--         :key="student.student_id" -->
-    <!--         :to="`/progressReport/${student.student_id}`" -->
-    <!--         class="bg-white rounded-xl shadow hover:shadow-md transition p-4"> -->
-    <!--         <div class="h-32"> -->
-    <!--           <Bar :data="makeStudentChartData(student)" :options="makeStudentChartOptions(student)" /> -->
-    <!--         </div> -->
-    <!--       </NuxtLink> -->
-    <!--     </div> -->
-    <!--   </div> -->
-    <!-- </div> -->
+    <div class="w-full max-w-2xl h-fit min-h-[35rem] bg-white rounded-2xl shadow-xl border border-[#2e777e]/30 p-8">
+      <div class="flex items-center justify-between mb-6">
+        <h2 class="text-2xl text-center w-full font-semibold">{{ teacher.teacher_lname }}'s Students</h2>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 max-h-[26rem] overflow-y-auto">
+        <NuxtLink
+          v-for="student in students"
+          :key="student.student_id"
+          :to="`/progressReport/${student.student_id}`"
+          class="bg-gray-50 hover:bg-white rounded-xl border border-black shadow-sm hover:shadow-md hover:scale-[1.01] transition-all duration-200 p-2 m-2 flex flex-col gap-3">
+          <div class="h-32">
+            <Bar :data="makeStudentChartData(student)" :options="makeStudentChartOptions(student)" />
+          </div>
+          <span class="text-xs text-black text-center">View Progress Report →</span>
+        </NuxtLink>
+      </div>
+    </div>
   </section>
 </template>
 
@@ -78,7 +88,7 @@ onMounted(async () => {
       StudentAverages(students.value);
       loading.value = false;
     } else {
-      console.error('no data found');
+      console.error('no data found:', data);
     }
   } catch (error) {
     console.error('Server Error:', error);

@@ -30,6 +30,6 @@ export default defineEventHandler(async (event) => {
 
     return { success: true, TeacherInfo: teacherInfo, StudentInfo: studentInfo };
   } catch (error) {
-    return { success: false, message: 'Server error:', error };
+    return { success: false, message: 'Server error:' + error };
   }
 });

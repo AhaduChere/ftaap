@@ -5,8 +5,8 @@
   <div v-else class="min-h-screen bg-gradient-to-b from-[#f7feff] to-slate-100 flex flex-col items-center pt-24">
     <main class="w-full max-w-6xl px-4 pb-10 space-y-6 flex flex-col items-center">
       <section class="w-full bg-white border border-[#2e777e] shadow-lg rounded-xl overflow-hidden p-6 flex justify-center gap-2">
-        <button class="px-4 py-2 bg-[#2e777e] text-white rounded-md hover:bg-[#3b797e]" @click="toggleTeacherForm()">Add Teacher</button>
-        <button class="px-4 py-2 bg-[#2e777e] text-white rounded-md hover:bg-[#3b797e]">Add Organization</button>
+        <button class="px-4 py-2 bg-[#2e777e] text-white rounded-md hover:bg-[#3b797e]" @click="toggleUserForm()">Create New User</button>
+        <button class="px-4 py-2 bg-[#2e777e] text-white rounded-md hover:bg-[#3b797e]">Create New Organization</button>
         <button class="px-4 py-2 bg-[#2e777e] text-white rounded-md hover:bg-[#3b797e]">Generate Report</button>
       </section>
 
@@ -52,18 +52,15 @@
         </section>
       </div>
     </main>
-    <div v-if="teacherform" class="fixed inset-0 bg-black/50 flex items-center justify-center">
+    <div v-if="userForm" class="fixed inset-0 h-screen backdrop-blur-lg flex items-center justify-center">
       <form
         class="w-full max-w-md bg-white/90 backdrop-blur-sm rounded-2xl shadow-2xl p-8 flex flex-col gap-5 relative"
-        @submit.prevent="createTeacher">
-        <button
-          type="button"
-          class="absolute top-4 right-4 text-gray-600 hover:text-gray-900 text-2xl font-bold"
-          @click="toggleTeacherForm">
+        @submit.prevent="createUser">
+        <button type="button" class="absolute top-4 right-4 text-gray-600 hover:text-gray-900 text-2xl font-bold" @click="toggleUserForm">
           X
         </button>
 
-        <h2 class="text-3xl pb-2 font-extrabold text-center text-[#2e777e]">Create Teacher</h2>
+        <h2 class="text-3xl pb-2 font-extrabold text-center text-[#2e777e]">Create User</h2>
 
         <div class="flex flex-col gap-4">
           <input
@@ -103,7 +100,7 @@
         <button
           type="submit"
           class="px-4 py-3 bg-[#2e777e] text-white font-semibold rounded-lg hover:bg-[#256166] active:scale-95 transition">
-          Create Teacher
+          Create User
         </button>
         <div v-if="error">{{ error }}</div>
       </form>
@@ -153,7 +150,7 @@ const filteredTeachers = computed(() => {
 });
 
 // NOTE: teacher form stuff
-const teacherform = ref(false);
+const userForm = ref(false);
 const firstName = ref('');
 const lastName = ref('');
 const email = ref('');
@@ -162,8 +159,8 @@ const role = ref('');
 const organization = ref('');
 const error = ref('');
 
-function toggleTeacherForm() {
-  teacherform.value = !teacherform.value;
+function toggleUserForm() {
+  userForm.value = !userForm.value;
   if (role.value) {
     role.value = '';
   }
@@ -171,7 +168,7 @@ function toggleTeacherForm() {
     organization.value = '';
   }
 }
-async function createTeacher() {
+async function createUser() {
   const payload = {
     firstName: firstName.value,
     lastName: lastName.value,
@@ -188,7 +185,7 @@ async function createTeacher() {
     });
 
     if (data.success) {
-      toggleTeacherForm();
+      toggleUserForm();
       error.value = '';
     } else {
       error.value('Server error');
