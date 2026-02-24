@@ -52,7 +52,7 @@
         </section>
       </div>
     </main>
-    <div v-if="userForm" class="fixed inset-0 h-screen backdrop-blur-lg flex items-center justify-center">
+    <div v-if="userForm" class="fixed inset-0 h-screen backdrop-blur-lg z-10 flex items-center justify-center">
       <form
         class="w-full max-w-md bg-white/90 backdrop-blur-sm rounded-2xl shadow-2xl p-8 flex flex-col gap-5 relative"
         @submit.prevent="createUser">

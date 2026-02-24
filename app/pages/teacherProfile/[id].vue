@@ -43,22 +43,23 @@
 
     <!-- NOTE:Student panel -->
 
-    <div class="w-full max-w-2xl h-fit min-h-[35rem] bg-white rounded-2xl shadow-xl border border-[#2e777e]/30 p-8">
-      <div class="flex items-center justify-between mb-6">
-        <h2 class="text-2xl text-center w-full font-semibold">{{ teacher.teacher_lname }}'s Students</h2>
+    <div class="grid grid-cols-1 shadow-xl rounded-b-2xl min-h-[35rem] min-w-[30rem]">
+      <div class="h-16 bg-[#2e777e] rounded-t-2xl border border-[#2e777e]/30 flex items-center">
+        <h2 class="text-2xl text-white text-left pl-5 font-semibold">{{ teacher.teacher_lname }}'s Students</h2>
       </div>
-
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 max-h-[26rem] overflow-y-auto">
-        <NuxtLink
-          v-for="student in students"
-          :key="student.student_id"
-          :to="`/progressReport/${student.student_id}`"
-          class="bg-gray-50 hover:bg-white rounded-xl border border-black shadow-sm hover:shadow-md hover:scale-[1.01] transition-all duration-200 p-2 m-2 flex flex-col gap-3">
-          <div class="h-32">
-            <Bar :data="makeStudentChartData(student)" :options="makeStudentChartOptions(student)" />
-          </div>
-          <span class="text-xs text-black text-center">View Progress Report →</span>
-        </NuxtLink>
+      <div class="bg-white rounded-b-2xl">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 p-2 max-h-[31rem] overflow-y-auto">
+          <NuxtLink
+            v-for="student in students"
+            :key="student.student_id"
+            :to="`/progressReport/${student.student_id}`"
+            class="bg-gray-50 hover:bg-white rounded-xl border border-black shadow-sm hover:shadow-md hover:scale-[1.01] transition-all duration-200 p-2 mx-2 flex flex-col gap-3">
+            <div class="h-32">
+              <Bar :data="makeStudentChartData(student)" :options="makeStudentChartOptions(student)" />
+            </div>
+            <span class="text-xs text-black text-center">View Progress Report →</span>
+          </NuxtLink>
+        </div>
       </div>
     </div>
   </section>

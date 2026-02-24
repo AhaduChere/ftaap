@@ -147,7 +147,12 @@ onMounted(async () => {
           <li>
             <div class="px-4 py-3 font-semibold text-lg text-[#e2fafc] border-b border-white/30 no-select">Settings</div>
             <div class="text-[#e2fafc]">
-              <div class="px-8 py-2 border-b border-white/20 hover:bg-[#205a5f] cursor-pointer" @click="closeMenu">Account</div>
+              <NuxtLink
+                to="/Account"
+                class="block px-8 py-2 border-b border-white/20 hover:bg-[#205a5f] cursor-pointer"
+                @click="closeMenu">
+                Account
+              </NuxtLink>
               <div class="px-8 py-2 border-b border-white/20 hover:bg-[#205a5f] cursor-pointer" @click="closeMenu">Notifications</div>
             </div>
           </li>
@@ -182,7 +187,7 @@ onMounted(async () => {
 }
 .sideMenuDropShadow {
   box-shadow: 2px 0 10px #16383b;
-  z-index: 999;
+  z-index: 2;
 }
 .no-select {
   user-select: none;
