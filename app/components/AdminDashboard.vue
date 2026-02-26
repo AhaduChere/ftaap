@@ -52,10 +52,8 @@
         </section>
       </div>
     </main>
-    <div v-if="userForm" class="fixed inset-0 h-screen backdrop-blur-lg z-10 flex items-center justify-center">
-      <form
-        class="w-full max-w-md bg-white/90 backdrop-blur-sm rounded-2xl shadow-2xl p-8 flex flex-col gap-5 relative"
-        @submit.prevent="createUser">
+    <div v-if="userForm" class="fixed inset-0 h-screen bg-black/30 z-10 flex items-center justify-center">
+      <form class="w-full max-w-md bg-white rounded-2xl shadow-2xl p-8 flex flex-col gap-5 relative" @submit.prevent="createUser">
         <button type="button" class="absolute top-4 right-4 text-gray-600 hover:text-gray-900 text-2xl font-bold" @click="toggleUserForm">
           X
         </button>
@@ -91,6 +89,7 @@
           </select>
           <select
             v-model="organization"
+            :disabled="role === 'Admin'"
             class="px-4 py-3 border rounded-lg focus:outline-none ring-2 ring-[#2e777e] transition bg-white/90">
             <option value="">Select Organization</option>
             <option v-for="org in organizations" :key="org.id" :value="org.id">{{ org.organization_name }}</option>
@@ -161,12 +160,6 @@ const error = ref('');
 
 function toggleUserForm() {
   userForm.value = !userForm.value;
-  if (role.value) {
-    role.value = '';
-  }
-  if (organization.value) {
-    organization.value = '';
-  }
 }
 async function createUser() {
   const payload = {
@@ -179,7 +172,7 @@ async function createUser() {
   };
 
   try {
-    const data = await $fetch('/api/teacher/teacher', {
+    const data = await $fetch('/api/user', {
       method: 'POST',
       body: payload,
     });
@@ -188,7 +181,8 @@ async function createUser() {
       toggleUserForm();
       error.value = '';
     } else {
-      error.value('Server error');
+      error.value = 'Server error';
+      console.log(data);
     }
   } catch (error) {
     console.error(error);

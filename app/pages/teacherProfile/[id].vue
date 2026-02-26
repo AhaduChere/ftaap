@@ -6,55 +6,47 @@
     <!-- <div class="fixed left-8"> -->
     <div class="flex flex-col gap-6">
       <!-- NOTE:Teacher card -->
-      <div class="w-[30rem] h-fit min-h-[35rem] rounded-2xl shadow-xl bg-white border border-[#2e777e]/30 p-8 flex flex-col items-center">
-        <div class="w-20 h-20 rounded-full bg-[#2e777e] text-white flex items-center justify-center text-2xl font-bold">
-          {{ teacher.teacher_fname?.[0] }}{{ teacher.teacher_lname?.[0] }}
+
+      <div class="w-[30rem] h-fit min-h-[35rem] rounded-2xl shadow-xl bg-white border border-[#2e777e]/30 flex flex-col items-center">
+        <div class="h-16 w-full bg-[#2e777e] rounded-t-2xl border border-[#2e777e]/30 flex items-center">
+          <h2 class="text-2xl text-white text-center w-full pl-5 font-semibold">{{ teacher.teacher_fname }} {{ teacher.teacher_lname }}</h2>
         </div>
+        <div class="px-8 py-2 flex flex-col flex-1 w-full">
+          <div class="text-center">
+            <p class="text-xl font-semibold text-center">Account Information</p>
+            <p class="text-gray-500 text-sm">{{ teacher.Email }}</p>
+            <p class="text-gray-500 text-sm">Last login: {{ teacher.Lastlogin }}</p>
+            <p class="text-gray-500 text-sm">Current students: {{ students.length }}</p>
+          </div>
 
-        <h2 class="text-2xl font-semibold text-center">{{ teacher.teacher_fname }} {{ teacher.teacher_lname }}</h2>
+          <div class="w-full text-center bg-gray-50 rounded-lg px-4">
+            <p class="text-xl font-semibold text-center">Organizations</p>
+            <div v-for="org in teacher.Organization" :key="org.organization_name" class="text-md font-bold text-gray-500 flex flex-col">
+              {{ org.organization_name }} <br />
+            </div>
+          </div>
 
-        <p class="text-gray-500 text-sm">{{ teacher.Email }}</p>
-        <!-- <p class="text-gray-500 text-sm">Last login: {{ teacher.Lastlogin }}</p> -->
-
-        <div class="w-full text-center bg-gray-50 rounded-lg px-4">
-          <p class="text-xl font-semibold text-center">Organizations</p>
-          <div v-for="org in teacher.Organization" :key="org.organization_name" class="text-md font-bold text-gray-500 flex flex-col">
-            {{ org.organization_name }}
+          <div class="mt-auto min-h-[18rem] bg-gray-50 rounded-lg">
+            <Bar :data="makeTeacherChartData(avgScores)" :options="makeTeacherChartOptions()" />
           </div>
         </div>
-
-        <div class="w-full text-center bg-gray-50 rounded-lg px-4">
-          <p class="text-xl font-semibold text-center">Last login</p>
-          <div class="text-md font-bold text-gray-500 flex flex-col">
-            {{ teacher.Lastlogin }}
-          </div>
-        </div>
-
-        <div class="w-full text-center bg-gray-50 rounded-lg">
-          <Bar :data="makeTeacherChartData(avgScores)" :options="makeTeacherChartOptions()" />
-        </div>
-        <button
-          class="w-full mt-2 px-4 py-3 bg-[#2e777e] text-white font-semibold rounded-lg hover:bg-[#256166] active:scale-95 transition"
-          @click="console.log('Tried to edit teacher, not functional yet')">
-          Edit Teacher
-        </button>
       </div>
     </div>
 
     <!-- NOTE:Student panel -->
 
-    <div class="grid grid-cols-1 shadow-xl rounded-b-2xl min-h-[35rem] min-w-[30rem]">
+    <div class="grid grid-cols-1 shadow-xl rounded-b-2xl min-h-[35rem] max-w-[50rem]">
       <div class="h-16 bg-[#2e777e] rounded-t-2xl border border-[#2e777e]/30 flex items-center">
-        <h2 class="text-2xl text-white text-left pl-5 font-semibold">{{ teacher.teacher_lname }}'s Students</h2>
+        <h2 class="w-full text-2xl text-white text-center pl-5 font-semibold">{{ teacher.teacher_lname }}'s Students</h2>
       </div>
       <div class="bg-white rounded-b-2xl">
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 p-2 max-h-[31rem] overflow-y-auto">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 p-2 max-h-[30rem] overflow-y-auto mt-4">
           <NuxtLink
             v-for="student in students"
             :key="student.student_id"
             :to="`/progressReport/${student.student_id}`"
             class="bg-gray-50 hover:bg-white rounded-xl border border-black shadow-sm hover:shadow-md hover:scale-[1.01] transition-all duration-200 p-2 mx-2 flex flex-col gap-3">
-            <div class="h-32">
+            <div class="h-fit">
               <Bar :data="makeStudentChartData(student)" :options="makeStudentChartOptions(student)" />
             </div>
             <span class="text-xs text-black text-center">View Progress Report →</span>
@@ -158,7 +150,7 @@ const makeStudentChartData = (student) => ({
 const makeStudentChartOptions = (student) => ({
   devicePixelRatio: 3,
   layout: {
-    padding: 8,
+    padding: { bottom: -30 },
   },
   plugins: {
     legend: { display: false },
@@ -166,13 +158,14 @@ const makeStudentChartOptions = (student) => ({
       display: true,
       text: `${student.student_fname} ${student.student_lname}`,
       font: { size: 14, weight: 'bold' },
-      padding: { bottom: 8 },
+      padding: { bottom: 15 },
     },
   },
 });
 
 const makeTeacherChartOptions = () => ({
   devicePixelRatio: 3,
+  maintainAspectRatio: false,
   layout: {
     padding: {
       top: 10,
