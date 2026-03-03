@@ -1,10 +1,10 @@
 import { supabase } from '../supabase.js';
-import { defineEventHandler } from 'h3';
+import { defineEventHandler, readBody } from 'h3';
 
 export default defineEventHandler(async (event) => {
-  const { organization_name } = await readBody(event);
+  const { org_name } = await readBody(event);
   try {
-    const { data, error } = await supabase.from('Organization').insert({ organization_name: organization_name });
+    const { data, error } = await supabase.from('Organization').insert({ organization_name: org_name });
 
     console.log(data);
     console.log(error);

@@ -295,7 +295,7 @@ async function createOrg() {
   try {
     const data = await $fetch('/api/organization', {
       method: 'POST',
-      body: org_name,
+      body: { org_name: org_name.value },
     });
 
     if (data.success) {
