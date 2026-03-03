@@ -11,24 +11,23 @@
         <div class="h-16 w-full bg-[#2e777e] rounded-t-2xl border border-[#2e777e]/30 flex items-center">
           <h2 class="text-2xl text-white text-center w-full pl-5 font-semibold">{{ teacher.teacher_fname }} {{ teacher.teacher_lname }}</h2>
         </div>
-        <div class="px-8 py-2 flex flex-col flex-1 w-full">
-          <div class="text-center">
-            <p class="text-xl font-semibold text-center">Account Information</p>
+        <div class="px-8 py-2 flex flex-col flex-1 w-full h-full justify-center items-center">
+          <div class="text-center w-full">
+            <p class="text-xl font-semibold">Account Information</p>
             <p class="text-gray-500 text-sm">{{ teacher.Email }}</p>
             <p class="text-gray-500 text-sm">Last login: {{ teacher.Lastlogin }}</p>
             <p class="text-gray-500 text-sm">Current students: {{ students.length }}</p>
           </div>
 
-          <div class="w-full text-center bg-gray-50 rounded-lg px-4">
-            <p class="text-xl font-semibold text-center">Organizations</p>
+          <div class="w-full text-center bg-gray-50 rounded-lg px-4 mt-6">
+            <p class="text-xl font-semibold">Organizations</p>
             <div v-for="org in teacher.Organization" :key="org.organization_name" class="text-md font-bold text-gray-500 flex flex-col">
-              {{ org.organization_name }} <br />
+              {{ org.organization_name }}
             </div>
           </div>
-
-          <div class="mt-auto min-h-[18rem] bg-gray-50 rounded-lg">
-            <Bar :data="makeTeacherChartData(avgScores)" :options="makeTeacherChartOptions()" />
-          </div>
+        </div>
+        <div class="mt-auto w-full min-h-[18rem] bg-gray-50 rounded-lg">
+          <Bar :data="makeTeacherChartData(avgScores)" :options="makeTeacherChartOptions()" />
         </div>
       </div>
     </div>
