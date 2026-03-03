@@ -8,23 +8,15 @@
         <div class="flex flex-col gap-6">
           <div
             class="w-[30rem] h-fit min-h-[35rem] rounded-2xl shadow-xl bg-white border border-[#2e777e]/30 p-8 flex flex-col items-center">
-            <img v-if="file" @src="file" />
             <button
-              class="w-20 h-20 rounded-full bg-[#2e777e] text-white flex items-center justify-center text-2xl font-bold"
-              @click="upload()"
-              @change="handleFileUpload">
-              photo here
+              class="w-20 h-20 rounded-full bg-[#2e777e] text-white flex items-center justify-center text-2xl font-bold overflow-hidden"
+              @click="upload()">
+              <img v-if="avatarUrl" :src="avatarUrl" class="w-full h-full object-cover" />
+              <span v-else>photo</span>
             </button>
-            <input id="fileInput" type="file" accept="image/*" style="display: none" />
-
-            <h2 class="text-2xl font-semibold text-center">name</h2>
-
-            <p class="text-gray-500 text-sm">email</p>
-
-            <div class="w-full text-center bg-gray-50 rounded-lg px-4">
-              <p class="text-xl font-semibold text-center">Organizations</p>
-            </div>
-
+            <input id="fileInput" type="file" accept="image/*" style="display: none" @change="handleFileUpload" />
+            <h2 class="text-2xl font-semibold text-center mt-4">{{ userdata.first_name }} {{ userdata.last_name }}</h2>
+            <p class="text-gray-500 text-sm">{{ user.data.user.email }}</p>
             <div class="w-full text-center bg-gray-50 rounded-lg"></div>
             <button
               class="w-full mt-2 px-4 py-3 bg-[#2e777e] text-white font-semibold rounded-lg hover:bg-[#256166] active:scale-95 transition"
@@ -42,17 +34,23 @@
 const loading = ref(true);
 const { $supabase } = useNuxtApp();
 const user = ref();
-const file = ref(null);
+const avatarUrl = ref(null);
+const userdata = ref({});
 
 onMounted(async () => {
   try {
     user.value = await $supabase.auth.getUser();
     const id = user.value.data.user.id;
+
     const data = await $fetch(`/api/user/${id}`);
     if (data.success) {
-      console.log('api returned:', data.user);
-      console.log('getuser returned:', user.value);
+      userdata.value = data.User;
     }
+
+    const { data: avatarData } = $supabase.storage.from('Profiles').getPublicUrl(`${id}/avatar.png`);
+
+    avatarUrl.value = `${avatarData.publicUrl}?t=${Date.now()}`;
+
     loading.value = false;
   } catch (error) {
     console.log(error);
@@ -63,17 +61,18 @@ function upload() {
   document.getElementById('fileInput').click();
 }
 
-async function deleteself() {
-  $supabase.auth.deleteUser();
-}
+const handleFileUpload = async (event) => {
+  const file = event.target.files[0];
+  if (!file) return;
 
-//TODO:does not work idk why
-const handleFileUpload = (event) => {
-  const target = event.target;
-  const files = target.files;
-  if (files) {
-    file.value = files[0];
-    console.log('Uploaded file:', file.value);
-  }
+  const id = user.value.data.user.id;
+
+  const { error } = await $supabase.storage.from('Profiles').upload(`${id}/avatar.png`, file, { upsert: true });
+
+  if (error) return;
+
+  const { data } = $supabase.storage.from('Profiles').getPublicUrl(`${id}/avatar.png`);
+
+  avatarUrl.value = `${data.publicUrl}?t=${Date.now()}`;
 };
 </script>
