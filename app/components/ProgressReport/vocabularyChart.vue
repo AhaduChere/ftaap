@@ -1,5 +1,5 @@
 <template>
-    <div class="grid grid-cols-2">
+    <div class="grid grid-cols-1 md:grid-cols-2">
         <div class="chart-container justify-self-start">
         <canvas ref="donutChartRef"></canvas>
         </div>

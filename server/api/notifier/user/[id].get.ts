@@ -7,7 +7,8 @@ export default defineEventHandler(async (event) => {
     return { error: 'Invalid user_id' };
   }
 
-  const { data: user, error } = await supabase
+
+  const { data: user, error } = await supabase.auth
     .from('User')
     .select('*')
     .eq('user_id', user_id)

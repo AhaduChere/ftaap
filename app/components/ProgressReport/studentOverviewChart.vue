@@ -24,7 +24,7 @@ let maxScores:number[] = [];
   displayScores()
 
   },
-  { immediate: false }
+  { immediate: true }
 )
 
 async function displayScores(){

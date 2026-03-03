@@ -128,11 +128,8 @@ onMounted(async () => {
           <li>
             <div class="px-4 py-3 font-semibold text-lg text-[#e2fafc] border-b border-white/30 no-select">Grades</div>
             <div class="text-[#e2fafc]">
-              <NuxtLink
-                to="/manageScores"
-                class="block px-8 py-2 border-b border-white/20 hover:bg-[#205a5f] cursor-pointer"
-                @click="closeMenu">
-                Manage Scores
+              <NuxtLink to="/gradebook" class="block px-8 py-2 border-b border-white/20 hover:bg-[#205a5f] cursor-pointer" @click="closeMenu">
+                Gradebook
               </NuxtLink>
             </div>
           </li>
