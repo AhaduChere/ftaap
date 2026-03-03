@@ -5,14 +5,18 @@
   <div v-else class="min-h-screen bg-gradient-to-b from-[#f7feff] to-slate-100 flex flex-col items-center pt-24">
     <main class="w-full max-w-6xl px-4 pb-10 space-y-6 flex flex-col items-center">
       <section class="w-full bg-white border border-[#2e777e] shadow-lg rounded-xl overflow-hidden p-6 flex justify-center gap-2">
-        <button class="px-4 py-2 bg-[#2e777e] text-white rounded-md hover:bg-[#3b797e]" @click="toggleTeacherForm()">Add Teacher</button>
-        <button class="px-4 py-2 bg-[#2e777e] text-white rounded-md hover:bg-[#3b797e]">Add Organization</button>
-        <button class="px-4 py-2 bg-[#2e777e] text-white rounded-md hover:bg-[#3b797e]">Generate Report</button>
+        <button class="px-4 py-2 bg-[#2e777e] text-white rounded-md hover:bg-[#3b797e]" @click="toggleUserForm()">Create New User</button>
+        <button class="px-4 py-2 bg-[#2e777e] text-white rounded-md hover:bg-[#3b797e]" @click="toggleOrgForm()">
+          Create New Organization
+        </button>
+        <button class="px-4 py-2 bg-[#2e777e] text-white rounded-md hover:bg-[#3b797e]" @click="toggleStudentForm()">
+          Create New Student
+        </button>
       </section>
 
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 w-full max-h-[60em]">
         <section class="bg-white border border-[#2e777e] shadow-lg rounded-xl overflow-hidden flex flex-col">
-          <div class="p-4 bg-[#3b797e] text-white font-semibold text-center rounded-t-lg">Students</div>
+          <div class="p-4 bg-[#3b797e] text-white font-semibold text-center rounded-t-lg">Students ({{ students.length }})</div>
           <div class="flex flex-col sm:flex-row gap-4 p-4">
             <input
               v-model="search_S"
@@ -32,7 +36,7 @@
         </section>
 
         <section class="bg-white border border-[#2e777e] shadow-lg rounded-xl overflow-hidden flex flex-col">
-          <div class="p-4 bg-[#3b797e] text-white font-semibold text-center rounded-t-lg">Teachers</div>
+          <div class="p-4 bg-[#3b797e] text-white font-semibold text-center rounded-t-lg">Teachers ({{ teachers.length }})</div>
           <div class="flex flex-col sm:flex-row gap-4 p-4">
             <input
               v-model="search_T"
@@ -44,7 +48,7 @@
             <NuxtLink
               v-for="(teacher, t) in filteredTeachers"
               :key="t"
-              :to="`/teacher/${teacher.teacher_id}`"
+              :to="`/teacherProfile/${teacher.teacher_id}`"
               class="px-4 py-3 border border-[#2e777e] rounded-md bg-white text-black hover:bg-gray-50 transition-transform hover:scale-[1.01]">
               {{ teacher.teacher_fname }} {{ teacher.teacher_lname }}
             </NuxtLink>
@@ -52,18 +56,101 @@
         </section>
       </div>
     </main>
-    <div v-if="teacherform" class="fixed inset-0 bg-black/50 flex items-center justify-center">
-      <form
-        class="w-full max-w-md bg-white/90 backdrop-blur-sm rounded-2xl shadow-2xl p-8 flex flex-col gap-5 relative"
-        @submit.prevent="createTeacher">
+    <!-- NOTE: Student Form -->
+    <div v-if="studentForm" class="fixed inset-0 h-screen bg-black/30 z-10 flex items-center justify-center">
+      <form class="w-full max-w-lg bg-white rounded-2xl shadow-2xl p-8 flex flex-col gap-5 relative" @submit.prevent="createStudent">
         <button
           type="button"
           class="absolute top-4 right-4 text-gray-600 hover:text-gray-900 text-2xl font-bold"
-          @click="toggleTeacherForm">
+          @click="toggleStudentForm">
+          X
+        </button>
+        <h2 class="text-3xl pb-2 font-extrabold text-center text-[#2e777e]">Create Student</h2>
+        <div class="flex flex-col gap-4">
+          <input
+            v-model="studentFirstName"
+            type="text"
+            placeholder="First Name"
+            class="px-4 py-3 border rounded-lg focus:outline-none ring-2 ring-[#2e777e] transition" />
+          <input
+            v-model="studentLastName"
+            type="text"
+            placeholder="Last Name"
+            class="px-4 py-3 border rounded-lg focus:outline-none ring-2 ring-[#2e777e] transition" />
+          <select
+            v-model="studentGradeLevel"
+            class="px-4 py-3 border rounded-lg focus:outline-none ring-2 ring-[#2e777e] transition bg-white/90">
+            <option :value="null">Select Grade Level (Optional)</option>
+            <option v-for="grade in 12" :key="grade" :value="grade">Grade {{ grade }}</option>
+          </select>
+          <input
+            v-model="studentProgram"
+            type="text"
+            placeholder="Program (Optional)"
+            class="px-4 py-3 border rounded-lg focus:outline-none ring-2 ring-[#2e777e] transition" />
+          <select
+            v-model="studentOrganizationId"
+            class="px-4 py-3 border rounded-lg focus:outline-none ring-2 ring-[#2e777e] transition bg-white/90">
+            <option :value="null">Select Organization</option>
+            <option v-for="org in organizations" :key="org.id" :value="org.id">{{ org.organization_name }}</option>
+          </select>
+          <select
+            v-model="studentTeacherId"
+            class="px-4 py-3 border rounded-lg focus:outline-none ring-2 ring-[#2e777e] transition bg-white/90">
+            <option :value="null">Select Teacher (Optional)</option>
+            <option v-for="teacher in teachers" :key="teacher.id" :value="teacher.id">
+              {{ teacher.teacher_fname }} {{ teacher.teacher_lname }}
+            </option>
+          </select>
+          <textarea
+            v-model="studentNotes"
+            placeholder="Notes (Optional)"
+            rows="3"
+            class="px-4 py-3 border rounded-lg focus:outline-none ring-2 ring-[#2e777e] transition resize-none" />
+        </div>
+        <button
+          type="submit"
+          class="px-4 py-3 bg-[#2e777e] text-white font-semibold rounded-lg hover:bg-[#256166] active:scale-95 transition">
+          Create Student
+        </button>
+        <div v-if="error_student" class="text-red-500 text-sm text-center">{{ error_student }}</div>
+      </form>
+    </div>
+
+    <!-- NOTE: Organization Form -->
+    <div v-if="orgForm" class="fixed inset-0 h-screen bg-black/30 z-10 flex items-center justify-center">
+      <form class="w-full max-w-md bg-white rounded-2xl shadow-2xl p-8 flex flex-col gap-5 relative" @submit.prevent="createOrg">
+        <button type="button" class="absolute top-4 right-4 text-gray-600 hover:text-gray-900 text-2xl font-bold" @click="toggleOrgForm">
           X
         </button>
 
-        <h2 class="text-3xl pb-2 font-extrabold text-center text-[#2e777e]">Create Teacher</h2>
+        <h2 class="text-3xl pb-2 font-extrabold text-center text-[#2e777e]">Create Organization</h2>
+
+        <div class="flex flex-col gap-4">
+          <input
+            v-model="org_name"
+            type="text"
+            placeholder="Organization Name"
+            class="px-4 py-3 border rounded-lg focus:outline-none ring-2 ring-[#2e777e] transition" />
+        </div>
+
+        <button
+          type="submit"
+          class="px-4 py-3 bg-[#2e777e] text-white font-semibold rounded-lg hover:bg-[#256166] active:scale-95 transition">
+          Create Organization
+        </button>
+        <div v-if="error_org">{{ error_org }}</div>
+      </form>
+    </div>
+
+    <!-- NOTE: User Form -->
+    <div v-if="userForm" class="fixed inset-0 h-screen bg-black/30 z-10 flex items-center justify-center">
+      <form class="w-full max-w-md bg-white rounded-2xl shadow-2xl p-8 flex flex-col gap-5 relative" @submit.prevent="createUser">
+        <button type="button" class="absolute top-4 right-4 text-gray-600 hover:text-gray-900 text-2xl font-bold" @click="toggleUserForm">
+          X
+        </button>
+
+        <h2 class="text-3xl pb-2 font-extrabold text-center text-[#2e777e]">Create User</h2>
 
         <div class="flex flex-col gap-4">
           <input
@@ -94,6 +181,7 @@
           </select>
           <select
             v-model="organization"
+            :disabled="role === 'Admin'"
             class="px-4 py-3 border rounded-lg focus:outline-none ring-2 ring-[#2e777e] transition bg-white/90">
             <option value="">Select Organization</option>
             <option v-for="org in organizations" :key="org.id" :value="org.id">{{ org.organization_name }}</option>
@@ -103,16 +191,16 @@
         <button
           type="submit"
           class="px-4 py-3 bg-[#2e777e] text-white font-semibold rounded-lg hover:bg-[#256166] active:scale-95 transition">
-          Create Teacher
+          Create User
         </button>
-        <div v-if="error">{{ error }}</div>
+        <div v-if="error_user">{{ error_user }}</div>
       </form>
     </div>
   </div>
 </template>
 
 <script setup>
-// basic stuff
+//NOTE: basic stuff
 const students = ref([]);
 const teachers = ref([]);
 const organizations = ref([]);
@@ -136,7 +224,7 @@ onMounted(async () => {
   loading.value = false;
 });
 
-// search stuff
+//NOTE: search stuff
 const search_T = ref('');
 const search_S = ref('');
 
@@ -152,26 +240,88 @@ const filteredTeachers = computed(() => {
   );
 });
 
-// teacher form stuff
-const teacherform = ref(false);
+//NOTE: Student form stuff// NOTE: student form stuff
+
+const studentForm = ref(false);
+const studentFirstName = ref('');
+const studentLastName = ref('');
+const studentGradeLevel = ref(null);
+const studentProgram = ref('');
+const studentOrganizationId = ref(null);
+const studentTeacherId = ref(null);
+const studentNotes = ref('');
+const error_student = ref('');
+
+function toggleStudentForm() {
+  studentForm.value = !studentForm.value;
+}
+
+async function createStudent() {
+  const payload = {
+    firstName: studentFirstName.value,
+    lastName: studentLastName.value,
+    gradeLevel: studentGradeLevel.value,
+    program: studentProgram.value || null,
+    organizationId: studentOrganizationId.value,
+    teacherId: studentTeacherId.value,
+    notes: studentNotes.value || null,
+    isArchived: false,
+  };
+  try {
+    const data = await $fetch('/api/students/student', {
+      method: 'POST',
+      body: payload,
+    });
+    if (data.id) {
+      toggleStudentForm();
+      error_student.value = '';
+    } else {
+      error_student.value = 'Server error';
+    }
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+// NOTE: Org form stuff
+const orgForm = ref(false);
+const org_name = ref('');
+const error_org = ref('');
+
+function toggleOrgForm() {
+  orgForm.value = !orgForm.value;
+}
+async function createOrg() {
+  try {
+    const data = await $fetch('/api/organization', {
+      method: 'POST',
+      body: { org_name: org_name.value },
+    });
+
+    if (data.success) {
+      toggleOrgForm();
+      error_org.value = '';
+    } else {
+      error_org.value = 'Server error';
+    }
+  } catch (error) {
+    console.error(error);
+  }
+}
+// NOTE: user form stuff
+const userForm = ref(false);
 const firstName = ref('');
 const lastName = ref('');
 const email = ref('');
 const password = ref('');
 const role = ref('');
 const organization = ref('');
-const error = ref('');
+const error_user = ref('');
 
-function toggleTeacherForm() {
-  teacherform.value = !teacherform.value;
-  if (role.value) {
-    role.value = '';
-  }
-  if (organization.value) {
-    organization.value = '';
-  }
+function toggleUserForm() {
+  userForm.value = !userForm.value;
 }
-async function createTeacher() {
+async function createUser() {
   const payload = {
     firstName: firstName.value,
     lastName: lastName.value,
@@ -182,20 +332,19 @@ async function createTeacher() {
   };
 
   try {
-    const data = await $fetch('/api/teacher/teacher', {
+    const data = await $fetch('/api/user', {
       method: 'POST',
       body: payload,
     });
 
     if (data.success) {
-      toggleTeacherForm();
-      error.value = '';
+      toggleUserForm();
+      error_user.value = '';
     } else {
-      error.value('Server error');
+      error_user.value = 'Server error';
     }
   } catch (error) {
     console.error(error);
   }
 }
 </script>
-
