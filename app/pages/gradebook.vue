@@ -15,7 +15,7 @@ import ScoresHeader from '~/components/scores/scoresHeader.vue'
 import ScoresControls from '~/components/scores/scoresControls.vue'
 
 import ScoreCreateModal from '@/components/scores/scoreCreateModal.vue'
-import ScoreEditModal from '~/components/scores/ScoreEditModal.vue'
+import ScoreEditModal from '@/components/scores/scoreEditModal.vue'
 import StudentsTable from '@/components/students/StudentsTable.vue'
 
 // Composable: API + state
