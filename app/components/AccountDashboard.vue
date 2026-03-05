@@ -17,9 +17,8 @@
             <input id="fileInput" type="file" accept="image/*" style="display: none" @change="handleFileUpload" />
             <h2 class="text-2xl font-semibold text-center mt-4">{{ userdata.first_name }} {{ userdata.last_name }}</h2>
             <p class="text-gray-500 text-sm">{{ user.data.user.email }}</p>
-            <div class="w-full text-center bg-gray-50 rounded-lg"></div>
             <button
-              class="w-full mt-2 px-4 py-3 bg-[#2e777e] text-white font-semibold rounded-lg hover:bg-[#256166] active:scale-95 transition"
+              class="w-full mt-auto px-4 py-3 bg-[#2e777e] text-white font-semibold rounded-lg hover:bg-[#256166] active:scale-95 transition"
               @click="console.log('Tried to edit account, not functional yet')">
               Edit
             </button>
