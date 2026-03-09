@@ -11,8 +11,8 @@ import {
 import { useStudents } from '~/composables/useStudents'
 
 // Child components
-import StudentsHeader from '@/components/students/studentsHeader.vue'
-import StudentsControls from '@/components/students/studentsControls.vue'
+import StudentsHeader from '@/components/students/StudentsHeader.vue'
+import StudentsControls from '@/components/students/StudentsControls.vue'
 
 import StudentCreateModal from '@/components/students/StudentCreateModal.vue'
 import StudentEditModal from '@/components/students/StudentEditModal.vue'
