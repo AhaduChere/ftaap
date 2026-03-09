@@ -10,16 +10,26 @@ import {
 
 import { useStudents } from '~/composables/useStudents'
 
+//types
+import type { StudentScore } from '../../types/studentScore';
+import type { StudentOption } from '../../types/studentOption';
+import type { SupabaseClient } from '@supabase/supabase-js'
+
 // Child components
 import ScoresHeader from '~/components/scores/scoresHeader.vue'
 import ScoresControls from '~/components/scores/scoresControls.vue'
 
 import ScoreCreateModal from '@/components/scores/scoreCreateModal.vue'
 import ScoreEditModal from '@/components/scores/scoreEditModal.vue'
-import StudentsTable from '@/components/students/StudentsTable.vue'
+import type { Student } from '~~/types/student';
 
 // Composable: API + state
-const { students, pending, error, refresh, create, replace, remove } = useStudents()
+const { students, error, refresh, pending } = useStudents()
+
+const { $supabase } = useNuxtApp();
+const supabase = $supabase as SupabaseClient
+const user = ref();
+let id:string = '';
 
 type row = StudentScore & {
         student_full_name: string
@@ -30,15 +40,19 @@ type row = StudentScore & {
     --------------------------------------------------------- */
     const studentList = computed<StudentOption[]>(() => {
         return students.value.map((s: Student) => ({
-            id: s.id,
-            firstName: s.firstName,
-            lastName: s.lastName
+            student_id: s.student_id,
+            student_fname: s.student_fname,
+            student_lname: s.student_lname
         }))
     });
 
-const scores = ref<StudentScore[]>([])
+const scores = ref<row[]>([])
 const scoresPending = ref(false)
 const scoresError = ref<string | null>(null)
+
+const studentMap = computed(() => Object.fromEntries(
+    students.value.map(s => [s.student_id, s])
+));
 
 async function loadScores(){ 
     scoresPending.value = true;
@@ -47,19 +61,19 @@ async function loadScores(){
     try {
         const rows = await $fetch<StudentScore[]>('/api/scores/scores')
 
-        if(Array.isArray(rows)){
-            scores.value = rows.map((s: StudentScore) => {
-                const student = students.value.find(
-                st => st.id === s.student_id
-                )
+        if(Array.isArray(rows) && students.value){
+            scores.value = rows
+            .map((s): row | null => {
+                const student = studentMap.value[s.student_id]
+
+                if (!student) return null
 
                 return {
-                    ...s,
-                    student_full_name: student
-                        ? `${student.firstName} ${student.lastName}`
-                        : 'Unknown Student'
+                ...s,
+                student_full_name: `${student.student_fname} ${student.student_lname}`
                 }
-            });
+            })
+            .filter((r): r is row => r !== null)
         }else {
             scores.value = [];
         }
@@ -76,18 +90,20 @@ async function loadScores(){
     }
 }
 
-
 /* ---------------------------------------------------------
     Lifecycle
     --------------------------------------------------------- */
-
-    onServerPrefetch(() => refresh())
+    
+onServerPrefetch(() => refresh(id))
 
 onMounted(async () => {
-  await Promise.all([refresh(), loadScores()])
+  user.value = await supabase.auth.getUser();
+  id = user.value.data.user.id;
+  await refresh(id);
+  await loadScores();
 })
 
-onActivated(() => refresh())
+onActivated(() => refresh(id))
 
 /* ---------------------------------------------------------
     CREATE MODAL
@@ -105,6 +121,8 @@ const form = reactive({
     student_comprehension_score: null as number | null,
     student_vocab_score: null as number | null,
     selectedStudentId: null as number | null,
+    student_known_words: null as string | null,
+    student_unknown_words: null as string | null
 })
 
 function openCreate() {
@@ -193,8 +211,9 @@ async function add() {
         selectedStudentId: null,
     })
 
+    loadScores();
     closeCreate()
-    } catch (e: error) {
+    } catch (e: any) {
         createError.value = e?.data?.message ?? e?.message ?? 'Failed to create student.'
     }
 }
@@ -207,15 +226,15 @@ const showEdit = ref(false)
 const editError = ref<string | null>(null)
 
 const draft = reactive({
-    id: 0,
-    student_dibel_score: null as number | null,
+    student_score_id: null as number | null,
+    student_dibel_score: null as number | null, 
     student_dibel_ORF: null as number | null,
     student_dibel_MAZE: null as number | null,
     student_fluency_score: null as number | null,
     student_comprehension_score: null as number | null,
     student_vocab_score: null as number | null,
     student_known_words: '',
-    student_unkown_words: '',
+    student_unknown_words: '',
     selectedStudentId: null as number | null,
 })
 
@@ -269,8 +288,8 @@ async function saveEdit() {
 
     loadScores();
     closeEdit();
-    } catch (e: error) {
-    editError.value = e?.data?.message ?? e?.message ?? 'Failed to save changes.'
+    } catch (e: any) {
+        editError.value = e?.data?.message ?? e?.message ?? 'Failed to save changes.'
     }
 }
 
@@ -284,7 +303,7 @@ type SortMode = 'dibel_avg_desc' | 'dibel_avg_asc' |
 'fluency_desc' | 'fluency_asc' | 
 'comprehension_desc' | 'comprehension_asc' | 
 'vocab_desc' | 'vocab_asc';
-const sortMode = ref<SortMode>('');
+const sortMode = ref<SortMode>('dibel_avg_desc');
 
 function computeDibelAvg(dibel:number, MAZE:number, ORF:number){
     return (dibel + MAZE + ORF) / 3
@@ -301,18 +320,18 @@ const visibleScores = computed(() => {
         return matchesQ
     });
 
-    base.sort((a: StudentScore, b: StudentScore) =>
+    base.sort((a: row, b: row) =>
       a.student_full_name.localeCompare(b.student_full_name),
     )
 
     if (sortMode.value === 'dibel_avg_desc') {
         base.sort(
-            (a: StudentScore, b: StudentScore) =>
+            (a: row, b: row) =>
             (computeDibelAvg(b.student_dibel_score, b.student_dibel_MAZE, b.student_dibel_ORF) ?? Number.NEGATIVE_INFINITY) - (computeDibelAvg(a.student_dibel_score, a.student_dibel_MAZE, a.student_dibel_ORF) ?? Number.NEGATIVE_INFINITY),
         )
     } else if (sortMode.value === 'dibel_avg_asc') {
         base.sort(
-            (a: StudentScore, b: StudentScore) =>
+            (a: row, b: row) =>
             (computeDibelAvg(a.student_dibel_score, a.student_dibel_MAZE, a.student_dibel_ORF) ?? Number.POSITIVE_INFINITY) - (computeDibelAvg(b.student_dibel_score, b.student_dibel_MAZE, b.student_dibel_ORF) ?? Number.POSITIVE_INFINITY),
         )
     } else if (sortMode.value === 'fluency_desc') {
@@ -371,7 +390,7 @@ const visibleScores = computed(() => {
             </div>
 
             <div class="p-4 overflow-x-auto bg-white">
-            <div v-if="scoresPending" class="py-8 text-center text-sm text-slate-500">
+            <div v-if="scoresPending || pending" class="py-8 text-center text-sm text-slate-500">
                 Loading students scores…
             </div>
 
@@ -386,7 +405,7 @@ const visibleScores = computed(() => {
                 <ScoresTable :rows="visibleScores" @edit="openEdit"/>
 
                 <p
-                v-if="!scoresPending && !scoresError && scores.length === 0"
+                v-if="!scoresPending && !pending && !scoresError && scores.length === 0"
                 class="mt-3 text-xs text-slate-500 italic text-center"
                 >
                     No student scores match your current filters.

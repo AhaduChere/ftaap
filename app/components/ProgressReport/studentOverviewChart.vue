@@ -8,7 +8,11 @@
 import { ref, onMounted, onBeforeUnmount, watch, nextTick } from 'vue'
 import Chart from 'chart.js/auto'
 import type { Chart as ChartType, LegendItem, ChartDataset, ChartOptions } from 'chart.js'
-import type { StudentScore } from '~/types/studentScore';
+import type { StudentScore } from '../../../types/studentScore';
+
+interface GroupedChartDataset extends ChartDataset<'line'> {
+  group?: string
+}
 
 const props = defineProps<{ studentScoreId: number | null }>()
 let MAZEScores:number[] = [];
@@ -147,12 +151,14 @@ onMounted(() => {
           },
           onClick(e, legendItem: LegendItem, legend) {
             const chart = legend.chart
-            const clickedDataset = chart.data.datasets[legendItem.datasetIndex as number] as ChartDataset
+            const clickedDataset = chart.data.datasets[legendItem.datasetIndex as number] as GroupedChartDataset
             const group = clickedDataset.group
             const visible = chart.isDatasetVisible(legendItem.datasetIndex as number)
 
-            chart.data.datasets.forEach((ds: ChartDataset, i) => {
-              if (ds.group === group) {
+            chart.data.datasets.forEach((ds, i) => {
+              const dataset = ds as GroupedChartDataset
+
+              if (dataset.group === group) {
                 chart.setDatasetVisibility(i, !visible)
               }
             })

@@ -12,10 +12,8 @@ const route = useRoute();
 const isAdminPage = computed(() => route.path.startsWith('/login'));
 
 const studentScoresData = useStudentScoresData();
-const studentAttendanceData = useStudentAttendanceData();
 
 onMounted(async () => {
   studentScoresData.loadStudentScores();
-  studentAttendanceData.loadStudentAttendance();
 });
 </script>

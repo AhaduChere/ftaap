@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import type { StudentScore } from '~~/types/studentScore';
+
     type row = StudentScore & {
         student_full_name: string
     }
@@ -28,7 +30,7 @@
           </thead>
     
           <tbody class="divide-y divide-slate-200 bg-white">
-            <tr v-for="row in rows" :key="row.id" class="hover:bg-slate-50/60">
+            <tr v-for="row in rows" :key="row.student_score_id" class="hover:bg-slate-50/60">
              <td class="px-3 py-2 text-slate-700">
                 {{ row.student_full_name ?? '—' }}
               </td>
