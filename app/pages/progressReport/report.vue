@@ -1,5 +1,6 @@
 <script setup lang="ts">
-    import reportPage from './reportPage'
+  //Call the page in general (this is for the sidebar logic)
+    import reportPage from './reportPage.vue'
 </script>
 
 <template>

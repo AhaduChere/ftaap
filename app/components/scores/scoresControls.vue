@@ -37,7 +37,6 @@
             @change="emit('update:sortMode', ($event.target as HTMLSelectElement).value)"
             class="w-40 rounded-md border border-slate-300 px-2 py-1.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-[#2e777e]"
           >
-            <option value="no_filter">No Filter</option>
             <option value="dibel_avg_desc">Dibel Average ↓</option>
             <option value="dibel_avg_asc">Dibel Average ↑</option>
             <option value="fluency_desc">Fluency ↓</option>

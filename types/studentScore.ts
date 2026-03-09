@@ -1,4 +1,5 @@
 export type StudentScore = {
+    student_full_name:string,
     inserted_date:Date,
     student_comprehension_score: number,
     student_dibel_MAZE:number,
@@ -9,5 +10,5 @@ export type StudentScore = {
     student_score_id:number,
     student_vocab_score:number,
     student_known_words: string[],
-    student_unkown_words:string[]
+    student_unknown_words:string[]
 }

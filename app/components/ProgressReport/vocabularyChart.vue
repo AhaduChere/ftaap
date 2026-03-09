@@ -5,9 +5,9 @@
         </div>
         <div class="hidden md:flex md:flex-col flex-row">
             <h4 class="text-[#2e777e] font-semibold">Known Words:</h4>
-            <p disabled class="text-[#2e777e]">{{ knownWords.join(', ') }}</p>
+            <p disabled class="text-[#2e777e]">{{ knownWords.join(', ') ?? 'No words to show'}}</p>
             <h4 class="text-[#2e777e] font-semibold">Unknown Words:</h4>
-            <p class="text-[#2e777e]">{{ unkownWords.join(', ') }}</p>
+            <p class="text-[#2e777e]">{{ unkownWords.join(', ') ?? 'No words to show'}}</p>
         </div>
     </div>
   </template>
@@ -16,7 +16,7 @@
 import { ref, onMounted, onBeforeUnmount, watch } from 'vue'
 import Chart from 'chart.js/auto'
 import type { Chart as ChartType, LegendItem, ChartDataset, ChartOptions } from 'chart.js'
-import type { StudentScore } from '~/types/studentScore';
+import type { StudentScore } from '../../../types/studentScore';
 
 const props = defineProps<{ studentScoreId: number | null }>()
 let vocabScore:number;
@@ -43,7 +43,7 @@ async function displayScores(){
     if(mostRecent[0]?.student_vocab_score){
         vocabScore = mostRecent[0].student_vocab_score;
         knownWords.value = mostRecent[0].student_known_words;
-        unkownWords.value = mostRecent[0].student_unkown_words;
+        unkownWords.value = mostRecent[0].student_unknown_words;
     }
 
     const trendColor = getTrendColor(vocabScore);

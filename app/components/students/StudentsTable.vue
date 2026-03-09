@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import type { Student } from '~~/types/student';
+
 const props = defineProps<{
   rows: Student[]
 }>()
@@ -23,22 +25,22 @@ const emit = defineEmits<{
       </thead>
 
       <tbody class="divide-y divide-slate-200 bg-white">
-        <tr v-for="row in rows" :key="row.id" class="hover:bg-slate-50/60">
+        <tr v-for="row in rows" :key="row.student_id" class="hover:bg-slate-50/60">
           <td class="px-3 py-2">
             <div class="font-medium text-slate-800">
-              {{ row.lastName }}, {{ row.firstName }}
+              {{ row.student_lname }}, {{ row.student_fname }}
             </div>
-            <div v-if="row.isArchived" class="text-xs text-slate-500 italic">
+            <div v-if="row.is_archived" class="text-xs text-slate-500 italic">
               Archived
             </div>
           </td>
 
           <td class="px-3 py-2 text-slate-700">
-            {{ row.gradeLevel ?? '—' }}
+            {{ row.student_grade_level ?? '—' }}
           </td>
 
           <td class="px-3 py-2 text-slate-700">
-            {{ row.program ?? '—' }}
+            {{ row.student_program ?? '—' }}
           </td>
 
           <td class="px-3 py-2 text-slate-700">
@@ -57,7 +59,7 @@ const emit = defineEmits<{
               <button
                 type="button"
                 class="px-2 py-1 rounded border border-red-200 bg-red-50 text-xs text-red-700 hover:bg-red-100"
-                @click="emit('delete', Number(row.id))"
+                @click="emit('delete', Number(row.student_id))"
               >
                 Archive
               </button>

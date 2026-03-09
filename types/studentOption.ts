@@ -1,5 +1,5 @@
 export type StudentOption = {
-    id: number,
-    firstName: string,
-    lastName: string
+    student_id: number,
+    student_fname: string,
+    student_lname: string
 }

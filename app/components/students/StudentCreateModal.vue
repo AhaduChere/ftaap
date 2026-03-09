@@ -2,13 +2,13 @@
 const props = defineProps<{
   open: boolean
   form: {
-    firstName: string
-    lastName: string
-    gradeLevel: number | null
-    program: string | null
-    organizationId: number | null
-    notes: string | null
-    isArchived: boolean | null
+    student_fname: string
+    student_lname: string
+    student_grade_level: number | null
+    student_program: string | null
+    organization_id: number | null
+    student_notes: string | null
+    is_archived: boolean | null
   }
   organizations: { id: number; organization_name: string }[] 
   errors: Record<string, string>
@@ -49,7 +49,7 @@ const emit = defineEmits<{
                 First Name
               </label>
               <input
-                v-model="form.firstName"
+                v-model="form.student_fname"
                 type="text"
                 class="w-full rounded-md border border-slate-300 px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#2e777e]"
               />
@@ -66,7 +66,7 @@ const emit = defineEmits<{
                 Last Name
               </label>
               <input
-                v-model="form.lastName"
+                v-model="form.student_lname"
                 type="text"
                 class="w-full rounded-md border border-slate-300 px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#2e777e]"
               />
@@ -86,7 +86,7 @@ const emit = defineEmits<{
                 Grade Level
               </label>
               <input
-                v-model.number="form.gradeLevel"
+                v-model.number="form.student_grade_level"
                 type="number"
                 min="0"
                 class="w-full rounded-md border border-slate-300 px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#2e777e]"
@@ -98,7 +98,7 @@ const emit = defineEmits<{
                 Program
               </label>
               <input
-                v-model="form.program"
+                v-model="form.student_program"
                 type="text"
                 class="w-full rounded-md border border-slate-300 px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#2e777e]"
               />
@@ -112,7 +112,7 @@ const emit = defineEmits<{
             </label>
 
             <select
-              v-model="form.organizationId"
+              v-model="form.organization_id"
               class="w-full rounded-md border border-slate-300 px-2 py-1.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-[#2e777e]"
             >
               <option :value="null" disabled>
@@ -142,7 +142,7 @@ const emit = defineEmits<{
               Notes (optional)
             </label>
             <textarea
-              v-model="form.notes"
+              v-model="form.student_notes"
               rows="3"
               class="w-full rounded-md border border-slate-300 px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#2e777e]"
               placeholder="Add any helpful notes about this student…"

@@ -78,7 +78,7 @@ export default defineEventHandler(async (event) => {
     }
     return { success: true };
   } catch (err) {
-    console.log('Unexpected error creating user:', err);
+    console.error('Unexpected error creating user:', err);
     return { success: false };
   }
 });

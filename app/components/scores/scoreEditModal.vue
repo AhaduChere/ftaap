@@ -1,15 +1,18 @@
 <script setup lang="ts">
+import type { StudentOption } from '~~/types/studentOption';
+
     const props = defineProps<{
       open: boolean
       draft: {
-        student_dibel_score: number
+        student_score_id: number | null,
+        student_dibel_score: number | null
         student_dibel_ORF: number | null
         student_dibel_MAZE: number | null
         student_fluency_score: number | null
         student_comprehension_score: number | null
         student_vocab_score: number | null
-        student_known_words:string | null
-        student_unknown_words: string | null
+        student_known_words:string
+        student_unknown_words: string
         selectedStudentId: number | null
       }
       studentList: StudentOption[]
@@ -52,10 +55,10 @@
                     <select v-model.number="draft.selectedStudentId">
                         <option
                             v-for="s in studentList  || []"
-                            :key="s.id"
-                            :value="s.id"
+                            :key="s.student_id"
+                            :value="s.student_id"
                         >
-                            {{ s.firstName + ' ' + s.lastName }}
+                            {{ s.student_fname + ' ' + s.student_lname }}
                         </option>
                     </select>
                 </div>
