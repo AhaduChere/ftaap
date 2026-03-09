@@ -11,12 +11,19 @@ import {
 import { useStudents } from '~/composables/useStudents'
 
 // Child components
-import StudentsHeader from '~/components/students/StudentsHeader.vue'
-import StudentsControls from '~/components/students/StudentsControls.vue'
+import StudentsHeader from '../components/students/studentsHeader.vue'
+import StudentsControls from '../components/students/studentsControls.vue'
 
 import StudentCreateModal from '@/components/students/StudentCreateModal.vue'
 import StudentEditModal from '@/components/students/StudentEditModal.vue'
 import StudentsTable from '@/components/students/StudentsTable.vue'
+import type { SupabaseClient } from '@supabase/supabase-js'
+import type {Student} from '../../types/student'
+
+const { $supabase } = useNuxtApp();
+const supabase = $supabase as SupabaseClient
+const user = ref();
+let id:string = '';
 
 // Composable: API + state
 const { students, pending, error, refresh, create, replace, remove } = useStudents()
@@ -40,7 +47,7 @@ async function loadOrganizations() {
   try {
     const rows = await $fetch<OrganizationOption[]>('/api/organizations')
     organizations.value = Array.isArray(rows) ? rows : []
-  } catch (e: error) {
+  } catch (e: any) {
     orgsError.value = e?.data?.message ?? e?.message ?? 'Failed to load organizations.'
     organizations.value = []
   } finally {
@@ -52,13 +59,16 @@ async function loadOrganizations() {
    Lifecycle
    --------------------------------------------------------- */
 
-onServerPrefetch(() => refresh())
+onServerPrefetch(() => refresh(id))
 
 onMounted(async () => {
-  await Promise.all([refresh(), loadOrganizations()])
+  user.value = await supabase.auth.getUser();
+  id = user.value.data.user.id;
+  await refresh(id);
+  await loadOrganizations();
 })
 
-onActivated(() => refresh())
+onActivated(() => refresh(id))
 
 /* ---------------------------------------------------------
    CREATE MODAL
@@ -69,16 +79,16 @@ const createError = ref<string | null>(null)
 const addErrors = reactive<Record<string, string>>({})
 
 const form = reactive({
-  firstName: '',
-  lastName: '',
-  gradeLevel: null as number | null,
-  program: '' as string | null,
+  student_fname: '',
+  student_lname: '',
+  student_grade_level: null as number | null,
+  student_program: '' as string | null,
 
  
-  organizationId: null as number | null,
-  notes: '' as string | null,
+  organization_id: null as number | null,
+  student_notes: '' as string | null,
 
-  isArchived: false as boolean | null,
+  is_archived: false as boolean | null,
 })
 
 function openCreate() {
@@ -103,9 +113,9 @@ function clearAddErrors() {
 
 function validateCreate(): boolean {
   clearAddErrors()
-  if (!form.firstName.trim()) addErrors.firstName = 'First name is required.'
-  if (!form.lastName.trim()) addErrors.lastName = 'Last name is required.'
-  if (form.organizationId === null || form.organizationId === undefined) {
+  if (!form.student_fname.trim()) addErrors.firstName = 'First name is required.'
+  if (!form.student_lname.trim()) addErrors.lastName = 'Last name is required.'
+  if (form.organization_id === null || form.organization_id === undefined) {
     addErrors.organizationId = 'Organization is required.'
   }
   return Object.keys(addErrors).length === 0
@@ -117,35 +127,35 @@ async function add() {
 
   try {
     await create({
-      firstName: form.firstName.trim(),
-      lastName: form.lastName.trim(),
+      firstName: form.student_fname.trim(),
+      lastName: form.student_lname.trim(),
       gradeLevel:
-        form.gradeLevel !== null && form.gradeLevel !== undefined
-          ? Number(form.gradeLevel)
+        form.student_grade_level !== null && form.student_grade_level !== undefined
+          ? Number(form.student_grade_level)
           : null,
-      program: form.program && form.program.trim() !== '' ? form.program.trim() : null,
+      program: form.student_program && form.student_program.trim() !== '' ? form.student_program.trim() : null,
 
       // required FK
-      organizationId: Number(form.organizationId),
+      organizationId: Number(form.organization_id),
 
       //optional notes
-      notes: form.notes && form.notes.trim() !== '' ? form.notes.trim() : null,
+      notes: form.student_notes && form.student_notes.trim() !== '' ? form.student_notes.trim() : null,
 
       isArchived: false,
-    })
+    }, id)
 
     Object.assign(form, {
-      firstName: '',
-      lastName: '',
-      gradeLevel: null,
-      program: '',
-      organizationId: null,
-      notes: '',
-      isArchived: false,
+      student_fname: '',
+      student_lname: '',
+      student_grade_level: null,
+      student_program: '',
+      organization_id: null,
+      student_notes: '',
+      is_archived: false,
     })
 
     closeCreate()
-  } catch (e: error) {
+  } catch (e: any) {
     createError.value = e?.data?.message ?? e?.message ?? 'Failed to create student.'
   }
 }
@@ -158,36 +168,36 @@ const showEdit = ref(false)
 const editError = ref<string | null>(null)
 
 const draft = reactive({
-  id: 0,
-  firstName: '',
-  lastName: '',
-  gradeLevel: null as number | null,
-  program: '' as string | null,
+  student_id: 0,
+  student_fname: '',
+  student_lname: '',
+  student_grade_level: null as number | null,
+  student_program: '' as string | null,
 
-  organizationId: null as number | null,
-  notes: '' as string | null,
+  organization_id: null as number | null,
+  student_notes: '' as string | null,
 
-  isArchived: false as boolean | null,
+  is_archived: false as boolean | null,
 })
 
 function openEdit(s: Student) {
   editError.value = null
 
   Object.assign(draft, {
-    id: s.id,
-    firstName: s.firstName ?? '',
-    lastName: s.lastName ?? '',
-    gradeLevel:
-      s.gradeLevel !== null && s.gradeLevel !== undefined ? Number(s.gradeLevel) : null,
-    program: s.program ?? '',
+    student_id: s.student_id,
+    student_fname: s.student_fname ?? '',
+    student_lname: s.student_lname ?? '',
+    student_grade_level:
+      s.student_grade_level !== null && s.student_grade_level !== undefined ? Number(s.student_grade_level) : null,
+    student_program: s.student_program ?? '',
 
-    organizationId:
-      s.organizationId !== null && s.organizationId !== undefined
-        ? Number(s.organizationId)
+    organization_id:
+      s.organization_id !== null && s.organization_id !== undefined
+        ? Number(s.organization_id)
         : null,
-    notes: s.notes ?? '',
+    student_notes: s.student_notes ?? '',
 
-    isArchived: !!s.isArchived,
+    is_archived: !!s.is_archived,
   })
 
   // Ensure dropdown has data
@@ -203,33 +213,33 @@ function closeEdit() {
 }
 
 async function saveEdit() {
-  if (!draft.firstName.trim() || !draft.lastName.trim()) {
+  if (!draft.student_fname.trim() || !draft.student_lname.trim()) {
     editError.value = 'First and last name are required.'
     return
   }
-  if (draft.organizationId === null || draft.organizationId === undefined) {
+  if (draft.organization_id === null || draft.organization_id === undefined) {
     editError.value = 'Organization is required.'
     return
   }
 
   try {
-    await replace(draft.id, {
-      firstName: draft.firstName.trim(),
-      lastName: draft.lastName.trim(),
+    await replace(draft.student_id, {
+      firstName: draft.student_fname.trim(),
+      lastName: draft.student_lname.trim(),
       gradeLevel:
-        draft.gradeLevel !== null && draft.gradeLevel !== undefined
-          ? Number(draft.gradeLevel)
+        draft.student_grade_level !== null && draft.student_grade_level !== undefined
+          ? Number(draft.student_grade_level)
           : null,
-      program: draft.program && draft.program.trim() !== '' ? draft.program.trim() : null,
+      program: draft.student_program && draft.student_program.trim() !== '' ? draft.student_program.trim() : null,
 
-      organizationId: Number(draft.organizationId),
-      notes: draft.notes && draft.notes.trim() !== '' ? draft.notes.trim() : null,
+      organizationId: Number(draft.organization_id),
+      notes: draft.student_notes && draft.student_notes.trim() !== '' ? draft.student_notes.trim() : null,
 
-      isArchived: !!draft.isArchived,
-    })
+      isArchived: !!draft.is_archived,
+    }, id)
 
     closeEdit()
-  } catch (e: error) {
+  } catch (e: any) {
     editError.value = e?.data?.message ?? e?.message ?? 'Failed to save changes.'
   }
 }
@@ -238,9 +248,9 @@ async function saveEdit() {
    DELETE (archive)
    --------------------------------------------------------- */
 
-async function confirmDelete(id: number) {
+async function confirmDelete(student_id: number) {
   if (confirm('Are you sure you want to archive this student?')) {
-    await remove(id)
+    await remove(student_id, id)
   }
 }
 
@@ -260,8 +270,8 @@ const organizationFilter = ref('All')
 const grades = computed(() => {
   const set = new Set<string>()
   students.value.forEach((s: Student) => {
-    if (s.gradeLevel !== null && s.gradeLevel !== undefined) {
-      set.add(String(s.gradeLevel))
+    if (s.student_grade_level !== null && s.student_grade_level !== undefined) {
+      set.add(String(s.student_grade_level))
     }
   })
   return ['All', ...Array.from(set).sort((a, b) => Number(a) - Number(b))]
@@ -270,7 +280,7 @@ const grades = computed(() => {
 const programs = computed(() => {
   const set = new Set<string>()
   students.value.forEach((s: Student) => {
-    const p = (s.program || '').trim()
+    const p = (s.student_program || '').trim()
     if (p) set.add(p)
   })
   return ['All', ...Array.from(set).sort((a, b) => a.localeCompare(b))]
@@ -283,6 +293,7 @@ const programs = computed(() => {
  * - search + filters include "None"
  */
 const normalizedStudents = computed(() => {
+  console.log(students.value);
   return students.value.map((s: Student) => {
     const org =
       s.organization && String(s.organization).trim() !== ''
@@ -309,11 +320,11 @@ const visibleStudents = computed(() => {
   const q = search.value.trim().toLowerCase()
 
   let base = normalizedStudents.value.filter((s: Student) => {
-    const fullName = `${s.lastName}, ${s.firstName}`.toLowerCase()
-    const program = (s.program || '').toLowerCase()
+    const fullName = `${s.student_lname}, ${s.student_fname}`.toLowerCase()
+    const program = (s.student_program || '').toLowerCase()
     const organization = (s.organization || '').toLowerCase()
     const gradeStr =
-      s.gradeLevel !== null && s.gradeLevel !== undefined ? String(s.gradeLevel) : ''
+      s.student_grade_level !== null && s.student_grade_level !== undefined ? String(s.student_grade_level) : ''
 
     const matchesQ =
       !q ||
@@ -324,12 +335,12 @@ const visibleStudents = computed(() => {
 
     const matchesGrade =
       gradeFilter.value === 'All' ||
-      (s.gradeLevel !== null &&
-        s.gradeLevel !== undefined &&
-        String(s.gradeLevel) === gradeFilter.value)
+      (s.student_grade_level !== null &&
+        s.student_grade_level !== undefined &&
+        String(s.student_grade_level) === gradeFilter.value)
 
     const matchesProgram =
-      programFilter.value === 'All' || (s.program || '').trim() === programFilter.value
+      programFilter.value === 'All' || (s.student_program || '').trim() === programFilter.value
 
     const matchesOrganization =
       organizationFilter.value === 'All' || (s.organization || '') === organizationFilter.value
@@ -339,17 +350,17 @@ const visibleStudents = computed(() => {
 
   if (sortMode.value === 'name') {
     base.sort((a: Student, b: Student) =>
-      `${a.lastName}${a.firstName}`.localeCompare(`${b.lastName}${b.firstName}`),
+      `${a.student_lname}${a.student_fname}`.localeCompare(`${b.student_lname}${b.student_fname}`),
     )
   } else if (sortMode.value === 'grade_desc') {
     base.sort(
       (a: Student, b: Student) =>
-        (b.gradeLevel ?? Number.NEGATIVE_INFINITY) - (a.gradeLevel ?? Number.NEGATIVE_INFINITY),
+        (b.student_grade_level ?? Number.NEGATIVE_INFINITY) - (a.student_grade_level ?? Number.NEGATIVE_INFINITY),
     )
   } else if (sortMode.value === 'grade_asc') {
     base.sort(
       (a: Student, b: Student) =>
-        (a.gradeLevel ?? Number.POSITIVE_INFINITY) - (b.gradeLevel ?? Number.POSITIVE_INFINITY),
+        (a.student_grade_level ?? Number.POSITIVE_INFINITY) - (b.student_grade_level ?? Number.POSITIVE_INFINITY),
     )
   }
 

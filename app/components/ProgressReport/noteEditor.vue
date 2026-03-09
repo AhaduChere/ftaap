@@ -25,7 +25,15 @@
 const emit = defineEmits(['close', 'update:studentNotes'])
 
 const props = defineProps<{ studentNotes: string | undefined; studentScoreId: number | undefined }>();
-let newNotes = ref(props.studentNotes ?? '')
+const newNotes = ref('')
+
+watch(
+  () => props.studentNotes,
+  (val) => {
+    newNotes.value = val ?? ''
+  },
+  { immediate: true }
+)
 
 function closeAndUpdate(){
   emit('close')
@@ -42,7 +50,6 @@ async function postStudentNotes() {
     const data = await response.json();
 
     if (data) {
-      props.studentNotes = newNotes;
       emit('update:studentNotes', newNotes.value)
       emit('close');
     }

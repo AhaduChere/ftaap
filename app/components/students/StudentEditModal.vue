@@ -7,16 +7,16 @@ type OrganizationOption = {
 const props = defineProps<{
   open: boolean
   draft: {
-    id: number
-    firstName: string
-    lastName: string
-    gradeLevel: number | null
-    program: string | null
+    student_id: number
+    student_fname: string
+    student_lname: string
+    student_grade_level: number | null
+    student_program: string | null
 
     //  allow editing org
-    organizationId: number | null
+    organization_id: number | null
 
-    isArchived: boolean | null
+    is_archived: boolean | null
   }
 
   // options passed from manageStudents page
@@ -60,7 +60,7 @@ const emit = defineEmits<{
               First Name
             </label>
             <input
-              v-model="props.draft.firstName"
+              v-model="props.draft.student_fname"
               type="text"
               class="w-full border rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#2e777e]"
             />
@@ -72,7 +72,7 @@ const emit = defineEmits<{
               Last Name
             </label>
             <input
-              v-model="props.draft.lastName"
+              v-model="props.draft.student_lname"
               type="text"
               class="w-full border rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#2e777e]"
             />
@@ -84,7 +84,7 @@ const emit = defineEmits<{
               Grade Level (numeric)
             </label>
             <input
-              v-model.number="props.draft.gradeLevel"
+              v-model.number="props.draft.student_grade_level"
               type="number"
               min="0"
               class="w-full border rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#2e777e]"
@@ -97,7 +97,7 @@ const emit = defineEmits<{
               Program
             </label>
             <input
-              v-model="props.draft.program"
+              v-model="props.draft.student_program"
               type="text"
               class="w-full border rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#2e777e]"
             />
@@ -110,7 +110,7 @@ const emit = defineEmits<{
             </label>
 
             <select
-              v-model="props.draft.organizationId"
+              v-model="props.draft.organization_id"
               class="w-full border rounded px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-[#2e777e]"
             >
               <option :value="null" disabled>

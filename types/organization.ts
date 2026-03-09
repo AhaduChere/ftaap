@@ -1,4 +1,4 @@
-export default Organization {
+export interface Organization {
     id:number,
     name:string
 }

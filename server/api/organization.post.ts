@@ -7,7 +7,7 @@ export default defineEventHandler(async (event) => {
     const { data, error } = await supabase.from('Organization').insert({ organization_name: org_name });
 
     console.log(data);
-    console.log(error);
+    console.error(error);
 
     return { success: true };
   } catch (err) {

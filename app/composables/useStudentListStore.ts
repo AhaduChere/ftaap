@@ -1,4 +1,5 @@
 import { ref, computed } from 'vue';
+import type { Student } from '../../types/student';
 
 // Reactive state
 export const students = ref<Student[]>([]);
@@ -26,14 +27,14 @@ export const fetchStudents = async () => {
     const data = await res.json();
 
   students.value = data.map((s: Student) => ({
-    id: s.id,
-    firstName: s.firstName,
-    lastName: s.lastName,
-    gradeLevel: s.gradeLevel,
-    program: s.program,
-    notes: s.notes,
-    isArchived: s.isArchived,
-    score: s.score ?? null,
+    id: s.student_id,
+    firstName: s.student_fname,
+    lastName: s.student_lname,
+    gradeLevel: s.student_grade_level,
+    program: s.student_program,
+    notes: s.student_notes,
+    isArchived: s.is_archived,
+    score: s.student_score_id ?? null,
   }));
   } catch (err) {
     console.error('Failed to fetch students', err);
@@ -42,7 +43,7 @@ export const fetchStudents = async () => {
 // Filtered and sorted students
 export const filteredStudents = computed(() => {
   let filtered = students.value.filter((s) =>
-    `${s.firstName} ${s.lastName}`.toLowerCase().includes(searchQuery.value.toLowerCase())
+    `${s.student_fname} ${s.student_lname}`.toLowerCase().includes(searchQuery.value.toLowerCase())
   );
 
   if (tierFilter.value !== 'All') {
@@ -50,12 +51,12 @@ export const filteredStudents = computed(() => {
   }
 
   if (sortMode.value === 'A - Z') {
-    filtered.sort((a, b) => a.lastName.localeCompare(b.lastName));
+    filtered.sort((a, b) => a.student_lname.localeCompare(b.student_lname));
   } else if (sortMode.value === 'By color') {
     filtered.sort(
       (a, b) =>
         performanceRank(b.score) - performanceRank(a.score) ||
-        a.lastName.localeCompare(b.lastName)
+        a.student_lname.localeCompare(b.student_lname)
     );
   }
 
