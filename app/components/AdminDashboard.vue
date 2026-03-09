@@ -3,7 +3,7 @@
     <loader />
   </div>
   <div v-else class="min-h-screen bg-gradient-to-b from-[#f7feff] to-slate-100 flex flex-col items-center pt-24">
-    <main class="w-full max-w-6xl px-4 pb-10 space-y-6 flex flex-col items-center">
+    <main class="w-full max-w-[90rem] px-4 pb-10 space-y-6 flex flex-col items-center">
       <section class="w-full bg-white border border-[#2e777e] shadow-lg rounded-xl overflow-hidden p-6 flex justify-center gap-2">
         <button class="px-4 py-2 bg-[#2e777e] text-white rounded-md hover:bg-[#3b797e]" @click="toggleUserForm()">Create New User</button>
         <button class="px-4 py-2 bg-[#2e777e] text-white rounded-md hover:bg-[#3b797e]" @click="toggleOrgForm()">
@@ -14,8 +14,8 @@
         </button>
       </section>
 
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 w-full max-h-[60em]">
-        <section class="bg-white border border-[#2e777e] shadow-lg rounded-xl overflow-hidden flex flex-col">
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 w-full max-h-[60em]">
+        <section class="bg-white border border-[#2e777e] shadow-lg rounded-xl overflow-hidden flex flex-col col-span-1">
           <div class="p-4 bg-[#3b797e] text-white font-semibold text-center rounded-t-lg">Students ({{ students.length }})</div>
           <div class="flex flex-col sm:flex-row gap-4 p-4">
             <input
@@ -35,7 +35,7 @@
           </div>
         </section>
 
-        <section class="bg-white border border-[#2e777e] shadow-lg rounded-xl overflow-hidden flex flex-col">
+        <section class="bg-white border border-[#2e777e] shadow-lg rounded-xl overflow-hidden flex flex-col col-span-1">
           <div class="p-4 bg-[#3b797e] text-white font-semibold text-center rounded-t-lg">Teachers ({{ teachers.length }})</div>
           <div class="flex flex-col sm:flex-row gap-4 p-4">
             <input
@@ -51,6 +51,25 @@
               :to="`/teacherProfile/${teacher.teacher_id}`"
               class="px-4 py-3 border border-[#2e777e] rounded-md bg-white text-black hover:bg-gray-50 transition-transform hover:scale-[1.01]">
               {{ teacher.teacher_fname }} {{ teacher.teacher_lname }}
+            </NuxtLink>
+          </div>
+        </section>
+        <section class="bg-white border border-[#2e777e] shadow-lg rounded-xl overflow-hidden flex flex-col col-span-1">
+          <div class="p-4 bg-[#3b797e] text-white font-semibold text-center rounded-t-lg">Admins ({{ admins.length }})</div>
+          <div class="flex flex-col sm:flex-row gap-4 p-4">
+            <input
+              v-model="search_A"
+              type="text"
+              placeholder="Search admins"
+              class="flex-1 px-3 py-2 rounded-md outline-none ring-1 ring-[#2e777e] bg-white text-gray-900" />
+          </div>
+          <div class="flex-1 overflow-y-auto p-4 flex flex-col gap-3 h-[60vh] max-h-[60vh]">
+            <NuxtLink
+              v-for="(admin, a) in filteredAdmins"
+              :key="a"
+              :to="``"
+              class="px-4 py-3 border border-[#2e777e] rounded-md bg-white text-black hover:bg-gray-50 transition-transform hover:scale-[1.01]">
+              {{ admin.admin_fname }} {{ admin.admin_lname }}
             </NuxtLink>
           </div>
         </section>
@@ -202,6 +221,7 @@
 <script setup>
 //NOTE: basic stuff
 const students = ref([]);
+const admins = ref([]);
 const teachers = ref([]);
 const organizations = ref([]);
 const loading = ref(true);
@@ -214,6 +234,7 @@ onMounted(async () => {
     if (data.success) {
       students.value = data.Students;
       teachers.value = data.Teachers;
+      admins.value = data.Admins;
       organizations.value = data.Organizations;
     } else {
       console.error('Server error');
@@ -226,12 +247,17 @@ onMounted(async () => {
 
 //NOTE: search stuff
 const search_T = ref('');
+const search_A = ref('');
 const search_S = ref('');
 
 const filteredStudents = computed(() => {
   return students.value.filter((student) =>
     `${student.student_fname} ${student.student_lname}`.toLowerCase().includes(search_S.value.toLowerCase())
   );
+});
+
+const filteredAdmins = computed(() => {
+  return admins.value.filter((admin) => `${admin.admin_fname} ${admin.admin_lname}`.toLowerCase().includes(search_A.value.toLowerCase()));
 });
 
 const filteredTeachers = computed(() => {

@@ -4,13 +4,12 @@ import { defineEventHandler, readBody } from 'h3';
 export default defineEventHandler(async (event) => {
   const { org_name } = await readBody(event);
   try {
-    const { data, error } = await supabase.from('Organization').insert({ organization_name: org_name });
+    const { data: organization, error } = await supabase.from('Organization').insert({ organization_name: org_name }).select().single();
 
-    console.log(data);
-    console.error(error);
+    if (error) return { success: false, message: error.message };
 
-    return { success: true };
+    return { success: true, organization };
   } catch (err) {
-    return { success: false, message: 'Server error:', err };
+    return { success: false, message: 'Server error', err };
   }
 });

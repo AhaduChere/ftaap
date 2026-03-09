@@ -34,7 +34,7 @@
 
     <!-- NOTE:Student panel -->
 
-    <div class="grid grid-cols-1 shadow-xl rounded-b-2xl min-h-[35rem] max-w-[50rem]">
+    <div class="grid grid-cols-1 shadow-xl rounded-b-2xl min-h-[35rem] w-[50rem]">
       <div class="h-16 bg-[#2e777e] rounded-t-2xl border border-[#2e777e]/30 flex items-center">
         <h2 class="w-full text-2xl text-white text-center pl-5 font-semibold">{{ teacher.teacher_lname }}'s Students</h2>
       </div>
@@ -88,45 +88,30 @@ onMounted(async () => {
 });
 
 async function StudentAverages(students) {
-  let avgComp = 0;
-  let avgMaze = 0;
-  let avgORF = 0;
-  let avgDibel = 0;
-  let avgFluency = 0;
-  for (let i = 0; i < students.length; i++) {
-    avgComp = avgComp + students[i].Student_Score.student_comprehension_score;
-    avgMaze = avgMaze + students[i].Student_Score.student_dibel_MAZE;
-    avgORF = avgORF + students[i].Student_Score.student_dibel_ORF;
-    avgDibel = avgDibel + students[i].Student_Score.student_dibel_score;
-    avgFluency = avgFluency + students[i].Student_Score.student_fluency_score;
+  const valid = students.filter((s) => s.Student_Score != null);
+  const len = valid.length;
+  if (!len) return;
+
+  let avgComp = 0,
+    avgMaze = 0,
+    avgORF = 0,
+    avgDibel = 0,
+    avgFluency = 0;
+
+  for (const s of valid) {
+    avgComp += s.Student_Score.student_comprehension_score;
+    avgMaze += s.Student_Score.student_dibel_MAZE;
+    avgORF += s.Student_Score.student_dibel_ORF;
+    avgDibel += s.Student_Score.student_dibel_score;
+    avgFluency += s.Student_Score.student_fluency_score;
   }
-  avgComp = (avgComp / students.length).toFixed(2);
-  avgMaze = (avgMaze / students.length).toFixed(2);
-  avgORF = (avgORF / students.length).toFixed(2);
-  avgDibel = (avgDibel / students.length).toFixed(2);
-  avgFluency = (avgFluency / students.length).toFixed(2);
 
   avgScores.value = {
-    Comp: {
-      score: avgComp,
-      name: 'Comprehension Score',
-    },
-    Maze: {
-      score: avgMaze,
-      name: 'Maze Score',
-    },
-    ORF: {
-      score: avgORF,
-      name: 'ORF Score',
-    },
-    Dibel: {
-      score: avgDibel,
-      name: 'Dibel Score',
-    },
-    Fluency: {
-      score: avgFluency,
-      name: 'Fluency Score',
-    },
+    Comp: { score: (avgComp / len).toFixed(2), name: 'Comprehension Score' },
+    Maze: { score: (avgMaze / len).toFixed(2), name: 'Maze Score' },
+    ORF: { score: (avgORF / len).toFixed(2), name: 'ORF Score' },
+    Dibel: { score: (avgDibel / len).toFixed(2), name: 'Dibel Score' },
+    Fluency: { score: (avgFluency / len).toFixed(2), name: 'Fluency Score' },
   };
 }
 

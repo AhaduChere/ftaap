@@ -436,4 +436,3 @@ const visibleScores = computed(() => {
     </main>
     </div>
 </template>
-    
