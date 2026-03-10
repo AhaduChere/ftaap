@@ -293,7 +293,6 @@ const programs = computed(() => {
  * - search + filters include "None"
  */
 const normalizedStudents = computed(() => {
-  console.log(students.value);
   return students.value.map((s: Student) => {
     const org =
       s.organization && String(s.organization).trim() !== ''
