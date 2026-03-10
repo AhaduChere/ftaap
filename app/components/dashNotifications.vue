@@ -1,31 +1,26 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
 import { format } from 'date-fns';
-import { CheckIcon, CheckBadgeIcon } from '@heroicons/vue/24/solid';
 import type { Student_Notification } from '../../types/notifications';
 
 const notifications = ref<Student_Notification[]>([]);
 
-/** Fetch unread notifications from API */
 const fetchNotifications = async () => {
   try {
     const res = await fetch('/api/notifications');
-    if(!res.ok){
-      console.error('Error getting notifications ', res.status, res.statusText);
+    if (!res.ok) {
+      console.error('Error getting notifications', res.status, res.statusText);
     }
     const data = await res.json();
-
-     notifications.value = data.map((n: Notifications) => ({
-       ...n,
+    notifications.value = data.map((n: any) => ({
+      ...n,
       id: Number(n.id),
-     }));
-
+    }));
   } catch (err) {
     console.error('Failed to fetch notifications', err);
   }
 };
 
-/** Mark a single notification as read */
 const markAsRead = async (id: number) => {
   try {
     await fetch(`/api/notifications/${id}`, {
@@ -39,12 +34,11 @@ const markAsRead = async (id: number) => {
   }
 };
 
-/** Mark all notifications as read */
 const markAllAsRead = async () => {
   try {
     await fetch('/api/notifications/markAll', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' }
+      headers: { 'Content-Type': 'application/json' },
     });
     notifications.value = [];
   } catch (err) {
@@ -52,8 +46,11 @@ const markAllAsRead = async () => {
   }
 };
 
-/** Format timestamp nicely */
-const formatDate = (date: string) => format(new Date(date), 'MMM dd, yyyy HH:mm');
+const formatDate = (date: string) => {
+  const parsed = new Date(date)
+  if (isNaN(parsed.getTime())) return 'Unknown date'
+  return format(parsed, 'MMM dd, yyyy')
+}
 
 onMounted(() => {
   fetchNotifications();
@@ -61,72 +58,61 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="w-full h-full flex flex-col space-y-2 overflow-y-auto p-2">
-    <!-- Mark All as Read -->
-    <div class="flex justify-end mb-2">
+  <div class="flex flex-col h-full rounded-md overflow-hidden border border-[#2e777e] drop-shadow-lg">
+    <!-- Teal header with title + mark all as read -->
+    <header class="bg-[#2e777e] text-white px-4 py-4 flex items-center justify-between shrink-0">
+      <h2 class="text-2xl font-bold tracking-wide">Notifications</h2>
       <button
-        @click="markAllAsRead"
-        class="flex items-center gap-1 text-sm px-3 py-1 bg-teal-100 text-teal-700 rounded hover:bg-teal-200 transition"
+        type="button"
+        class="inline-flex items-center gap-2 rounded-full px-4 py-2 text-xs font-semibold text-white shadow-sm transition
+               bg-[#4aa9b1] hover:bg-[#5cc3cc]
+               focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#5cc3cc]
+               disabled:opacity-50 disabled:cursor-not-allowed"
         :disabled="notifications.length === 0"
-        :class="{ 'opacity-50 cursor-not-allowed': notifications.length === 0 }"
+        @click="markAllAsRead"
       >
-        <CheckBadgeIcon class="w-5 h-5" />
         <span>Mark all as read</span>
       </button>
-    </div>
+    </header>
 
-    <!-- Notifications List -->
-    <div
-      v-for="notif in notifications"
-      :key="notif.id"
-      class="p-3 rounded-md shadow flex flex-col gap-2 transition hover:scale-[1.01] hover:shadow-md"
-      :class="{
-        'bg-red-50 border border-red-400 text-red-800': notif.level === 'red',
-        'bg-yellow-50 border border-yellow-400 text-yellow-800': notif.level === 'yellow',
-        'bg-green-50 border border-green-400 text-green-800': notif.level === 'green'
-      }"
-    >
-      <div class="flex justify-between items-center">
-        <div class="flex items-center space-x-2">
-          <span
-            class="inline-block w-3 h-3 rounded-full"
-            :class="{
-              'bg-red-500': notif.level === 'red',
-              'bg-yellow-400': notif.level === 'yellow',
-              'bg-green-500': notif.level === 'green'
-            }"
-          ></span>
-          <span class="font-semibold">{{ notif.name }}</span>
+    <!-- Notification rows -->
+    <div class="flex-1 min-h-0 overflow-y-auto bg-white">
+      <div
+        v-for="notif in notifications"
+        :key="notif.id"
+        class="flex items-center justify-between px-4 py-3 border-b border-slate-100 hover:bg-slate-50 transition-colors cursor-pointer"
+        @click="markAsRead(notif.id)"
+      >
+        <!-- Left: name + message -->
+        <div>
+          <div class="font-semibold text-[#2e777e]">{{ notif.name }}</div>
+          <div class="text-sm text-slate-500">{{ notif.message }}</div>
         </div>
-        <div class="flex items-center space-x-3">
-          <span class="text-xs text-gray-500 whitespace-nowrap">
-            {{ formatDate(notif.timestamp) }}
-          </span>
+
+        <!-- Right: date + check button -->
+        <div class="flex items-center gap-3 shrink-0 ml-4">
+          <span class="text-xs text-slate-400 whitespace-nowrap">{{ formatDate(notif.timestamp) }}</span>
           <button
-            @click="markAsRead(notif.id)"
-            class="text-gray-500 hover:text-green-600 transition"
-            title="Mark as Read"
+            class="w-7 h-7 rounded-full bg-[#2e777e] hover:bg-[#4aa9b1] flex items-center justify-center transition-colors shrink-0"
+            title="Mark as read"
+            @click.stop="markAsRead(notif.id)"
           >
-            <CheckIcon class="w-5 h-5" />
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="20 6 9 17 4 12" />
+            </svg>
           </button>
         </div>
       </div>
-      <div class="text-sm">{{ notif.message }}</div>
-    </div>
 
-    <!-- Empty State -->
-    <div v-if="notifications.length === 0" class="text-center text-gray-500 italic py-4">
-      🎉 All caught up! No new notifications.
+      <!-- Empty state -->
+      <div v-if="notifications.length === 0" class="text-center text-gray-400 italic py-8">
+        🎉 All caught up! No new notifications.
+      </div>
     </div>
   </div>
 </template>
 
 <style scoped>
-div::-webkit-scrollbar {
-  width: 6px;
-}
-div::-webkit-scrollbar-thumb {
-  background-color: rgba(0, 0, 0, 0.2);
-  border-radius: 3px;
-}
+div::-webkit-scrollbar { width: 6px; }
+div::-webkit-scrollbar-thumb { background-color: rgba(0,0,0,0.2); border-radius: 3px; }
 </style>

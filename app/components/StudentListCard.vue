@@ -1,29 +1,46 @@
 <script setup lang="ts">
-import { filteredStudents, scoreBorderClass, flagFillClass } from '~/composables/useStudentListStore';
+import type { StudentScore } from '~~/types/studentScore'
+
+type ScoreRow = StudentScore & { student_full_name: string }
+
+const props = defineProps<{
+  rows: ScoreRow[]
+}>()
 </script>
 
 <template>
-  <div class="h-full p-4 flex flex-col min-h-0">
-    <ul class="w-full flex-1 min-h-0 max-h-full overflow-y-auto rounded-md p-2 space-y-2" style="scrollbar-gutter: stable;">
-      <NuxtLink 
-        :to="`/progressReport/${s.id}`"
-        v-for="s in filteredStudents"
-        :key="s.id"
-        class="px-4 py-3 border-2 rounded-md bg-white hover:bg-gray-50 flex items-center justify-between transition-transform duration-200 hover:scale-105"
-        :class="scoreBorderClass()"
+  <div class="flex flex-col h-full min-h-0">
+    <!-- Column headers -->
+    <div class="grid grid-cols-2 px-4 py-2 bg-slate-100 border-b-2 border-[#2e777e] text-sm font-semibold text-slate-700 shrink-0">
+      <span>Student Name</span>
+      <span class="text-right">Dibel Avg (Score + ORF + MAZE)</span>
+    </div>
+
+    <!-- Scrollable rows -->
+    <div class="flex-1 min-h-0 overflow-y-auto" style="scrollbar-gutter: stable;">
+      <NuxtLink
+        v-for="r in rows"
+        :key="r.student_score_id"
+        :to="`/progressReport/${r.student_id}`"
+        class="grid grid-cols-2 px-4 py-3 border-b border-slate-200 bg-white hover:bg-[#f0fafb] transition-colors duration-150"
       >
-        <div>
-          <!-- Use firstName + lastName instead of s.name -->
-          <div class="font-semibold">{{ s.firstName }} {{ s.lastName }}</div>
-          <div class="text-sm text-gray-600">Score: {{ s.score ?? 'N/A' }}</div>
-        </div>
-        <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" viewBox="0 0 24 24" :class="flagFillClass(s.score)">
-          <path d="M5 3v18h2v-6h9l-1.5-4L16 7H7V3H5Z" />
-        </svg>
+        <span class="font-medium text-slate-800">{{ r.student_full_name }}</span>
+        <span
+          class="text-right font-semibold"
+          :class="{
+            'text-red-500':    r.student_dibel_score != null && r.student_dibel_score < 5,
+            'text-yellow-500': r.student_dibel_score != null && r.student_dibel_score >= 5 && r.student_dibel_score < 10,
+            'text-green-500':  r.student_dibel_score == null || r.student_dibel_score >= 10
+          }"
+        >{{ r.student_dibel_score ?? '—' }}</span>
       </NuxtLink>
-      <li v-if="filteredStudents.length === 0" class="px-4 py-2 text-gray-600 italic bg-white border-2 border-dashed border-gray-300 rounded-md">
+
+      <div
+        v-if="rows.length === 0"
+        class="px-4 py-4 text-center text-gray-500 italic"
+      >
         No students found
-      </li>
-    </ul>
+      </div>
+    </div>
   </div>
 </template>

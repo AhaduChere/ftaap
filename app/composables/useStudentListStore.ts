@@ -43,7 +43,7 @@ export const fetchStudents = async () => {
 // Filtered and sorted students
 export const filteredStudents = computed(() => {
   let filtered = students.value.filter((s) =>
-    `${s.student_fname} ${s.student_lname}`.toLowerCase().includes(searchQuery.value.toLowerCase())
+    `${s.firstName} ${s.lastName}`.toLowerCase().includes(searchQuery.value.toLowerCase())
   );
 
   if (tierFilter.value !== 'All') {
@@ -51,12 +51,12 @@ export const filteredStudents = computed(() => {
   }
 
   if (sortMode.value === 'A - Z') {
-    filtered.sort((a, b) => a.student_lname.localeCompare(b.student_lname));
+    filtered.sort((a, b) => a.lastName.localeCompare(b.lastName));
   } else if (sortMode.value === 'By color') {
     filtered.sort(
       (a, b) =>
         performanceRank(b.score) - performanceRank(a.score) ||
-        a.student_lname.localeCompare(b.student_lname)
+        a.lastName.localeCompare(b.lastName)
     );
   }
 
