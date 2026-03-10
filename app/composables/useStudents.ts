@@ -41,7 +41,6 @@ export function useStudents() {
     }else{
       try {
         const data = await $fetch<Success>(`/api/studentsByTeacher/${teacher_id}`)
-        console.log(data.students);
         if(data.success){
           students.value = Array.isArray(data.students) ? data.students : []
         }else {
