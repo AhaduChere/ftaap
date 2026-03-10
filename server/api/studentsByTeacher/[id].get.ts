@@ -22,7 +22,7 @@ export default defineEventHandler(async (event) => {
             return {success: false, message: 'Error fetching teacher data'};
         }
 
-        const { data } = await supabase.from('Student').select('*').eq('teacher_id', teacherData.teacher_id).or('is_archived.is.null,isarchived.eq.false');
+        const { data } = await supabase.from('Student').select('*').eq('teacher_id', teacherData.teacher_id).or('is_archived.is.null,is_archived.eq.false');
         studentsByTeacher = data ?? [];
     }else if(userData.admin_id){
         const {data: adminData} = await supabase.from('Admin').select('*').eq('user_id', userData.user_id).single();
@@ -31,7 +31,7 @@ export default defineEventHandler(async (event) => {
             return {success: false, message: 'Error fetching admin data'};
         }
 
-        const { data } = await supabase.from('Student').select('*').or('is_archived.is.null,isarchived.eq.false');
+        const { data } = await supabase.from('Student').select('*').or('is_archived.is.null,is_archived.eq.false');
         studentsByTeacher = data ?? [];
     }
 
