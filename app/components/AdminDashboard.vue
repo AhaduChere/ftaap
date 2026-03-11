@@ -5,9 +5,7 @@
   <div v-else class="min-h-screen bg-gradient-to-b from-[#f7feff] to-slate-100 flex flex-col items-center pt-24">
     <main class="w-full max-w-[90rem] px-4 pb-10 space-y-6 flex flex-col items-center">
       <section class="w-full bg-white border border-[#2e777e] shadow-lg rounded-xl overflow-hidden p-6 flex justify-center gap-2">
-        <button class="px-4 py-2 bg-[#2e777e] text-white rounded-md hover:bg-[#3b797e]" @click="toggleUserForm()">
-          Create New User
-        </button>
+        <button class="px-4 py-2 bg-[#2e777e] text-white rounded-md hover:bg-[#3b797e]" @click="toggleUserForm()">Create New User</button>
         <button class="px-4 py-2 bg-[#2e777e] text-white rounded-md hover:bg-[#3b797e]" @click="toggleOrgForm()">
           Create New Organization
         </button>
@@ -350,6 +348,9 @@ function toggleUserForm() {
   userForm.value = !userForm.value;
 }
 async function createUser() {
+  if (/^[A-Za-z0-9._%+-]+@forehandconsulting\.com$/.test(email.value)) {
+    return;
+  }
   const payload = {
     firstName: firstName.value,
     lastName: lastName.value,
@@ -367,6 +368,7 @@ async function createUser() {
 
     if (data.success) {
       toggleUserForm();
+      location.reload();
       error_user.value = '';
     } else {
       error_user.value = 'Server error';
