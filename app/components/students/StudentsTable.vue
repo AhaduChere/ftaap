@@ -13,9 +13,7 @@ const emit = defineEmits<{
 
 <template>
   <div class="w-full h-full min-h-0">
-    <div
-      class="table-scroll h-full min-h-0 overflow-y-auto overflow-x-auto border border-slate-200 rounded-lg bg-white"
-    >
+    <div class="table-scroll max-h-[520px] overflow-y-auto overflow-x-auto border border-slate-200 rounded-lg bg-white">
       <table class="min-w-full text-sm border-collapse">
         <thead class="bg-slate-50 text-slate-700 sticky top-0">
           <tr class="text-left">

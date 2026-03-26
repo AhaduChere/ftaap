@@ -403,13 +403,13 @@ const visibleScores = computed(() => {
 
       <main class="max-w-6xl mx-auto px-4 pb-4 flex-1 min-h-0 w-full">
         <section
-          class="w-full h-full bg-white border border-[#2e777e] shadow-lg rounded-xl overflow-hidden flex flex-col"
+          class="w-full max-h-full bg-white border border-[#2e777e] shadow-lg rounded-xl overflow-hidden flex flex-col"
         >
           <div class="shrink-0">
             <ScoresHeader @add="openCreate" />
           </div>
 
-          <div class="border-t border-slate-200 flex flex-col flex-1 min-h-0">
+          <div class="border-t border-slate-200 flex flex-col">
             <div class="px-4 py-3 bg-slate-50/80 border-b border-slate-200 shrink-0">
               <ScoresControls
                 v-model:search="search"
@@ -421,7 +421,7 @@ const visibleScores = computed(() => {
               </p>
             </div>
 
-            <div class="p-4 bg-white flex-1 min-h-0">
+            <div class="p-4 bg-white">
               <div v-if="scoresPending || pending" class="py-8 text-center text-sm text-slate-500">
                 Loading students scores…
               </div>
@@ -433,7 +433,7 @@ const visibleScores = computed(() => {
                 {{ error }}
               </div>
 
-              <div v-else class="h-full min-h-0">
+              <div v-else>
                 <ScoresTable :rows="visibleScores" @edit="openEdit" />
 
                 <p

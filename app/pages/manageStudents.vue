@@ -379,13 +379,13 @@ const visibleStudents = computed(() => {
 
       <main class="max-w-6xl mx-auto px-4 pb-4 flex-1 min-h-0 w-full">
         <section
-          class="w-full h-full bg-white border border-[#2e777e] shadow-lg rounded-xl overflow-hidden flex flex-col"
+          class="w-full max-h-full bg-white border border-[#2e777e] shadow-lg rounded-xl overflow-hidden flex flex-col"
         >
           <div class="shrink-0">
             <StudentsHeader @add="openCreate" />
           </div>
 
-          <div class="border-t border-slate-200 flex flex-col flex-1 min-h-0">
+          <div class="border-t border-slate-200 flex flex-col">
             <div class="px-4 py-3 bg-slate-50/80 border-b border-slate-200 shrink-0">
               <StudentsControls
                 v-model:search="search"
@@ -403,7 +403,7 @@ const visibleStudents = computed(() => {
               </p>
             </div>
 
-            <div class="p-4 bg-white flex-1 min-h-0">
+            <div class="p-4 bg-white">
               <div v-if="pending" class="py-8 text-center text-sm text-slate-500">
                 Loading students…
               </div>
@@ -415,7 +415,7 @@ const visibleStudents = computed(() => {
                 {{ error }}
               </div>
 
-              <div v-else class="h-full min-h-0">
+              <div v-else>
                 <StudentsTable
                   :rows="visibleStudents"
                   @edit="openEdit"
