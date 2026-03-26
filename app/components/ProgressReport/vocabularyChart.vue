@@ -21,7 +21,7 @@ import type { StudentScore } from '../../../types/studentScore';
 const props = defineProps<{ studentScoreId: number | null }>()
 let vocabScore:number;
 let knownWords = ref<string[]>([]);
-let unkownWords = ref<string[]>([]);
+let unknownWords = ref<string[]>([]);
 
 watch(
   () => props.studentScoreId,
@@ -31,6 +31,7 @@ watch(
   { immediate: true }
 )
 
+//get the most recent three scores for the selected student
 async function displayScores(){
     const response: StudentScore[] = await getStudentScores();
     vocabScore = 0;
@@ -43,7 +44,7 @@ async function displayScores(){
     if(mostRecent[0]?.student_vocab_score){
         vocabScore = mostRecent[0].student_vocab_score;
         knownWords.value = mostRecent[0].student_known_words;
-        unkownWords.value = mostRecent[0].student_unknown_words;
+        unknownWords.value = mostRecent[0].student_unknown_words;
     }
 
     const trendColor = getTrendColor(vocabScore);
@@ -59,6 +60,7 @@ async function displayScores(){
 
 }
 
+//determine whether a score trend is increasing, decrasing, or unkown (the same)
 function getTrendColor(vocabScore:number) {
   if(vocabScore > 80){
     return '#10B981';
@@ -69,6 +71,7 @@ function getTrendColor(vocabScore:number) {
   }
 }
 
+//create the chart on load
 const donutChartRef = ref<HTMLCanvasElement | null>(null)
 let donutChartInstance: ChartType | null = null
 

@@ -54,9 +54,11 @@ const studentMap = computed(() =>
   Object.fromEntries(students.value.map((s) => [s.student_id, s])),
 )
 
-async function loadScores() {
-  scoresPending.value = true
-  scoresError.value = null
+//load scores and map them to the correct student to create the rows
+//return [] if there are no scores or if an error occurs
+async function loadScores(){ 
+    scoresPending.value = true;
+    scoresError.value = null;
 
   try {
     const rows = await $fetch<StudentScore[]>('/api/scores/scores')
@@ -136,12 +138,14 @@ function clearAddErrors() {
   for (const k of Object.keys(addErrors)) delete addErrors[k]
 }
 
+//make sure a student is selected before creating a new score
 function validateCreate(): boolean {
   clearAddErrors()
   if (!form.selectedStudentId) addErrors.selectedStudent = 'Student is required.'
   return Object.keys(addErrors).length === 0
 }
 
+//add new scores to the database
 async function add() {
   if (!validateCreate()) return
   createError.value = null
@@ -268,14 +272,16 @@ async function saveEdit() {
 
   try {
     const payload = {
-      student_score_id: draft.student_score_id,
-      student_dibel_score: draft.student_dibel_score ?? null,
-      student_dibel_ORF: draft.student_dibel_ORF ?? null,
-      student_dibel_MAZE: draft.student_dibel_MAZE ?? null,
-      student_fluency_score: draft.student_fluency_score ?? null,
-      student_comprehension_score: draft.student_comprehension_score ?? null,
-      student_vocab_score: draft.student_vocab_score ?? null,
-      student_id: draft.selectedStudentId,
+        student_score_id: draft.student_score_id,
+        student_dibel_score: draft.student_dibel_score ?? null,
+        student_dibel_ORF: draft.student_dibel_ORF ?? null,
+        student_dibel_MAZE: draft.student_dibel_MAZE ?? null,
+        student_fluency_score: draft.student_fluency_score ?? null,
+        student_comprehension_score: draft.student_comprehension_score ?? null,
+        student_vocab_score: draft.student_vocab_score ?? null,
+        student_id: draft.selectedStudentId,
+        student_unknown_words: draft.student_unknown_words ?? [],
+        student_known_words: draft.student_known_words ?? []
     }
 
     await fetch('/api/scores/scores', {
@@ -314,6 +320,7 @@ function computeDibelAvg(dibel: number, MAZE: number, ORF: number) {
   return (dibel + MAZE + ORF) / 3
 }
 
+//display the scores based on the current sort
 const visibleScores = computed(() => {
   const q = search.value.trim().toLowerCase()
 

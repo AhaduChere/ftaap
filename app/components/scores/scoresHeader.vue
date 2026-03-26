@@ -14,7 +14,7 @@
           Gradebook
         </h1>
     
-        <!-- Add Student Button (lighter teal version of header color) -->
+        <!-- Add Score Button (lighter teal version of header color) -->
         <button
           type="button"
           class="inline-flex items-center gap-2 rounded-full 
