@@ -80,7 +80,6 @@ import type { StudentScore } from '~~/types/studentScore';
         </tbody>
       </table>
     </div>
-  </div>
 </template>
 
 <style scoped>

@@ -7,7 +7,7 @@
             <h4 class="text-[#2e777e] font-semibold">Known Words:</h4>
             <p disabled class="text-[#2e777e]">{{ knownWords?.join(', ') ?? 'No words to show'}}</p>
             <h4 class="text-[#2e777e] font-semibold">Unknown Words:</h4>
-            <p class="text-[#2e777e]">{{ unkownWords?.join(', ') ?? 'No words to show'}}</p>
+            <p class="text-[#2e777e]">{{ unknownWords?.join(', ') ?? 'No words to show'}}</p>
         </div>
     </div>
   </template>
