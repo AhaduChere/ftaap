@@ -1,8 +1,5 @@
 <script setup lang="ts">
-type OrganizationOption = {
-  id: number
-  organization_name: string
-}
+import { ref, watch, computed } from 'vue'
 
 const props = defineProps<{
   open: boolean
@@ -12,113 +9,165 @@ const props = defineProps<{
     student_lname: string
     student_grade_level: number | null
     student_program: string | null
-
-    //  allow editing org
     organization_id: number | null
-
+    student_notes: string | null
     is_archived: boolean | null
   }
-
-  // options passed from manageStudents page
-  organizations: OrganizationOption[]
-
-  errorText?: string | null
+  organizations: { id: number; organization_name: string }[]
+  programOptions: string[]
+  errorText: string | null
 }>()
 
 const emit = defineEmits<{
   (e: 'close'): void
   (e: 'save'): void
 }>()
+
+/* -------------------------
+   Autocomplete logic
+------------------------- */
+const programQuery = ref('')
+const showDropdown = ref(false)
+
+function hideDropdown() {
+  setTimeout(() => {
+    showDropdown.value = false
+  }, 100)
+}
+
+watch(
+  () => props.open,
+  (isOpen) => {
+    if (!isOpen) return
+    programQuery.value = props.draft.student_program ?? ''
+    showDropdown.value = false
+  },
+  { immediate: true },
+)
+
+const filteredPrograms = computed(() => {
+  const q = programQuery.value.trim().toLowerCase()
+  if (!q) return props.programOptions
+
+  return props.programOptions.filter((p) =>
+    p.toLowerCase().includes(q),
+  )
+})
+
+watch(programQuery, (val) => {
+  props.draft.student_program = val
+})
+
+function selectProgram(program: string) {
+  programQuery.value = program
+  props.draft.student_program = program
+  showDropdown.value = false
+}
 </script>
 
 <template>
-  <transition name="fade">
+  <Teleport to="body">
     <div
-      v-if="props.open"
-      class="fixed inset-0 z-50 flex items-center justify-center bg-black/40"
+      v-if="open"
+      class="fixed inset-0 z-40 flex items-center justify-center bg-black/40"
     >
-      <div class="bg-white rounded-lg shadow-lg w-full max-w-lg mx-4">
-        <!-- Header -->
-        <div class="px-6 py-4 border-b flex items-center justify-between">
-          <h2 class="text-lg font-semibold text-gray-800">
+      <div class="bg-white rounded-lg shadow-xl w-full max-w-lg mx-4">
+        <header class="px-4 py-3 border-b border-slate-200 flex items-center justify-between">
+          <h2 class="text-base font-semibold text-slate-800">
             Edit Student
           </h2>
           <button
             type="button"
-            class="text-gray-500 hover:text-gray-700"
+            class="text-slate-500 hover:text-slate-800"
             @click="emit('close')"
           >
             ✕
           </button>
-        </div>
+        </header>
 
-        <!-- Body -->
-        <div class="px-6 py-4 space-y-4">
-          <!-- First Name -->
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">
-              First Name
-            </label>
-            <input
-              v-model="props.draft.student_fname"
-              type="text"
-              class="w-full border rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#2e777e]"
-            />
+        <div class="px-4 py-4 space-y-3 max-h-[70vh] overflow-y-auto">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs font-semibold text-slate-600 mb-1">
+                First Name
+              </label>
+              <input
+                v-model="draft.student_fname"
+                type="text"
+                class="w-full rounded-md border border-slate-300 px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#2e777e]"
+              />
+            </div>
+
+            <div>
+              <label class="block text-xs font-semibold text-slate-600 mb-1">
+                Last Name
+              </label>
+              <input
+                v-model="draft.student_lname"
+                type="text"
+                class="w-full rounded-md border border-slate-300 px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#2e777e]"
+              />
+            </div>
           </div>
 
-          <!-- Last Name -->
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">
-              Last Name
-            </label>
-            <input
-              v-model="props.draft.student_lname"
-              type="text"
-              class="w-full border rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#2e777e]"
-            />
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs font-semibold text-slate-600 mb-1">
+                Grade Level
+              </label>
+              <input
+                v-model.number="draft.student_grade_level"
+                type="number"
+                min="1"
+                class="w-full rounded-md border border-slate-300 px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#2e777e]"
+              />
+            </div>
+
+            <div class="relative">
+              <label class="block text-xs font-semibold text-slate-600 mb-1">
+                Program
+              </label>
+
+              <input
+                v-model="programQuery"
+                type="text"
+                placeholder="Type a program..."
+                class="w-full rounded-md border border-slate-300 px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#2e777e]"
+                @focus="showDropdown = true"
+                @blur="hideDropdown"
+              />
+
+              <ul
+                v-if="showDropdown && filteredPrograms.length"
+                class="absolute z-50 mt-1 max-h-48 w-full overflow-y-auto rounded-md border border-slate-300 bg-white shadow-lg"
+              >
+                <li
+                  v-for="program in filteredPrograms"
+                  :key="program"
+                  class="cursor-pointer px-3 py-2 text-sm border-b border-slate-100 last:border-b-0 hover:bg-slate-50"
+                  @mousedown.prevent="selectProgram(program)"
+                >
+                  {{ program }}
+                </li>
+              </ul>
+            </div>
           </div>
 
-          <!-- Grade Level -->
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">
-              Grade Level (numeric)
-            </label>
-            <input
-              v-model.number="props.draft.student_grade_level"
-              type="number"
-              min="0"
-              class="w-full border rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#2e777e]"
-            />
-          </div>
-
-          <!-- Program -->
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">
-              Program
-            </label>
-            <input
-              v-model="props.draft.student_program"
-              type="text"
-              class="w-full border rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#2e777e]"
-            />
-          </div>
-
-          <!-- ✅ NEW: Organization -->
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">
+            <label class="block text-xs font-semibold text-slate-600 mb-1">
               Organization
             </label>
 
             <select
-              v-model="props.draft.organization_id"
-              class="w-full border rounded px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-[#2e777e]"
+              v-model="draft.organization_id"
+              class="w-full rounded-md border border-slate-300 px-2 py-1.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-[#2e777e]"
             >
               <option :value="null" disabled>
                 Select an organization…
               </option>
 
               <option
-                v-for="org in props.organizations"
+                v-for="org in organizations"
                 :key="org.id"
                 :value="org.id"
               >
@@ -127,44 +176,43 @@ const emit = defineEmits<{
             </select>
           </div>
 
-          <!-- Error text -->
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 mb-1">
+              Notes (optional)
+            </label>
+            <textarea
+              v-model="draft.student_notes"
+              rows="3"
+              class="w-full rounded-md border border-slate-300 px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#2e777e]"
+              placeholder="Add any helpful notes about this student…"
+            />
+          </div>
+
           <p
-            v-if="props.errorText"
-            class="text-red-600 text-sm mt-2"
+            v-if="errorText"
+            class="text-xs text-red-600 mt-2"
           >
-            {{ props.errorText }}
+            {{ errorText }}
           </p>
         </div>
 
-        <!-- Footer -->
-        <div class="px-6 py-3 border-t flex justify-end space-x-2">
+        <footer class="px-4 py-3 border-t border-slate-200 flex justify-end gap-2">
           <button
             type="button"
-            class="px-4 py-2 border rounded text-sm text-gray-700 hover:bg-gray-50"
+            class="px-3 py-1.5 text-xs rounded border border-slate-300 text-slate-700 hover:bg-slate-100"
             @click="emit('close')"
           >
             Cancel
           </button>
           <button
             type="button"
-            class="px-4 py-2 rounded text-sm text-white bg-[#2e777e] hover:bg-[#255f64]"
+            class="px-3 py-1.5 text-xs rounded bg-[#2e777e] text-white font-medium hover:bg-[#245e64]"
             @click="emit('save')"
           >
             Save Changes
           </button>
-        </div>
+        </footer>
       </div>
     </div>
-  </transition>
+  </Teleport>
 </template>
-
-<style scoped>
-.fade-enter-active,
-.fade-leave-active {
-  transition: opacity 0.15s ease;
-}
-.fade-enter-from,
-.fade-leave-to {
-  opacity: 0;
-}
-</style>

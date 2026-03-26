@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { ref, watch, computed } from 'vue'
+
 const props = defineProps<{
   open: boolean
   form: {
@@ -10,7 +12,8 @@ const props = defineProps<{
     student_notes: string | null
     is_archived: boolean | null
   }
-  organizations: { id: number; organization_name: string }[] 
+  organizations: { id: number; organization_name: string }[]
+  programOptions: string[]
   errors: Record<string, string>
   errorText: string | null
 }>()
@@ -19,6 +22,47 @@ const emit = defineEmits<{
   (e: 'close'): void
   (e: 'save'): void
 }>()
+
+/* -------------------------
+   Autocomplete logic
+------------------------- */
+const programQuery = ref('')
+const showDropdown = ref(false)
+
+function hideDropdown() {
+  setTimeout(() => {
+    showDropdown.value = false
+  }, 100)
+}
+
+watch(
+  () => props.open,
+  (isOpen) => {
+    if (!isOpen) return
+    programQuery.value = props.form.student_program ?? ''
+    showDropdown.value = false
+  },
+  { immediate: true },
+)
+
+const filteredPrograms = computed(() => {
+  const q = programQuery.value.trim().toLowerCase()
+  if (!q) return props.programOptions
+
+  return props.programOptions.filter((p) =>
+    p.toLowerCase().includes(q),
+  )
+})
+
+watch(programQuery, (val) => {
+  props.form.student_program = val
+})
+
+function selectProgram(program: string) {
+  programQuery.value = program
+  props.form.student_program = program
+  showDropdown.value = false
+}
 </script>
 
 <template>
@@ -53,10 +97,7 @@ const emit = defineEmits<{
                 type="text"
                 class="w-full rounded-md border border-slate-300 px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#2e777e]"
               />
-              <p
-                v-if="errors.firstName"
-                class="text-xs text-red-600 mt-0.5"
-              >
+              <p v-if="errors.firstName" class="text-xs text-red-600 mt-0.5">
                 {{ errors.firstName }}
               </p>
             </div>
@@ -70,16 +111,13 @@ const emit = defineEmits<{
                 type="text"
                 class="w-full rounded-md border border-slate-300 px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#2e777e]"
               />
-              <p
-                v-if="errors.lastName"
-                class="text-xs text-red-600 mt-0.5"
-              >
+              <p v-if="errors.lastName" class="text-xs text-red-600 mt-0.5">
                 {{ errors.lastName }}
               </p>
             </div>
           </div>
 
-          <!-- Grade / Program -->
+          <!-- Grade + Program -->
           <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
             <div>
               <label class="block text-xs font-semibold text-slate-600 mb-1">
@@ -88,24 +126,46 @@ const emit = defineEmits<{
               <input
                 v-model.number="form.student_grade_level"
                 type="number"
-                min="0"
+                min="1"
                 class="w-full rounded-md border border-slate-300 px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#2e777e]"
               />
+              <p v-if="errors.gradeLevel" class="text-xs text-red-600 mt-0.5">
+                {{ errors.gradeLevel }}
+              </p>
             </div>
 
-            <div>
+            <!-- ✅ AUTOCOMPLETE PROGRAM -->
+            <div class="relative">
               <label class="block text-xs font-semibold text-slate-600 mb-1">
                 Program
               </label>
+
               <input
-                v-model="form.student_program"
+                v-model="programQuery"
                 type="text"
+                placeholder="Type a program..."
                 class="w-full rounded-md border border-slate-300 px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#2e777e]"
+                @focus="showDropdown = true"
+                @blur="hideDropdown"
               />
+
+              <ul
+                v-if="showDropdown && filteredPrograms.length"
+                class="absolute z-50 mt-1 max-h-48 w-full overflow-y-auto rounded-md border border-slate-300 bg-white shadow-lg"
+              >
+                <li
+                  v-for="program in filteredPrograms"
+                  :key="program"
+                  class="cursor-pointer px-3 py-2 text-sm border-b border-slate-100 last:border-b-0 hover:bg-slate-50"
+                  @mousedown.prevent="selectProgram(program)"
+                >
+                  {{ program }}
+                </li>
+              </ul>
             </div>
           </div>
 
-          <!-- Organization select -->
+          <!-- Organization -->
           <div>
             <label class="block text-xs font-semibold text-slate-600 mb-1">
               Organization
@@ -128,15 +188,12 @@ const emit = defineEmits<{
               </option>
             </select>
 
-            <p
-              v-if="errors.organizationId"
-              class="text-xs text-red-600 mt-0.5"
-            >
+            <p v-if="errors.organizationId" class="text-xs text-red-600 mt-0.5">
               {{ errors.organizationId }}
             </p>
           </div>
 
-          <!-- ✅ NEW: Notes -->
+          <!-- Notes -->
           <div>
             <label class="block text-xs font-semibold text-slate-600 mb-1">
               Notes (optional)
@@ -149,11 +206,7 @@ const emit = defineEmits<{
             />
           </div>
 
-
-          <p
-            v-if="errorText"
-            class="text-xs text-red-600 mt-2"
-          >
+          <p v-if="errorText" class="text-xs text-red-600 mt-2">
             {{ errorText }}
           </p>
         </div>
