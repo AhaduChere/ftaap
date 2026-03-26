@@ -1,5 +1,6 @@
 import { supabase } from '../../supabase.js';
 import { defineEventHandler, createError } from 'h3'
+import { StudentScore } from '../../../types/studentScore.js'
 
 export default defineEventHandler(async (event) => {
     const body = await readBody<StudentScore>(event)
@@ -23,7 +24,7 @@ export default defineEventHandler(async (event) => {
         student_id: body.student_id,
         student_vocab_score: body.student_vocab_score,
         student_known_words: body.student_known_words,
-        student_unkown_words: body.student_unkown_words
+        student_unknown_words: body.student_unknown_words
     })
     .select()
     .single()

@@ -135,7 +135,7 @@ import type { StudentOption } from '~~/types/studentOption';
 
               <div>
                 <label class="block text-sm font-medium text-slate-700 mb-1">
-                    Known Words
+                    Known Words (Enter words seperated by a comma)
                 </label>
                 <textarea
                 v-model="draft.student_known_words"
@@ -146,14 +146,14 @@ import type { StudentOption } from '~~/types/studentOption';
             </div>
 
             <div>
-                <label class="block text-xs font-semibold text-slate-600 mb-1">
-                    Unkown Words
+                <label class="block text-sm font-medium text-slate-700 mb-1">
+                    Unknown Words (Enter words seperated by a comma)
                 </label>
                 <textarea
                 v-model="draft.student_unknown_words"
                 rows="3"
                 class="w-full rounded-md border border-slate-300 px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#2e777e]"
-                placeholder="Add any of the students unkown words..."
+                placeholder="Add any of the students unknown words..."
                 />
             </div>
     

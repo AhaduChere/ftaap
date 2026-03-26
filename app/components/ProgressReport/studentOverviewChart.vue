@@ -31,6 +31,7 @@ let maxScores:number[] = [];
   { immediate: true }
 )
 
+//get the most recent three scores for the selected student
 async function displayScores(){
     const response: StudentScore[] = await getStudentScores();
     MAZEScores = [];
@@ -81,6 +82,7 @@ async function displayScores(){
 
 }
 
+//determine whether a score trend is increasing, decrasing, or unkown (the same)
 function getTrend(arr?: number[]): 'increasing' | 'decreasing' | 'unknown' {
   if (!arr || arr.length < 2) return 'unknown'
 
@@ -100,6 +102,7 @@ function getTrend(arr?: number[]): 'increasing' | 'decreasing' | 'unknown' {
   return 'unknown'
 }
 
+//create the chart on load
 const chartRef = ref()
 let chartInstance: ChartType | null = null
 
