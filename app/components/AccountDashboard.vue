@@ -14,7 +14,7 @@
               <img v-if="avatarUrl" :src="avatarUrl" class="w-full h-full object-cover" />
               <span v-else>photo</span>
             </button>
-            <input id="fileInput" type="file" accept="image/*" style="display: none" @change="handleFileUpload" />
+            <input id="fileInput" type="file" accept="image/*" style="display: none" @change="uploadNewAvatar" />
             <h2 class="text-2xl font-semibold text-center mt-4">{{ userdata.first_name }} {{ userdata.last_name }}</h2>
             <p class="text-gray-500 text-sm">{{ user.data.user.email }}</p>
             <button
@@ -36,6 +36,7 @@ const user = ref();
 const avatarUrl = ref(null);
 const userdata = ref({});
 
+// NOTE: Grabs current user info and avatar
 onMounted(async () => {
   try {
     user.value = await $supabase.auth.getUser();
@@ -60,7 +61,7 @@ function upload() {
   document.getElementById('fileInput').click();
 }
 
-const handleFileUpload = async (event) => {
+const uploadNewAvatar = async (event) => {
   const file = event.target.files[0];
   if (!file) return;
 

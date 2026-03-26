@@ -11,7 +11,6 @@
           type="email"
           placeholder="Email"
           class="px-4 py-3 border rounded-lg focus:outline-none ring-2 ring-[#2e777e] transition" />
-
         <input
           v-model="password"
           type="password"
@@ -25,6 +24,7 @@
         Sign In
       </button>
 
+      <a class="text-sm text-center font-medium cursor-pointer hover:underline" href="/Reset">forgot password</a>
       <p v-if="error" class="text-red-600 text-sm text-center font-medium">{{ error }}</p>
     </form>
   </div>

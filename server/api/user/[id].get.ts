@@ -8,7 +8,7 @@ export default defineEventHandler(async (event) => {
 
   const { data: role } = await supabase.from('User').select('*').eq('auth_id', id).single();
 
-  //NOTE: cuz for SOME REASON we have the role name in the users first and last name
+  //NOTE:Remap names for simplicity
   if (role?.role_id == 1) {
     user = await supabase.from('Admin').select('*').eq('admin_id', role?.admin_id).single();
     user = {

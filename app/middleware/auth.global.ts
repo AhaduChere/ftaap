@@ -9,11 +9,10 @@ export default defineNuxtRouteMiddleware(async (to) => {
     data: { user },
   } = await $supabase.auth.getUser();
 
-  if (!user && to.path !== '/login') {
+  if (!user && to.path.toLowerCase() !== '/login' && to.path.toLowerCase() !== '/reset') {
     return navigateTo('/login');
   }
-
-  if (user && to.path === '/login') {
+  if (user && (to.path.toLowerCase() === '/login' || to.path.toLowerCase() === '/reset')) {
     return navigateTo('/');
   }
 });

@@ -16,6 +16,7 @@ const loading = ref(true);
 
 const { $supabase } = useNuxtApp();
 
+// NOTE: Checks if user is an admin
 onMounted(async () => {
   const { data: userdata } = await $supabase.auth.getUser();
   const data = await $fetch('/api/admin', {

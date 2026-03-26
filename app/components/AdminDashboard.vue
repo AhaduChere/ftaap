@@ -4,6 +4,7 @@
   </div>
   <div v-else class="min-h-screen bg-gradient-to-b from-[#f7feff] to-slate-100 flex flex-col items-center pt-24">
     <main class="w-full max-w-[90rem] px-4 pb-10 space-y-6 flex flex-col items-center">
+      <!-- NOTE: Quick Access forms -->
       <section class="w-full bg-white border border-[#2e777e] shadow-lg rounded-xl overflow-hidden p-6 flex justify-center gap-2">
         <button class="px-4 py-2 bg-[#2e777e] text-white rounded-md hover:bg-[#3b797e]" @click="toggleUserForm()">Create New User</button>
         <button class="px-4 py-2 bg-[#2e777e] text-white rounded-md hover:bg-[#3b797e]" @click="toggleOrgForm()">
@@ -14,9 +15,12 @@
         </button>
       </section>
 
+      <!-- NOTE: Student list -->
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 w-full max-h-[60em]">
         <section class="bg-white border border-[#2e777e] shadow-lg rounded-xl overflow-hidden flex flex-col col-span-1">
-          <div class="p-4 bg-[#3b797e] text-white font-semibold text-center rounded-t-lg">Students ({{ students.length }})</div>
+          <div class="p-4 bg-[#3b797e] text-white font-semibold text-center rounded-t-lg">
+            {{ students.length }} Student{{ students.length === 1 ? '' : 's' }}
+          </div>
           <div class="flex flex-col sm:flex-row gap-4 p-4">
             <input
               v-model="search_S"
@@ -35,8 +39,11 @@
           </div>
         </section>
 
+        <!-- NOTE: Teacher list -->
         <section class="bg-white border border-[#2e777e] shadow-lg rounded-xl overflow-hidden flex flex-col col-span-1">
-          <div class="p-4 bg-[#3b797e] text-white font-semibold text-center rounded-t-lg">Teachers ({{ teachers.length }})</div>
+          <div class="p-4 bg-[#3b797e] text-white font-semibold text-center rounded-t-lg">
+            {{ teachers.length }} Teacher{{ teachers.length === 1 ? '' : 's' }}
+          </div>
           <div class="flex flex-col sm:flex-row gap-4 p-4">
             <input
               v-model="search_T"
@@ -54,8 +61,12 @@
             </NuxtLink>
           </div>
         </section>
+
+        <!-- NOTE:Admin list -->
         <section class="bg-white border border-[#2e777e] shadow-lg rounded-xl overflow-hidden flex flex-col col-span-1">
-          <div class="p-4 bg-[#3b797e] text-white font-semibold text-center rounded-t-lg">Admins ({{ admins.length }})</div>
+          <div class="p-4 bg-[#3b797e] text-white font-semibold text-center rounded-t-lg">
+            {{ admins.length }} Admin{{ admins.length === 1 ? '' : 's' }}
+          </div>
           <div class="flex flex-col sm:flex-row gap-4 p-4">
             <input
               v-model="search_A"
@@ -68,14 +79,14 @@
               v-for="(admin, a) in filteredAdmins"
               :key="a"
               :to="``"
-              class="px-4 py-3 border border-[#2e777e] rounded-md bg-white text-black hover:bg-gray-50 transition-transform hover:scale-[1.01]">
+              class="px-4 py-3 border border-[#2e777e] rounded-md bg-white text-black hover:bg-gray-50 transition-transform hover:scale-[1.01] cursor-default">
               {{ admin.admin_fname }} {{ admin.admin_lname }}
             </NuxtLink>
           </div>
         </section>
       </div>
     </main>
-    <!-- NOTE: Student Form -->
+    <!-- NOTE: Create Student Form -->
     <div v-if="studentForm" class="fixed inset-0 h-screen bg-black/30 z-10 flex items-center justify-center">
       <form class="w-full max-w-lg bg-white rounded-2xl shadow-2xl p-8 flex flex-col gap-5 relative" @submit.prevent="createStudent">
         <button
@@ -136,7 +147,7 @@
       </form>
     </div>
 
-    <!-- NOTE: Organization Form -->
+    <!-- NOTE: Create Organization Form -->
     <div v-if="orgForm" class="fixed inset-0 h-screen bg-black/30 z-10 flex items-center justify-center">
       <form class="w-full max-w-md bg-white rounded-2xl shadow-2xl p-8 flex flex-col gap-5 relative" @submit.prevent="createOrg">
         <button type="button" class="absolute top-4 right-4 text-gray-600 hover:text-gray-900 text-2xl font-bold" @click="toggleOrgForm">
@@ -158,11 +169,11 @@
           class="px-4 py-3 bg-[#2e777e] text-white font-semibold rounded-lg hover:bg-[#256166] active:scale-95 transition">
           Create Organization
         </button>
-        <div v-if="error_org">{{ error_org }}</div>
+        <div v-if="error_org" class="w-full text-center text-red-500 font-bold">{{ error_org }}</div>
       </form>
     </div>
 
-    <!-- NOTE: User Form -->
+    <!-- NOTE: Create User Form -->
     <div v-if="userForm" class="fixed inset-0 h-screen bg-black/30 z-10 flex items-center justify-center">
       <form class="w-full max-w-md bg-white rounded-2xl shadow-2xl p-8 flex flex-col gap-5 relative" @submit.prevent="createUser">
         <button type="button" class="absolute top-4 right-4 text-gray-600 hover:text-gray-900 text-2xl font-bold" @click="toggleUserForm">
@@ -202,7 +213,7 @@
             v-model="organization"
             :disabled="role === 'Admin'"
             class="px-4 py-3 border rounded-lg focus:outline-none ring-2 ring-[#2e777e] transition bg-white/90">
-            <option value="">Select Organization</option>
+            <option value="">Select Organization (optional)</option>
             <option v-for="org in organizations" :key="org.id" :value="org.id">{{ org.organization_name }}</option>
           </select>
         </div>
@@ -212,7 +223,7 @@
           class="px-4 py-3 bg-[#2e777e] text-white font-semibold rounded-lg hover:bg-[#256166] active:scale-95 transition">
           Create User
         </button>
-        <div v-if="error_user">{{ error_user }}</div>
+        <div v-if="error_user" class="w-full text-center text-red-500 font-bold">{{ error_user }}</div>
       </form>
     </div>
   </div>
@@ -245,7 +256,7 @@ onMounted(async () => {
   loading.value = false;
 });
 
-//NOTE: search stuff
+//NOTE: Searching functionality
 const search_T = ref('');
 const search_A = ref('');
 const search_S = ref('');
@@ -266,7 +277,7 @@ const filteredTeachers = computed(() => {
   );
 });
 
-//NOTE: Student form stuff// NOTE: student form stuff
+//NOTE: Student form functionality
 
 const studentForm = ref(false);
 const studentFirstName = ref('');
@@ -283,6 +294,7 @@ function toggleStudentForm() {
 }
 
 async function createStudent() {
+  error_student.value = '';
   const payload = {
     firstName: studentFirstName.value,
     lastName: studentLastName.value,
@@ -309,7 +321,7 @@ async function createStudent() {
   }
 }
 
-// NOTE: Org form stuff
+// NOTE: Organization form functionality
 const orgForm = ref(false);
 const org_name = ref('');
 const error_org = ref('');
@@ -318,6 +330,7 @@ function toggleOrgForm() {
   orgForm.value = !orgForm.value;
 }
 async function createOrg() {
+  error_org.value = '';
   try {
     const data = await $fetch('/api/organization', {
       method: 'POST',
@@ -334,7 +347,7 @@ async function createOrg() {
     console.error(error);
   }
 }
-// NOTE: user form stuff
+// NOTE: user form functionality
 const userForm = ref(false);
 const firstName = ref('');
 const lastName = ref('');
@@ -348,7 +361,10 @@ function toggleUserForm() {
   userForm.value = !userForm.value;
 }
 async function createUser() {
-  if (/^[A-Za-z0-9._%+-]+@forehandconsulting\.com$/.test(email.value)) {
+  error_user.value = '';
+  // NOTE: If not the right domain
+  if (!/^[A-Za-z0-9._%+-]+@forehandconsulting\.com$/.test(email.value)) {
+    error_user.value = 'Please use a forehandconsulting email';
     return;
   }
   const payload = {
