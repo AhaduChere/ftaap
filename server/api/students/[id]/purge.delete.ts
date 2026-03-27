@@ -1,10 +1,22 @@
+// purge.delete.ts
+// API handler for permanently deleting an archived student.
+// This endpoint handles:
+// - validating the provided student id parameter
+// - checking whether the student exists
+// - ensuring only archived students can be purged
+// - permanently deleting the student record from the database
+// - returning a success response or throwing an API error
+
+
 import { supabase } from '../../../supabase.js'
 import { defineEventHandler, createError } from 'h3'
 
 export default defineEventHandler(async (event) => {
+  // Read the student id from route params
   const idParam = event.context.params?.id
   const id = Number(idParam)
 
+  // Validate that the id is a usable number
   if (!id || Number.isNaN(id)) {
     throw createError({
       statusCode: 400,
@@ -19,6 +31,7 @@ export default defineEventHandler(async (event) => {
     .eq('student_id', id)
     .single()
 
+  // Return not found if no matching student exists
   if (fetchError || !existing) {
     throw createError({
       statusCode: 404,
@@ -26,6 +39,7 @@ export default defineEventHandler(async (event) => {
     })
   }
 
+  // Prevent permanent deletion of non-archived students
   if (!existing.is_archived) {
     throw createError({
       statusCode: 400,
@@ -33,11 +47,13 @@ export default defineEventHandler(async (event) => {
     })
   }
 
+  // Permanently delete the student row
   const { error: deleteError } = await supabase
     .from('Student')
     .delete()
     .eq('student_id', id)
 
+  // Handle database delete failure
   if (deleteError) {
     console.error('Error permanently deleting student:', deleteError)
     throw createError({
@@ -47,5 +63,6 @@ export default defineEventHandler(async (event) => {
     })
   }
 
+  // Return success response
   return { ok: true }
 })

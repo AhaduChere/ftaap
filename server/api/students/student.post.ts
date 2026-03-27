@@ -1,31 +1,43 @@
+// student.post.ts
+// API handler for creating a new student.
+// This endpoint handles:
+// - reading and validating the request body
+// - verifying the current logged-in user
+// - determining the correct teacher_id for the new student
+// - inserting the student into the database
+// - transforming the created row into a frontend-friendly object
+
+
 import { supabase } from '../../supabase.js'
 import { readBody, createError, defineEventHandler } from 'h3'
 import type { Student } from '../../../types/student'
 
+// Converts a database student row into a frontend-friendly format
 function toFrontend(s: Student) {
   return {
-    id: Number(s.student_id),
-    firstName: s.student_fname ?? '',
-    lastName: s.student_lname ?? '',
+    id: Number(s.student_id), // normalize id to number
+    firstName: s.student_fname ?? '', // fallback to empty string
+    lastName: s.student_lname ?? '', // fallback to empty string
     gradeLevel:
       s.student_grade_level !== null && s.student_grade_level !== undefined
         ? Number(s.student_grade_level)
-        : null,
-    program: s.student_program ?? null,
+        : null, // normalize grade level or set null
+    program: s.student_program ?? null, // allow null if missing
     organizationId:
       s.organization_id !== null && s.organization_id !== undefined
         ? Number(s.organization_id)
-        : null,
-    notes: s.student_notes ?? null,
-    isArchived: s.is_archived ?? false,
+        : null, // normalize organization id or set null
+    notes: s.student_notes ?? null, // allow null if missing
+    isArchived: s.is_archived ?? false, // default to false if undefined
     teacherId:
       s.teacher_id !== null && s.teacher_id !== undefined
         ? Number(s.teacher_id)
-        : null,
+        : null, // normalize teacher id or set null
   }
 }
 
 export default defineEventHandler(async (event) => {
+  // Expected request body shape for creating a student
   type Body = {
     firstName?: string
     lastName?: string
@@ -38,8 +50,10 @@ export default defineEventHandler(async (event) => {
     authId?: string | null
   }
 
+  // Read request body
   const body = await readBody<Body>(event)
 
+  // Validate required student name fields
   if (!body.firstName || !body.lastName) {
     throw createError({
       statusCode: 400,
@@ -47,6 +61,7 @@ export default defineEventHandler(async (event) => {
     })
   }
 
+  // Validate required organization id
   if (body.organizationId === undefined || body.organizationId === null) {
     throw createError({
       statusCode: 400,
@@ -54,6 +69,7 @@ export default defineEventHandler(async (event) => {
     })
   }
 
+  // Validate that the request is tied to a logged-in user
   if (!body.authId) {
     throw createError({
       statusCode: 401,
@@ -61,12 +77,14 @@ export default defineEventHandler(async (event) => {
     })
   }
 
+  // Look up the current user in the database using auth_id
   const { data: currentUser, error: currentUserError } = await supabase
     .from('User')
     .select('*')
     .eq('auth_id', body.authId)
     .single()
 
+  // Stop if current user cannot be found/resolved
   if (currentUserError || !currentUser) {
     console.error('Error fetching current user:', currentUserError)
     throw createError({
@@ -75,6 +93,7 @@ export default defineEventHandler(async (event) => {
     })
   }
 
+  // Teacher id that will be assigned to the new student
   let teacherId: number | null = null
 
   // Teacher creating student: always use their own teacher_id
@@ -96,6 +115,7 @@ export default defineEventHandler(async (event) => {
         : null
   }
 
+  // Insert new student row into the database
   const { data: created, error: insertError } = await supabase
     .from('Student')
     .insert({
@@ -114,6 +134,7 @@ export default defineEventHandler(async (event) => {
     .select()
     .single()
 
+  // Handle database insert failure
   if (insertError || !created) {
     console.error('Error creating student:', insertError)
     throw createError({
@@ -122,5 +143,6 @@ export default defineEventHandler(async (event) => {
     })
   }
 
+  // Return created student in frontend-friendly format
   return toFrontend(created)
 })

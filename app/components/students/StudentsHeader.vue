@@ -1,7 +1,18 @@
+// StudentsHeader.vue
+// Header component for the student management page.
+// This component handles:
+// - displaying the page title
+// - providing an "Add Student" action button
+// - emitting an event when the add button is clicked
+
+
 <script setup lang="ts">
+
+// Event emitted when the "Add Student" button is clicked
 const emit = defineEmits<{
-  (e: 'add'): void
+  (e: 'add'): void // trigger opening of add student modal
 }>()
+
 </script>
 
 <template>
@@ -14,7 +25,8 @@ const emit = defineEmits<{
       Student Management
     </h1>
 
-    <!-- Add Student Button (lighter teal version of header color) -->
+    <!-- Add Student Button  -->
+    <!-- Clicking this button emits the "add" event to parent -->
     <button
       type="button"
       class="inline-flex items-center gap-2 rounded-full 
@@ -25,7 +37,10 @@ const emit = defineEmits<{
              focus:ring-[#5cc3cc]"
       @click="emit('add')"
     >
+      <!-- Plus icon -->
       <span class="text-base leading-none">＋</span>
+
+      <!-- Button label -->
       <span>Add Student</span>
     </button>
   </header>
