@@ -1,18 +1,11 @@
 export default defineNuxtRouteMiddleware(async (to) => {
   const { $supabase } = useNuxtApp();
+  if (!$supabase) return;
 
-  if (!$supabase) {
-    return;
-  }
+  const { data: { user } } = await $supabase.auth.getUser();
+  const path = to.path.toLowerCase();
+  const isAuthPage = path === '/login' || path === '/reset';
 
-  const {
-    data: { user },
-  } = await $supabase.auth.getUser();
-
-  if (!user && to.path.toLowerCase() !== '/login' && to.path.toLowerCase() !== '/reset') {
-    return navigateTo('/login');
-  }
-  if (user && (to.path.toLowerCase() === '/login' || to.path.toLowerCase() === '/reset')) {
-    return navigateTo('/');
-  }
+  if (!user && !isAuthPage) return navigateTo('/login');
+  if (user && isAuthPage) return navigateTo('/');
 });

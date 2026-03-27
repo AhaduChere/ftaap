@@ -230,7 +230,7 @@ const sortOrder_T = ref('alpha_asc');
 const teacherData = ref({});
 const organizations = ref([]);
 
-// NOTE: Search functionality
+// NOTE: Search and sort functionality
 const filteredTeachers = computed(() => {
   const query = search_T.value.toLowerCase();
   const list = teachers.value.filter((t) => `${t.teacher_fname} ${t.teacher_lname}`.toLowerCase().includes(query));
