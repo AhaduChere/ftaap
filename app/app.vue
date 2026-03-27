@@ -6,7 +6,7 @@
 </template>
 
 <script setup>
-import { useStudentScoresData } from './composables/studentScores.js';
+import { useStudentScoresData } from './composables/studentScores.ts';
 
 const route = useRoute();
 const isAdminPage = computed(() => route.path.startsWith('/login'));
