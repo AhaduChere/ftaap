@@ -1,6 +1,6 @@
-
 import { supabase } from '../../supabase.js'
-import { readBody, createError } from 'h3'
+import { readBody, createError, defineEventHandler } from 'h3'
+import type { Student } from '../../../types/student'
 
 function toFrontend(s: Student) {
   return {
@@ -12,16 +12,11 @@ function toFrontend(s: Student) {
         ? Number(s.student_grade_level)
         : null,
     program: s.student_program ?? null,
-
-    
     organizationId:
       s.organization_id !== null && s.organization_id !== undefined
         ? Number(s.organization_id)
         : null,
-
-    
     notes: s.student_notes ?? null,
-
     isArchived: s.is_archived ?? false,
     teacherId:
       s.teacher_id !== null && s.teacher_id !== undefined
@@ -36,20 +31,15 @@ export default defineEventHandler(async (event) => {
     lastName?: string
     gradeLevel?: number | null
     program?: string | null
-
-   
     organizationId?: number | null
-
-
     notes?: string | null
-
     isArchived?: boolean | null
     teacherId?: number | null
+    authId?: string | null
   }
 
   const body = await readBody<Body>(event)
 
-  // Require names
   if (!body.firstName || !body.lastName) {
     throw createError({
       statusCode: 400,
@@ -57,7 +47,6 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  // Require organizationId (Student.organization_id is required)
   if (body.organizationId === undefined || body.organizationId === null) {
     throw createError({
       statusCode: 400,
@@ -65,27 +54,46 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  // Determine teacher_id
-  let teacherId: number
+  if (!body.authId) {
+    throw createError({
+      statusCode: 401,
+      statusMessage: 'You must be logged in to create a student.',
+    })
+  }
 
-  if (body.teacherId !== undefined && body.teacherId !== null) {
-    teacherId = Number(body.teacherId)
-  } else {
-    const { data: defaultTeacher, error } = await supabase
-      .from('Teacher')
-      .select('teacher_id')
-      .limit(1)
-      .single()
+  const { data: currentUser, error: currentUserError } = await supabase
+    .from('User')
+    .select('*')
+    .eq('auth_id', body.authId)
+    .single()
 
-    if (error || !defaultTeacher) {
-      throw createError({
-        statusCode: 500,
-        statusMessage:
-          'No teacher available to assign to new students (teacher_id is required).',
-      })
-    }
+  if (currentUserError || !currentUser) {
+    console.error('Error fetching current user:', currentUserError)
+    throw createError({
+      statusCode: 403,
+      statusMessage: 'Unable to determine the current user role.',
+    })
+  }
 
-    teacherId = Number(defaultTeacher.teacher_id)
+  let teacherId: number | null = null
+
+  // Teacher creating student: always use their own teacher_id
+  if (currentUser.teacher_id !== null && currentUser.teacher_id !== undefined) {
+    teacherId = Number(currentUser.teacher_id)
+  }
+  // Admin creating student: use selected teacher if provided, otherwise null
+  else if (currentUser.admin_id !== null && currentUser.admin_id !== undefined) {
+    teacherId =
+      body.teacherId !== undefined && body.teacherId !== null
+        ? Number(body.teacherId)
+        : null
+  }
+  // fallback
+  else {
+    teacherId =
+      body.teacherId !== undefined && body.teacherId !== null
+        ? Number(body.teacherId)
+        : null
   }
 
   const { data: created, error: insertError } = await supabase
@@ -99,13 +107,8 @@ export default defineEventHandler(async (event) => {
           ? Number(body.gradeLevel)
           : null,
       student_program: body.program ?? null,
-
-
       organization_id: Number(body.organizationId),
-
-
       student_notes: body.notes ?? null,
-
       is_archived: body.isArchived ?? false,
     })
     .select()
@@ -115,7 +118,7 @@ export default defineEventHandler(async (event) => {
     console.error('Error creating student:', insertError)
     throw createError({
       statusCode: 500,
-      statusMessage: 'Failed to create student.',
+      statusMessage: insertError?.message || 'Failed to create student.',
     })
   }
 

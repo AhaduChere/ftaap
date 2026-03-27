@@ -1,4 +1,3 @@
-
 // Centralized student state + CRUD helpers
 import type { Student } from "../../types/student"
 
@@ -10,12 +9,13 @@ type CreateStudent = {
   organizationId: number
   notes?: string | null
   isArchived: boolean | null
+  teacherId?: number | null
 }
 
 type Success = {
-  success:boolean,
-  message:string | null,
-  students:Student[]
+  success: boolean
+  message: string | null
+  students: Student[]
 }
 
 type UpdateStudent = Partial<CreateStudent>
@@ -33,18 +33,18 @@ export function useStudents() {
   const pending = useState<boolean>('students_pending', () => false)
   const error = useState<string | null>('students_error', () => null)
 
-  const refresh = async (teacher_id:string) => {
+  const refresh = async (teacher_id: string) => {
     pending.value = true
 
-    if(!teacher_id){
-      students.value = [];
-    }else{
+    if (!teacher_id) {
+      students.value = []
+    } else {
       try {
         const data = await $fetch<Success>(`/api/studentsByTeacher/${teacher_id}`)
-        if(data.success){
+        if (data.success) {
           students.value = Array.isArray(data.students) ? data.students : []
-        }else {
-          error.value = 'Error getting students';
+        } else {
+          error.value = 'Error getting students'
         }
         error.value = null
       } catch (e) {
@@ -57,13 +57,24 @@ export function useStudents() {
     }
   }
 
-  const create = async (payload: CreateStudent, teacher_id:string) => {
+  const create = async (payload: CreateStudent, teacher_id: string) => {
     pending.value = true
     try {
+      const { $supabase } = useNuxtApp()
+      const { data: userData, error: userError } = await ($supabase as any).auth.getUser()
+
+      if (userError || !userData?.user?.id) {
+        throw new Error('Unable to determine the logged in user.')
+      }
+
       await $fetch<Student>('/api/students/student', {
         method: 'POST',
-        body: payload,
+        body: {
+          ...payload,
+          authId: userData.user.id,
+        },
       })
+
       await refresh(teacher_id)
       error.value = null
     } catch (e) {
@@ -75,7 +86,7 @@ export function useStudents() {
     }
   }
 
-  const replace = async (id: number, payload: UpdateStudent, teacher_id:string) => {
+  const replace = async (id: number, payload: UpdateStudent, teacher_id: string) => {
     pending.value = true
     try {
       await $fetch<Student>(`/api/students/${id}`, {
@@ -93,8 +104,7 @@ export function useStudents() {
     }
   }
 
-  // Existing: archive (soft delete)
-  const remove = async (id: number, teacher_id:string) => {
+  const remove = async (id: number, teacher_id: string) => {
     pending.value = true
     try {
       await $fetch(`/api/students/${id}`, {
@@ -111,15 +121,12 @@ export function useStudents() {
     }
   }
 
-  
   const purge = async (id: number) => {
     pending.value = true
     try {
       await $fetch(`/api/students/${id}/purge`, {
         method: 'DELETE',
       })
-      // NOTE: do not call refresh() here automatically because this composable’s refresh()
-      // loads active (non-archived) students. The archived page should refresh its own list.
       error.value = null
     } catch (e) {
       console.error('Failed to permanently delete student', e)
