@@ -201,7 +201,7 @@ async function getStudentScores(): Promise<StudentScore[]> {
   
   <style scoped>
   .chart-container {
-    height: 15rem;
+    height: 23rem;
     max-width: 900px;
     margin: auto;
   }

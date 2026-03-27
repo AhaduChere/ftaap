@@ -1,21 +1,21 @@
 <template>
-    <div class="grid grid-cols-1 md:grid-cols-2">
-        <div class="chart-container justify-self-start">
+    <div class="grid grid-cols-1 w-full h-full">
+        <div class="chart-container justify-self-center">
         <canvas ref="donutChartRef"></canvas>
         </div>
-        <div class="hidden md:flex md:flex-col flex-row">
+        <!-- <div class="hidden md:flex md:flex-col flex-row">
             <h4 class="text-[#2e777e] font-semibold">Known Words:</h4>
             <p disabled class="text-[#2e777e]">{{ knownWords?.join(', ') ?? 'No words to show'}}</p>
             <h4 class="text-[#2e777e] font-semibold">Unknown Words:</h4>
             <p class="text-[#2e777e]">{{ unknownWords?.join(', ') ?? 'No words to show'}}</p>
-        </div>
+        </div> -->
     </div>
   </template>
 
 <script setup lang="ts">
 import { ref, onMounted, onBeforeUnmount, watch } from 'vue'
 import Chart from 'chart.js/auto'
-import type { Chart as ChartType, LegendItem, ChartDataset, ChartOptions } from 'chart.js'
+import type { Chart as ChartType} from 'chart.js'
 import type { StudentScore } from '../../../types/studentScore';
 
 const props = defineProps<{ studentScoreId: number | null }>()
@@ -94,9 +94,12 @@ onMounted(() => {
     },
     options: {
       responsive: true,
+      maintainAspectRatio: false,
       cutout: '70%', 
       plugins: {
-        legend: { display: true }, 
+        legend: { 
+          display: true
+         }, 
         tooltip: { callbacks: {
           label: function(context) {
             return context.parsed + '%';
@@ -125,8 +128,6 @@ async function getStudentScores(): Promise<StudentScore[]> {
   
   <style scoped>
   .chart-container {
-    height: 14rem;
-    max-width: 800px;
-    margin: auto;
+    height: 10rem;
   }
   </style>
