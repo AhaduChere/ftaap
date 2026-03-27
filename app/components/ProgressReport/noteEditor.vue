@@ -24,7 +24,7 @@
 <script setup lang="ts">
 const emit = defineEmits(['close', 'update:studentNotes'])
 
-const props = defineProps<{ studentNotes: string | undefined; studentScoreId: number | undefined }>();
+const props = defineProps<{ studentNotes: string | null | undefined; studentScoreId: number | undefined }>();
 const newNotes = ref('')
 
 watch(

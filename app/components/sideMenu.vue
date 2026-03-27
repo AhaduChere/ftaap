@@ -1,6 +1,8 @@
 <script setup lang="ts">
+import type { SupabaseClient } from '@supabase/supabase-js';
 import { watch, onMounted, onBeforeUnmount } from 'vue';
 const { $supabase } = useNuxtApp();
+const supabase = $supabase as SupabaseClient
 
 const emit = defineEmits(['close']);
 const props = defineProps({ isOpen: Boolean });
@@ -41,16 +43,17 @@ onBeforeUnmount(() => {
 });
 
 async function logout() {
-  await $supabase.auth.signOut();
+  await supabase.auth.signOut();
   window.location.reload();
 }
 
 onMounted(async () => {
-  const { data: userdata } = await $supabase.auth.getUser();
+  const { data: userdata } = await supabase.auth.getUser();
+  
   const data = await $fetch('/api/admin', {
     method: 'POST',
     body: {
-      userId: userdata.user.id,
+      userId: userdata?.user.id,
     },
   });
   if (data.isAdmin) {
@@ -80,8 +83,6 @@ onMounted(async () => {
               <NuxtLink to="/" class="block px-8 py-2 border-b border-white/20 hover:bg-[#205a5f] cursor-pointer" @click="closeMenu">
                 Overview
               </NuxtLink>
-              <div class="px-8 py-2 border-b border-white/20 hover:bg-[#205a5f] cursor-pointer" @click="closeMenu">Reports</div>
-              <div class="px-8 py-2 border-b border-white/20 hover:bg-[#205a5f] cursor-pointer" @click="closeMenu">Analytics</div>
             </div>
           </li>
 
@@ -101,13 +102,6 @@ onMounted(async () => {
                 @click="closeMenu">
                 Archived Students
               </NuxtLink>
-              <NuxtLink
-                to="/progressReport/report"
-                class="block px-8 py-2 border-b border-white/20 hover:bg-[#205a5f] cursor-pointer"
-                @click="closeMenu">
-                Progress Tracker
-              </NuxtLink>
-              <div class="px-8 py-2 border-b border-white/20 hover:bg-[#205a5f] cursor-pointer" @click="closeMenu">Attendance</div>
             </div>
           </li>
 
@@ -127,13 +121,20 @@ onMounted(async () => {
                 @click="closeMenu">
                 Manage Organizations
               </NuxtLink>
+              <div class="px-8 py-2 border-b border-white/20 hover:bg-[#205a5f] cursor-pointer" @click="closeMenu">Analytics</div>
             </div>
           </li>
 
-          <!--Students' Scores-->
-          <li>
+           <!--Students' Scores-->
+           <li>
             <div class="px-4 py-3 font-semibold text-lg text-[#e2fafc] border-b border-white/30 no-select">Grades</div>
             <div class="text-[#e2fafc]">
+              <NuxtLink
+                to="/progressReport/report"
+                class="block px-8 py-2 border-b border-white/20 hover:bg-[#205a5f] cursor-pointer"
+                @click="closeMenu">
+                Progress Tracker
+              </NuxtLink>
               <NuxtLink to="/gradebook" class="block px-8 py-2 border-b border-white/20 hover:bg-[#205a5f] cursor-pointer" @click="closeMenu">
                 Gradebook
               </NuxtLink>
@@ -144,6 +145,7 @@ onMounted(async () => {
           <li>
             <div class="px-4 py-3 font-semibold text-lg text-[#e2fafc] border-b border-white/30 no-select">Settings</div>
             <div class="text-[#e2fafc]">
+              
               <NuxtLink
                 to="/Account"
                 class="block px-8 py-2 border-b border-white/20 hover:bg-[#205a5f] cursor-pointer"
