@@ -142,7 +142,7 @@
     </div>
 
     <div v-if="editForm" class="fixed inset-0 h-screen bg-black/30 z-20 flex items-center justify-center">
-      <div class="w-full max-w-2xl bg-white rounded-2xl shadow-2xl p-8 flex flex-col gap-5 relative max-h-[90vh] overflow-y-auto">
+      <div class="w-2xl bg-white rounded-2xl shadow-2xl p-8 flex flex-col gap-5 relative h-5/6 overflow-y-auto">
         <button type="button" class="absolute top-4 right-4 text-gray-600 hover:text-gray-900 text-2xl font-bold" @click="editForm = false">
           X
         </button>
@@ -169,7 +169,7 @@
         <div class="flex flex-col gap-3">
           <h3 class="text-sm font-semibold text-slate-600 uppercase tracking-wide">Assigned Students</h3>
           <div v-if="editingStudents.length === 0" class="text-slate-400 text-sm">No students assigned.</div>
-          <div class="flex flex-col gap-2 max-h-40 overflow-y-auto">
+          <div class="flex flex-col gap-2 max-h-96 overflow-y-auto">
             <div
               v-for="student in editingStudents"
               :key="student.student_id"
@@ -230,6 +230,7 @@ const sortOrder_T = ref('alpha_asc');
 const teacherData = ref({});
 const organizations = ref([]);
 
+// NOTE: Search functionality
 const filteredTeachers = computed(() => {
   const query = search_T.value.toLowerCase();
   const list = teachers.value.filter((t) => `${t.teacher_fname} ${t.teacher_lname}`.toLowerCase().includes(query));
@@ -308,6 +309,8 @@ async function deleteTeacher(id) {
     alert('An error occurred while deleting.');
   }
 }
+
+//NOTE: New teacher form
 const userForm = ref(false);
 const firstName = ref('');
 const lastName = ref('');
@@ -381,6 +384,7 @@ onMounted(async () => {
   }
 });
 
+//NOTE: edit teacher form
 const editForm = ref(false);
 const editingTeacher = ref(null);
 const editingStudents = ref([]);
