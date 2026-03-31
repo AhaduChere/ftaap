@@ -3,7 +3,6 @@ import { computed, ref, onMounted } from 'vue'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import { useStudents } from '~/composables/useStudents'
 import type { StudentScore } from '~~/types/studentScore'
-import type { Student } from '~~/types/student'
 
 const { students, pending, error, refresh } = useStudents()
 

@@ -294,7 +294,7 @@
           @update:studentNotes="handleNotesUpdate"
           @close=" openNotes = false"></NoteEditor>
     
-          <div v-if="selectedStudent" class="pt-[5rem] w-screen min-h-screen grid grid-cols-1 md:grid-cols-3 auto-rows-[13rem] gap-x-10  gap-y-2">
+          <div v-if="selectedStudent" class="pt-[5.5rem] w-screen min-h-screen grid grid-cols-1 md:grid-cols-3 auto-rows-[13rem] gap-x-10  gap-y-2">
                 <div class="w-full ml-5 h-full bg-white border border-[#2e777e] border-1 drop-shadow-lg rounded-md md:col-span-2 row-span-2">
                     <div class="p-2 bg-[#2e777e] flex justify-center items-center text-white font-semibold rounded-t-md">Student Overview  </div>
                     <StudentOverviewChart :student-score-id="selectedStudent?.student_id" />
@@ -306,21 +306,20 @@
                         <VocabularyChart :student-score-id="selectedStudent?.student_id" />
                     </div>
 
-                    <div class="grid grid-cols-2 gap-x-1">
-                        <div class="w-full h-full bg-white border border-[#2e777e] border-1 drop-shadow-lg rounded-md md:col-span-1">
-                            <div class="w-full p-2 bg-[#2e777e] text-white font-semibold text-center rounded-t-md">Known Words</div>
-                            <VocabularyWords :student-score-id="selectedStudent?.student_id" :known-words="true"/>
-                        </div>
-                        <div class="w-full h-full bg-white border border-[#2e777e] border-1 drop-shadow-lg rounded-md md:col-span-1 ">
-                            <div class="w-full p-2 bg-[#2e777e] text-white font-semibold text-center rounded-t-md">Unknown Words</div>
-                            <VocabularyWords :student-score-id="selectedStudent?.student_id" :known-words="false" />
-                        </div>
+                    <div class="w-full h-full bg-white border border-[#2e777e] border-1 drop-shadow-lg rounded-md md:col-span-1">
+                        <div class="w-full p-2 bg-[#2e777e] text-white font-semibold text-center rounded-t-md">Known Words</div>
+                        <VocabularyWords :student-score-id="selectedStudent?.student_id" :known-words="true"/>
                     </div>
+                    
                 </div>
 
-                <div class=" bg-white border border-[#2e777e] border-1 drop-shadow-lg rounded-md col-span-3 ml-5 mr-5">
+                <div class="w-full bg-white border border-[#2e777e] border-1 drop-shadow-lg rounded-md col-span-2 ml-5">
                     <div class="p-2 bg-[#2e777e] text-white font-semibold text-center rounded-t-md">ORF Score</div>
                     <ORFChart :student-score-id="selectedStudent?.student_id" />
+                </div>
+                <div class=" mr-5 bg-white border border-[#2e777e] border-1 drop-shadow-lg rounded-md col-span-1">
+                    <div class=" p-2 bg-[#2e777e] text-white font-semibold text-center rounded-t-md">Unknown Words</div>
+                    <VocabularyWords :student-score-id="selectedStudent?.student_id" :known-words="false" />
                 </div>
 
             </div>
