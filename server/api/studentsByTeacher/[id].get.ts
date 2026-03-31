@@ -5,6 +5,7 @@ import { Organization } from '~~/types/organization.js';
 
 export default defineEventHandler(async (event) => {
   const id = event.context.params?.id;
+  console.log(id)
   let studentsByTeacher:Student[] = [];
 
   if(id == null || id == undefined){
