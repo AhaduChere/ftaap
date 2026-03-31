@@ -1,20 +1,23 @@
 import { supabase } from '../supabase';
+
 export default defineEventHandler(async (event) => {
   if (!event.path.startsWith('/api/')) return;
   if (event.path === '/api/notifer/') return;
 
-  const cookies = parseCookies(event)
-  const raw = Object.entries(cookies)
-    .find(([key]) => key.startsWith('sb-'))?.[1]
+  const cookies = parseCookies(event);
+  const config = useRuntimeConfig();
+  const authkey = config.authkey;
 
-  if (!raw) {
+  const raw = Object.entries(cookies).find(([key]) => key === authkey);
+  const token = raw ? raw[1] : null;
+
+  if (!token) {
     throw createError({ statusCode: 401, message: 'Unauthorized' });
   }
 
-  const session = JSON.parse(raw)
-  const token = session.access_token
-
-  const { data: { user } } = await supabase.auth.getUser(token)
+  const {
+    data: { user },
+  } = await supabase.auth.getUser(token);
 
   if (!user) {
     throw createError({ statusCode: 401, message: 'Unauthorized' });
