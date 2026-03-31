@@ -1,17 +1,25 @@
 // archivedStudents.vue
 // Main page component for viewing archived students.
 // This component handles:
-// - fetching and refreshing archived student data
+// - fetching and refreshing archived student data for the current teacher
 // - filtering archived students by search, program, and grade
 // - restoring archived students to the active list
 // - permanently deleting archived students
 // - displaying loading, error, and empty states
 
-
 <script setup lang="ts">
-import { ref, computed, onMounted, onServerPrefetch } from 'vue'
+import { ref, computed, onMounted, onServerPrefetch, onActivated } from 'vue'
 import { useArchivedStudents } from '~/composables/useArchivedStudents'
 import { useStudents } from '~/composables/useStudents'
+import type { SupabaseClient } from '@supabase/supabase-js'
+
+// Access supabase client from Nuxt app
+const { $supabase } = useNuxtApp()
+const supabase = $supabase as SupabaseClient
+
+// Current authenticated user
+const user = ref()
+let id: string = '' // teacher/user id used for filtering
 
 // Local row shape used for archived student display
 type ArchivedStudentRow = {
@@ -31,10 +39,17 @@ const { students, pending, error, refresh } = useArchivedStudents()
 const { purge } = useStudents()
 
 // Prefetch archived students on server render
-onServerPrefetch(() => refresh())
+onServerPrefetch(() => refresh(id))
 
 // Refresh archived students when component mounts
-onMounted(() => refresh())
+onMounted(async () => {
+  user.value = await supabase.auth.getUser()
+  id = user.value.data.user.id
+  await refresh(id)
+})
+
+// Refresh archived students when component is re-activated
+onActivated(() => refresh(id))
 
 // Search/filter state
 const search = ref('')
@@ -106,7 +121,7 @@ async function unarchiveStudent(s: { id: number; firstName: string; lastName: st
   unarchiveLoadingId.value = s.id
   try {
     await $fetch(`/api/students/${s.id}/unarchive`, { method: 'POST' })
-    await refresh()
+    await refresh(id)
   } catch (e) {
     console.error('Failed to unarchive student', e)
     alert('Failed to restore this student. Please try again.')
@@ -128,7 +143,7 @@ async function permanentlyDeleteStudent(s: { id: number; firstName: string; last
   deleteLoadingId.value = s.id
   try {
     await purge(s.id)
-    await refresh()
+    await refresh(id)
   } catch (e: unknown) {
     console.error('Failed to permanently delete student', e)
 
@@ -158,7 +173,6 @@ async function permanentlyDeleteStudent(s: { id: number; firstName: string; last
             <h1 class="text-xl md:text-2xl font-semibold tracking-tight">
               Archived Students
             </h1>
-            
           </div>
         </header>
 

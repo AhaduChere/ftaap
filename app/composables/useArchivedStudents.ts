@@ -1,13 +1,11 @@
 // useArchivedStudents.ts
 // Centralized archived student state management.
 // This composable handles:
-// - fetching archived students from the API
+// - fetching archived students for the current teacher
 // - storing archived student data in global state
 // - tracking loading and error states
 // - exposing a refresh function to reload data
 
-
-// Type definition for archived student objects used in the frontend
 export type ArchivedStudent = {
   id: number
   firstName: string
@@ -20,43 +18,54 @@ export type ArchivedStudent = {
   isArchived: boolean | null
 }
 
+type Success = {
+  success: boolean
+  message: string | null
+  students: ArchivedStudent[]
+}
+
+function friendlyError(e: any) {
+  const msg = e?.data?.message ?? e?.data?.statusMessage ?? e?.message ?? 'Request failed.'
+
+  if (typeof msg === 'string' && (msg.includes('<!DOCTYPE html>') || msg.includes('<html'))) {
+    return 'Service temporarily unavailable. Please refresh and try again.'
+  }
+
+  return msg
+}
+
 export function useArchivedStudents() {
-  // Global state for archived students list
   const students = useState<ArchivedStudent[]>('archived_students', () => [])
-
-  // Tracks whether data is currently being fetched
   const pending = useState<boolean>('archived_students_pending', () => false)
-
-  // Stores any error message from fetch attempts
   const error = useState<string | null>('archived_students_error', () => null)
 
-  // Fetch archived students from backend API
-  const refresh = async () => {
-    pending.value = true // set loading state
+  const refresh = async (teacher_id: string) => {
+    pending.value = true
+
+    if (!teacher_id) {
+      students.value = []
+      pending.value = false
+      return
+    }
+
     try {
-      // Request archived students
-      const data = await $fetch<ArchivedStudent[]>('/api/students/archived')
+      const data = await $fetch<Success>(`/api/students/archived?authId=${teacher_id}`)
 
-      // Ensure response is an array before assigning
-      students.value = Array.isArray(data) ? data : []
-
-      // Clear previous errors on success
-      error.value = null
-    } catch (e:any) {
-      // Log error for debugging
+      if (data.success) {
+        students.value = Array.isArray(data.students) ? data.students : []
+        error.value = null
+      } else {
+        students.value = []
+        error.value = data.message ?? 'Failed to load archived students.'
+      }
+    } catch (e: any) {
       console.error('Failed to load archived students', e)
-
-      // Set user-friendly error message
-      error.value = e?.data?.message ?? e?.message ?? 'Failed to load archived students.'
-
-      // Reset students list on failure
+      error.value = friendlyError(e)
       students.value = []
     } finally {
-      // Always clear loading state
       pending.value = false
     }
   }
 
-  // Expose state + refresh function to components
   return { students, pending, error, refresh }
 }
