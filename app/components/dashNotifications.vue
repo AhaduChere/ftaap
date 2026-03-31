@@ -5,6 +5,12 @@ import type { Student_Notification } from '../../types/notifications';
 
 const notifications = ref<Student_Notification[]>([]);
 
+/**
+ * Fetches all unread notifications from the API and stores them in the
+ * notifications ref. Coerces each notification's id to a number to ensure
+ * type consistency with Student_Notification.
+ */
+
 const fetchNotifications = async () => {
   try {
     const res = await fetch('/api/notifications');
@@ -21,6 +27,12 @@ const fetchNotifications = async () => {
   }
 };
 
+/**
+ * Marks a single notification as read by POSTing to its endpoint, then
+ * removes it from the local notifications list so the UI updates immediately
+ * without a refetch.
+ */
+
 const markAsRead = async (id: number) => {
   try {
     await fetch(`/api/notifications/${id}`, {
@@ -34,6 +46,11 @@ const markAsRead = async (id: number) => {
   }
 };
 
+/**
+ * Marks all notifications as read in a single API call, then clears the
+ * local notifications list to reflect the empty state in the UI.
+ */
+
 const markAllAsRead = async () => {
   try {
     await fetch('/api/notifications/markAll', {
@@ -46,12 +63,19 @@ const markAllAsRead = async () => {
   }
 };
 
+/**
+ * Formats an ISO date string into a human-readable "MMM dd, yyyy" format
+ * (e.g. "Mar 27, 2026"). Returns "Unknown date" if the string cannot be
+ * parsed as a valid date.
+ */
+
 const formatDate = (date: string) => {
   const parsed = new Date(date)
   if (isNaN(parsed.getTime())) return 'Unknown date'
   return format(parsed, 'MMM dd, yyyy')
 }
 
+// Fetch notifications when the component is first mounted.
 onMounted(() => {
   fetchNotifications();
 });

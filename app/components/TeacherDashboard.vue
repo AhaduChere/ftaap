@@ -3,9 +3,10 @@ import { onMounted, onServerPrefetch } from 'vue'
 import { useStudents } from '../composables/useStudents'
 
 const { refresh } = useStudents()
+const teacher_id = '' // Replace with actual teacher ID
 
-onServerPrefetch(() => refresh())
-onMounted(() => refresh())
+onServerPrefetch(() => refresh(teacher_id))
+onMounted(() => refresh(teacher_id))
 </script>
 
 <template>

@@ -4,13 +4,14 @@ import SideMenu from '~/components/sideMenu.vue';
 
 const isSidebarOpen = ref(false);
 
+// Toggles the sidebar open/closed.
 const toggleSidebar = () => {
   isSidebarOpen.value = !isSidebarOpen.value;
 };
 
-// Real-time clock
 const time = ref('');
 
+// Updates the time ref with the current local time formatted as HH:MM.
 function updateTime() {
   const now = new Date();
   time.value = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit'})
@@ -18,11 +19,13 @@ function updateTime() {
 
 let clockInterval
 
+// Runs an initial time update then starts a 1-second interval to keep it current.
 onMounted(() => {
   updateTime()
   clockInterval = setInterval(updateTime, 1000)
 })
 
+// Clears the clock interval to prevent memory leaks when the component unmounts.
 onBeforeUnmount(() => {
   clearInterval(clockInterval)
 })

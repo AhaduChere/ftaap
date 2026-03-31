@@ -49,7 +49,7 @@ async function loadAndRender() {
       counts[tier(dibelAvg(s))]++
     }
 
-    if (chartInstance) {
+    if (chartInstance && chartInstance.data.datasets[0]) {
       chartInstance.data.datasets[0].data = [counts.Struggling, counts.Danger, counts.Strong]
       // Set y axis max to total number of teacher's students
       const totalStudents = students.value.length

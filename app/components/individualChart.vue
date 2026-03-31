@@ -19,6 +19,7 @@
     { date: '2025-10-15', dibel_score: 55 },
   ])
   
+  // Initializes the Chart.js line chart once the canvas element is mounted.
   onMounted(() => {
     if (!chartCanvas.value) return
   
