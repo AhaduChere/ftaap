@@ -2,7 +2,7 @@
     <div class="grid grid-cols-1 w-full h-full">
         <div class="max-h-[10rem] hidden md:flex md:flex-col flex-row text-[#2e777e] items-center overflow-scroll">
             <div v-if="props.knownWords">
-                <ol v-if="knownWords.length > 0" class="flex flex-wrap gap-5 max-w-full list-decimal list-inside p-2">
+                <ol v-if="knownWords.length > 0" class="flex flex-wrap gap-2 max-w-full list-decimal list-inside p-2">
                 <li v-for="(word, index) in knownWords" :key="index" class="whitespace-nowrap">
                     {{ word }}
                 </li>
@@ -12,7 +12,7 @@
                 </div>
             </div>
             <div v-else>
-                <ol v-if="unknownWords.length > 0" class="flex flex-wrap gap-5 max-w-full list-decimal list-inside p-2">
+                <ol v-if="unknownWords.length > 0" class="flex flex-wrap gap-2 max-w-full list-decimal list-inside p-2">
                 <li v-for="(word, index) in unknownWords" :key="index" class="whitespace-nowrap">
                     {{ word }}
                 </li>

@@ -53,12 +53,12 @@ const loadStudentScores = async () => {
     }
   
     channel = supabase.channel('student_scores');
-    const emailsToSend:emailElements[] = [];
   
     channel.on(
       'postgres_changes',
       { event: 'UPDATE', schema: 'public', table: 'Student_Score' },
       async (payload) => {
+        const emailsToSend:emailElements[] = [];
         const changedColumns = Object.keys(payload.new).filter(
           key => payload.old[key] !== payload.new[key] && key != 'student_unknown_words' && key != 'student_known_words'
         );
