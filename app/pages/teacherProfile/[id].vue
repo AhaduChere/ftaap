@@ -6,11 +6,11 @@
 
     <div class="w-[38%] shrink-0 flex flex-col gap-6 h-full">
       <div class="w-full flex-1 bg-white border border-[#2e777e] drop-shadow-lg rounded-md overflow-hidden">
-        <MainChart />
+        <!-- <MainChart /> -->
       </div>
 
       <div class="w-full flex-1 border border-[#2e777e] drop-shadow-lg rounded-md overflow-hidden flex flex-col">
-        <DashNotifications class="w-full h-full" />
+        <!-- <DashNotifications class="w-full h-full" /> -->
       </div>
     </div>
   </section>

@@ -79,11 +79,10 @@ onMounted(async () => {
     if (data.success) {
       await refresh(data.TeacherInfo.user_id);
       await loadScores();
-      return;
     }
   } else if (teacherId) {
-    // await refresh(teacherId);
-    // await loadScores();
+    await refresh(teacherId);
+    await loadScores();
   }
 });
 
