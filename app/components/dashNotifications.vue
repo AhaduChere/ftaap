@@ -1,50 +1,9 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
-import { format } from 'date-fns';
-import type { Student_Notification } from '../../types/notifications';
+import { onMounted } from 'vue'
+import { format } from 'date-fns'
+import { useNotifications } from '~/composables/useNotifications'
 
-const notifications = ref<Student_Notification[]>([]);
-
-const fetchNotifications = async () => {
-  try {
-    const res = await fetch('/api/notifications');
-    if (!res.ok) {
-      console.error('Error getting notifications', res.status, res.statusText);
-    }
-    const data = await res.json();
-    notifications.value = data.map((n: any) => ({
-      ...n,
-      id: Number(n.id),
-    }));
-  } catch (err) {
-    console.error('Failed to fetch notifications', err);
-  }
-};
-
-const markAsRead = async (id: number) => {
-  try {
-    await fetch(`/api/notifications/${id}`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: '{}',
-    });
-    notifications.value = notifications.value.filter(n => n.id !== id);
-  } catch (err) {
-    console.error('Failed to mark as read', err);
-  }
-};
-
-const markAllAsRead = async () => {
-  try {
-    await fetch('/api/notifications/markAll', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-    });
-    notifications.value = [];
-  } catch (err) {
-    console.error('Failed to mark all as read', err);
-  }
-};
+const { notifications, fetchUnread, markAsRead, markAllAsRead } = useNotifications()
 
 const formatDate = (date: string) => {
   const parsed = new Date(date)
@@ -53,8 +12,8 @@ const formatDate = (date: string) => {
 }
 
 onMounted(() => {
-  fetchNotifications();
-});
+  fetchUnread()
+})
 </script>
 
 <template>
@@ -91,7 +50,7 @@ onMounted(() => {
 
         <!-- Right: date + check button -->
         <div class="flex items-center gap-3 shrink-0 ml-4">
-          <span class="text-xs text-slate-400 whitespace-nowrap">{{ formatDate(notif.timestamp) }}</span>
+          <span class="text-xs text-slate-400 whitespace-nowrap">{{ formatDate(notif.created_at) }}</span>
           <button
             class="w-7 h-7 rounded-full bg-[#2e777e] hover:bg-[#4aa9b1] flex items-center justify-center transition-colors shrink-0"
             title="Mark as read"
