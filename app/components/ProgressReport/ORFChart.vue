@@ -175,9 +175,14 @@ async function getStudentScores(): Promise<StudentScore[]> {
 </script>
   
   <style scoped>
+  @media (min-width: 1400px) {
+    .chart-container{
+        height: 10rem ;
+    }
+}
   .chart-container {
-    height: 10rem;
     max-width: 1300px;
     margin: auto;
+    height: clamp(8rem, 5vw, 10rem);
   }
   </style>

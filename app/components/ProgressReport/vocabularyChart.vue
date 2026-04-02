@@ -1,14 +1,8 @@
 <template>
     <div class="grid grid-cols-1 w-full h-full">
-        <div class="chart-container justify-self-center">
+        <div class="chart-container justify-self-center h-[9rem]">
         <canvas ref="donutChartRef"></canvas>
         </div>
-        <!-- <div class="hidden md:flex md:flex-col flex-row">
-            <h4 class="text-[#2e777e] font-semibold">Known Words:</h4>
-            <p disabled class="text-[#2e777e]">{{ knownWords?.join(', ') ?? 'No words to show'}}</p>
-            <h4 class="text-[#2e777e] font-semibold">Unknown Words:</h4>
-            <p class="text-[#2e777e]">{{ unknownWords?.join(', ') ?? 'No words to show'}}</p>
-        </div> -->
     </div>
   </template>
 
@@ -125,9 +119,9 @@ async function getStudentScores(): Promise<StudentScore[]> {
 }
 </script>
 
-  
-  <style scoped>
-  .chart-container {
-    height: 10rem;
-  }
-  </style>
+<style scoped>
+.chart-container {
+  height: clamp(9rem, 5vw, 10rem);
+  max-width: 800px;
+}
+</style>
