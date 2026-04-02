@@ -247,16 +247,17 @@
     <template>
       <!-- DO NOT remove the below section tag it is needed-->
       <section
-        class="pt-20 md:pt-10 bg-[#f7feff] overflow-hidden w-screen h-auto md:h-screen place-items-center md:space-y-0 space-y-20 flex-row justify-center">
+        class="pt-20 md:pt-10 bg-[#f7feff] overflow-hidden w-screen h-auto xl:h-screen place-items-center md:space-y-0 space-y-10 justify-center">
         <div class="w-screen px-4 py-3 bg-slate-50 border-b border-slate-200 shrink-0 drop-shadow-md absolute top-[4rem] md:left-1 flex flex-col md:flex-row justify-between items-center">
-            <div v-if="selectedStudent" class="flex flex-wrap flex-1">
+            <div v-if="selectedStudent" class="hidden lg:flex flex-wrap md:flex-1">
                 <p class="ml-5 text-[#2e777e] font-semibold">Grade Level:</p>
                 <p class="ml-1 text-[#2e777e]">{{ selectedStudent.student_grade_level }}</p>
+               
                 <p class="ml-2 md:ml-5 text-[#2e777e] font-semibold">Program:</p>
-                <p class="ml-1 text-[#2e777e]">{{ selectedStudent.student_program }}</p>
+                <p class="ml-1 text-[#2e777e]">{{ selectedStudent.student_program }}</p>         
             </div>
 
-        <div class="flex justify-center flex-1">
+        <div class="m-2 flex justify-center flex-1">
             <select
                 id="students"
                 v-model="selectedStudentId"
@@ -269,11 +270,11 @@
         <div class="flex justify-end flex-1" v-if="selectedStudent">
             <button
             type="button"
-            class="inline-flex items-center ml-5 px-2 py-1 bg-[#2e777e] text-white rounded hover:bg-[#276166] transition-colors"
+            class="inline-flex items-center md:ml-5 px-2 py-1 bg-[#2e777e] text-white rounded hover:bg-[#276166] transition-colors"
             @click="generateWithJsPDF"
             >
             Download Student Report
-            <Icon name="material-symbols:download" class="w-5 h-5 ml-2"/>
+            <Icon name="material-symbols:download" class="lg:w-5 lg:h-5 lg:ml-2"/>
             </button>
 
             <button
@@ -294,31 +295,31 @@
           @update:studentNotes="handleNotesUpdate"
           @close=" openNotes = false"></NoteEditor>
     
-          <div v-if="selectedStudent" class="pt-[5.5rem] w-screen min-h-screen grid grid-cols-1 md:grid-cols-3 auto-rows-[13rem] gap-x-10  gap-y-2">
-                <div class="w-full ml-5 h-full bg-white border border-[#2e777e] border-1 drop-shadow-lg rounded-md md:col-span-2 row-span-2">
-                    <div class="p-2 bg-[#2e777e] flex justify-center items-center text-white font-semibold rounded-t-md">Student Overview  </div>
+          <div v-if="selectedStudent" class="pt-[5.5rem] md:pt-[6.5rem] lg:pt-[5.5rem] w-screen min-h-screen md:h-screen grid grid-cols-1 md:grid-cols-3 auto-rows-[13rem] md:grid-rows-3 gap-x-10 gap-y-2">
+                <div class="m-2 md:w-full md:ml-5 h-full bg-white border border-[#2e777e] border-1 drop-shadow-lg rounded-md col-span-1 md:col-span-2 row-span-2">
+                    <div class="p-1 lg:p-2 bg-[#2e777e] flex justify-center items-center text-white font-semibold rounded-t-md">Student Overview  </div>
                     <StudentOverviewChart :student-score-id="selectedStudent?.student_id" />
                 </div>
                
-                <div class="grid grid-rows-2 col-span-1 row-span-2 gap-y-2 mr-5">
-                    <div class="w-full bg-white border border-[#2e777e] border-1 drop-shadow-lg rounded-md md:col-span-1 row-span-1">
-                        <div class="p-2 bg-[#2e777e] text-white font-semibold text-center rounded-t-md">Vocabulary</div>
+                <div class="m-2 grid grid-rows-2 col-span-1 row-span-2 gap-y-2 md:mr-5">
+                    <div class=" w-full bg-white border border-[#2e777e] border-1 drop-shadow-lg rounded-md col-span-1 row-span-1">
+                        <div class="p-1 lg:p-2 bg-[#2e777e] text-white font-semibold text-center rounded-t-md">Vocabulary</div>
                         <VocabularyChart :student-score-id="selectedStudent?.student_id" />
                     </div>
 
-                    <div class="w-full h-full bg-white border border-[#2e777e] border-1 drop-shadow-lg rounded-md md:col-span-1">
-                        <div class="w-full p-2 bg-[#2e777e] text-white font-semibold text-center rounded-t-md">Known Words</div>
+                    <div class="w-full h-full bg-white border border-[#2e777e] border-1 drop-shadow-lg rounded-md col-span-1">
+                        <div class="w-full p-1 lg:p-2 bg-[#2e777e] text-white font-semibold text-center rounded-t-md">Known Words</div>
                         <VocabularyWords :student-score-id="selectedStudent?.student_id" :known-words="true"/>
                     </div>
                     
                 </div>
 
-                <div class="w-full bg-white border border-[#2e777e] border-1 drop-shadow-lg rounded-md col-span-2 ml-5">
-                    <div class="p-2 bg-[#2e777e] text-white font-semibold text-center rounded-t-md">ORF Score</div>
+                <div class="m-2  md:w-full bg-white border border-[#2e777e] border-1 drop-shadow-lg rounded-md col-span-1 md:col-span-2 md:ml-5">
+                    <div class="p-1 lg:p-2 bg-[#2e777e] text-white font-semibold text-center rounded-t-md">ORF Score</div>
                     <ORFChart :student-score-id="selectedStudent?.student_id" />
                 </div>
-                <div class=" mr-5 bg-white border border-[#2e777e] border-1 drop-shadow-lg rounded-md col-span-1">
-                    <div class=" p-2 bg-[#2e777e] text-white font-semibold text-center rounded-t-md">Unknown Words</div>
+                <div class="m-2 md:mr-5 bg-white border border-[#2e777e] border-1 drop-shadow-lg rounded-md col-span-1">
+                    <div class="p-1 lg:p-2 bg-[#2e777e] text-white font-semibold text-center rounded-t-md">Unknown Words</div>
                     <VocabularyWords :student-score-id="selectedStudent?.student_id" :known-words="false" />
                 </div>
 

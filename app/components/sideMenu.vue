@@ -102,6 +102,7 @@ onMounted(async () => {
                 @click="closeMenu">
                 Archived Students
               </NuxtLink>
+              
             </div>
           </li>
 
@@ -135,9 +136,7 @@ onMounted(async () => {
                 @click="closeMenu">
                 Progress Tracker
               </NuxtLink>
-              <NuxtLink to="/gradebook" class="block px-8 py-2 border-b border-white/20 hover:bg-[#205a5f] cursor-pointer" @click="closeMenu">
-                Gradebook
-              </NuxtLink>
+             
             </div>
           </li>
 

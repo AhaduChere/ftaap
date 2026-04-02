@@ -34,7 +34,7 @@ onBeforeUnmount(() => {
 <template>
   <!-- This creates the top navigation bar -->
   <div
-    class="fixed w-screen h-16 bg-[#2e777e] flex items-center justify-between navBarDropShadow border-b border-1 border-[#16383b]"
+    class="fixed w-full h-16 bg-[#2e777e] flex items-center justify-between navBarDropShadow border-b border-1 border-[#16383b]"
     title="Menu">
     <Icon id="icon" name="arcticons:hamburger-menu" class="h-10 w-[4rem] text-[#e2fafc] cursor-pointer ml-2" @click="toggleSidebar"></Icon>
     <img class="h-full mb-3" src="/possibleFASTTrackLogo2.png">
