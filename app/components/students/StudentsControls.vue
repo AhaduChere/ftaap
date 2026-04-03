@@ -52,24 +52,6 @@ const emit = defineEmits<{
       />
     </div>
 
-    <!-- Sort -->
-    <div class="flex flex-col">
-      <label class="text-xs font-semibold text-slate-600 mb-1">
-        Sort
-      </label>
-      <!-- Dropdown for selecting how students are sorted -->
-      <select
-        :value="sortMode"
-        @change="emit('update:sortMode', ($event.target as HTMLSelectElement).value)"
-        class="w-40 rounded-md border border-slate-300 px-2 py-1.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-[#2e777e]"
-      >
-        <!-- Sorting options -->
-        <option value="name">Name</option>
-        <option value="grade_asc">Grade ↑</option>
-        <option value="grade_desc">Grade ↓</option>
-      </select>
-    </div>
-
     <!-- Grade -->
     <div class="flex flex-col">
       <label class="text-xs font-semibold text-slate-600 mb-1">
