@@ -113,7 +113,7 @@ import type { StudentOption } from '~~/types/studentOption';
     
                 <div>
                   <label class="block text-xs font-semibold text-slate-600 mb-1">
-                    Vocab Score
+                    Vocab Score 
                   </label>
                   <input
                     v-model.number="form.student_vocab_score"
@@ -139,7 +139,7 @@ import type { StudentOption } from '~~/types/studentOption';
 
               <div>
                 <label class="block text-xs font-semibold text-slate-600 mb-1">
-                    Known Words
+                    Known Words  (Enter words seperated by a comma)
                 </label>
                 <textarea
                 v-model="form.student_known_words"
@@ -151,7 +151,7 @@ import type { StudentOption } from '~~/types/studentOption';
 
             <div>
                 <label class="block text-xs font-semibold text-slate-600 mb-1">
-                    Unknown Words
+                    Unknown Words  (Enter words seperated by a comma)
                 </label>
                 <textarea
                 v-model="form.student_unknown_words"

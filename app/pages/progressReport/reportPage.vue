@@ -1,16 +1,17 @@
 <script setup lang="ts">
-    import { ref, watchEffect, computed, onMounted } from 'vue';
+    import { ref, watch, computed, onMounted } from 'vue';
     import type { Student } from '../../../types/student';
-    import StudentOverviewChart from '~/components/ProgressReport/studentOverviewChart.vue';
-    import ORFChart from '~/components/ProgressReport/ORFChart.vue';
-    import VocabularyChart from '~/components/ProgressReport/vocabularyChart.vue';
-    import VocabularyWords from '~/components/ProgressReport/vocabularyWords.vue';
-    import NoteEditor from '~/components/ProgressReport/noteEditor.vue';
-    import { useRouter } from 'vue-router';
-    import type { StudentScore } from '~~/types/studentScore';
+    import StudentOverviewChart from '../../components/ProgressReport/studentOverviewChart.vue';
+    import ORFChart from '../../components/ProgressReport/ORFChart.vue';
+    import VocabularyChart from '../../components/ProgressReport/vocabularyChart.vue';
+    import VocabularyWords from '../../components/ProgressReport/vocabularyWords.vue';
+    import NoteEditor from '../../components/ProgressReport/noteEditor.vue'
+    import { useRoute, useRouter } from 'vue-router';
+    import type { StudentScore } from '../../../types/studentScore'
     import type { SupabaseClient } from '@supabase/supabase-js'
     
     import 'jspdf';
+import { useNuxtApp } from 'nuxt/app';
 
     //declare module so TypeScript doesn't yell about autoTable not existing
     declare module 'jspdf' {
@@ -19,9 +20,6 @@
         lastAutoTable?: any;
     }
     }
-
-    const { jsPDF } = await import("jspdf");
-    const autoTable = (await import("jspdf-autotable")).default;
 
     const { $supabase } = useNuxtApp();
     const supabase = $supabase as SupabaseClient
@@ -131,6 +129,8 @@
 
     //code to create the pprogress reports
     const generateWithJsPDF = async () => {
+    const { jsPDF } = await import("jspdf")
+    const autoTable = (await import("jspdf-autotable")).default
     if (process.server) return;
 
     const studentInfo = students.value.find(s => s.student_id == selectedStudentId.value);
@@ -295,7 +295,7 @@
           @update:studentNotes="handleNotesUpdate"
           @close=" openNotes = false"></NoteEditor>
     
-          <div v-if="selectedStudent" class="pt-[5.5rem] md:pt-[6.5rem] lg:pt-[5.5rem] w-screen min-h-screen md:h-screen grid grid-cols-1 md:grid-cols-3 auto-rows-[13rem] md:grid-rows-3 gap-x-10 gap-y-2">
+          <div v-if="selectedStudent" class="xl:pb-[3rem] pt-[5.5rem] md:pt-[6.5rem] w-screen min-h-screen md:h-screen grid grid-cols-1 md:grid-cols-3 auto-rows-[13rem] md:grid-rows-3 gap-x-10 gap-y-2">
                 <div class="m-2 md:w-full md:ml-5 h-full bg-white border border-[#2e777e] border-1 drop-shadow-lg rounded-md col-span-1 md:col-span-2 row-span-2">
                     <div class="p-1 lg:p-2 bg-[#2e777e] flex justify-center items-center text-white font-semibold rounded-t-md">Student Overview  </div>
                     <StudentOverviewChart :student-score-id="selectedStudent?.student_id" />

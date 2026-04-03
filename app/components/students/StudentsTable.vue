@@ -14,13 +14,20 @@ import type { Student } from '~~/types/student'
 // Props passed into the table component
 const props = defineProps<{
   rows: Student[] // student rows to display in the table
+  sortMode: string
 }>()
 
 // Events emitted to parent component
 const emit = defineEmits<{
   (e: 'edit', row: Student): void // open edit flow for a student row
   (e: 'delete', id: number): void // archive a student by id
+  (e: 'update:sortMode', v: string): void
 }>()
+
+function toggle(field: string): string {
+      if (props.sortMode === `${field}_desc`) return `${field}_asc`
+      return `${field}_desc`
+    }
 </script>
 
 <template>
@@ -32,8 +39,8 @@ const emit = defineEmits<{
         <!-- Sticky table header -->
         <thead class="bg-slate-50 text-slate-700 sticky top-0">
           <tr class="text-left">
-            <th class="px-3 py-2 font-semibold">Student</th>
-            <th class="px-3 py-2 font-semibold">Grade</th>
+            <th class="px-3 py-2 font-semibold hover:cursor-pointer"  @click="emit('update:sortMode', toggle('name'))">Student</th>
+            <th class="px-3 py-2 font-semibold hover:cursor-pointer" @click="emit('update:sortMode', toggle('grade'))">Grade</th>
             <th class="px-3 py-2 font-semibold">Program</th>
             <th class="px-3 py-2 font-semibold">Organization</th>
             <th class="px-3 py-2 font-semibold text-right">Actions</th>
