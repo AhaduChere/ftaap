@@ -1,5 +1,4 @@
 import { ref } from 'vue'
-import { useNuxtApp } from '#app'
 import type { SupabaseClient } from '@supabase/supabase-js'
 
 export type NotificationLevel = 'red' | 'yellow' | 'green'

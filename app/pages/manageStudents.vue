@@ -30,6 +30,7 @@ import StudentsTable from '@/components/students/StudentsTable.vue'
 
 import type { SupabaseClient } from '@supabase/supabase-js'
 import type { Student } from '../../types/student'
+import { useNuxtApp } from 'nuxt/app'
 
 // Access supabase client from Nuxt app
 const { $supabase } = useNuxtApp()
@@ -492,6 +493,7 @@ const visibleStudents = computed(() => {
                   :rows="visibleStudents"
                   @edit="openEdit"
                   @delete="confirmDelete"
+                  v-model:sortMode="sortMode"
                 />
 
                 <!-- Empty state -->

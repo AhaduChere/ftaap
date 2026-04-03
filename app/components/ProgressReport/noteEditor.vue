@@ -22,6 +22,8 @@
 </template>
 
 <script setup lang="ts">
+import { ref, watch } from 'vue';
+
 const emit = defineEmits(['close', 'update:studentNotes'])
 
 const props = defineProps<{ studentNotes: string | null | undefined; studentScoreId: number | undefined }>();

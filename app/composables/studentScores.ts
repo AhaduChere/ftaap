@@ -1,4 +1,3 @@
-import { useNuxtApp } from '#app'
 import type { RealtimeChannel, SupabaseClient } from '@supabase/supabase-js'
 import type { Student } from '~~/types/student'
 import type { StudentScore } from '~~/types/studentScore'
@@ -98,10 +97,10 @@ const loadStudentScores = async () => {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          from: 'Acme <onboarding@resend.dev>',
+          from: 'FAST Track Academy <onboarding@resend.dev>',
           to: teacherEmail,
-          subject: `Score drop detected for ${column}`,
-          html: `<p>${student.student_fname} ${student.student_lname}'s ${column} decreased by ${decreased_percentage}%!</p>`
+          subject: `Score drop detected for ${student.student_fname} ${student.student_lname}`,
+          html: `<p>${student.student_fname} ${student.student_lname}'s ${column.replace('_', ' ')} decreased by ${decreased_percentage}%</p>`
         }),
       });
     } catch (err) {

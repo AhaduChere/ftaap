@@ -22,6 +22,7 @@ import ScoresTable from '~/components/scores/scoresTable.vue'
 import ScoreCreateModal from '@/components/scores/scoreCreateModal.vue'
 import ScoreEditModal from '@/components/scores/scoreEditModal.vue'
 import type { Student } from '~~/types/student'
+import { useNuxtApp } from 'nuxt/app'
 
 // Composable: API + state
 const { students, error, refresh, pending } = useStudents()
@@ -51,7 +52,7 @@ const scoresPending = ref(false)
 const scoresError = ref<string | null>(null)
 
 const studentMap = computed(() =>
-  Object.fromEntries(students.value.map((s) => [s.student_id, s])),
+  Object.fromEntries(students.value.map((s:Student) => [s.student_id, s])),
 )
 
 //load scores and map them to the correct student to create the rows
@@ -280,8 +281,8 @@ async function saveEdit() {
         student_comprehension_score: draft.student_comprehension_score ?? null,
         student_vocab_score: draft.student_vocab_score ?? null,
         student_id: draft.selectedStudentId,
-        student_unknown_words: draft.student_unknown_words ?? [],
-        student_known_words: draft.student_known_words ?? []
+        student_unknown_words: draft.student_unknown_words?.toString().split(',') ?? [],
+        student_known_words: draft.student_known_words?.toString().split(',') ?? []
     }
 
     await fetch('/api/scores/scores', {
@@ -313,6 +314,8 @@ type SortMode =
   | 'comprehension_asc'
   | 'vocab_desc'
   | 'vocab_asc'
+  | 'date_asc'
+  | 'date_desc'
 
 const sortMode = ref<SortMode>('dibel_avg_desc')
 
@@ -397,6 +400,32 @@ const visibleScores = computed(() => {
         (a.student_vocab_score ?? Number.POSITIVE_INFINITY) -
         (b.student_vocab_score ?? Number.POSITIVE_INFINITY),
     )
+  }else if(sortMode.value == 'date_asc'){
+    base.sort(
+      (a: StudentScore, b: StudentScore) =>{
+        const aTime = a.inserted_date
+        ? new Date(a.inserted_date).getTime()
+        : Number.POSITIVE_INFINITY
+
+      const bTime = b.inserted_date
+        ? new Date(b.inserted_date).getTime()
+        : Number.POSITIVE_INFINITY
+
+      return aTime - bTime
+    })
+  }else if(sortMode.value == 'date_desc'){
+    base.sort(
+      (a: StudentScore, b: StudentScore) =>{
+        const aTime = a.inserted_date
+        ? new Date(a.inserted_date).getTime()
+        : Number.NEGATIVE_INFINITY
+
+      const bTime = b.inserted_date
+        ? new Date(b.inserted_date).getTime()
+        : Number.NEGATIVE_INFINITY
+
+      return bTime - aTime
+    })
   }
 
   return base
@@ -441,7 +470,10 @@ const visibleScores = computed(() => {
               </div>
 
               <div v-else>
-                <ScoresTable :rows="visibleScores" @edit="openEdit" />
+                <ScoresTable 
+                :rows="visibleScores" 
+                @edit="openEdit"
+                v-model:sortMode="sortMode"/>
 
                 <p
                   v-if="!scoresPending && !pending && !scoresError && scores.length === 0"

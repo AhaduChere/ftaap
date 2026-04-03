@@ -5,25 +5,32 @@ import type { StudentScore } from '~~/types/studentScore';
     }
     const props = defineProps<{
       rows: row[]
+      sortMode: string
     }>()
     const emit = defineEmits<{
       (e: 'edit', row: row): void
       (e: 'delete', id: number): void
+      (e: 'update:sortMode', v: string): void
     }>()
+
+    function toggle(field: string): string {
+      if (props.sortMode === `${field}_desc`) return `${field}_asc`
+      return `${field}_desc`
+    }
     </script>
-    
     <template>
       <div class="w-full overflow-scroll">
         <table class="min-w-full text-sm border border-slate-200 rounded-lg overflow-hidden">
           <thead class="bg-slate-50 text-slate-700">
             <tr class="text-left">
               <th class="px-3 py-2 font-semibold">Student</th>
-              <th class="px-3 py-2 font-semibold">Dibel Score</th>
-              <th class="px-3 py-2 font-semibold">Dibel ORF Score</th>
-              <th class="px-3 py-2 font-semibold">Dibel MAZE Score</th>
-              <th class="px-3 py-2 font-semibold">Fluency Score</th>
-              <th class="px-3 py-2 font-semibold">Comprehension Score</th>
-              <th class="px-3 py-2 font-semibold">Vocabulary Score</th>
+              <th class="px-3 py-2 font-semibold hover:cursor-pointer" title="Sort on Date" @click="emit('update:sortMode', toggle('date'))">Created Date</th>
+              <th class="px-3 py-2 font-semibold hover:cursor-pointer" title="Sort on Dibel Avg" @click="emit('update:sortMode', toggle('dibel_avg'))">Dibel Score</th>
+              <th class="px-3 py-2 font-semibold hover:cursor-pointer" title="Sort on Dibel Avg" @click="emit('update:sortMode', toggle('dibel_avg'))">Dibel ORF Score</th>
+              <th class="px-3 py-2 font-semibold hover:cursor-pointer" title="Sort on Dibel Avg" @click="emit('update:sortMode', toggle('dibel_avg'))">Dibel MAZE Score</th>
+              <th class="px-3 py-2 font-semibold hover:cursor-pointer" title="Sort on Fluency" @click="emit('update:sortMode', toggle('fluency'))">Fluency Score</th>
+              <th class="px-3 py-2 font-semibold hover:cursor-pointer" title="Sort on Comprehension" @click="emit('update:sortMode', toggle('comprehension'))">Comprehension Score</th>
+              <th class="px-3 py-2 font-semibold hover:cursor-pointer" title="Sort on Vocab" @click="emit('update:sortMode', toggle('vocab'))">Vocabulary Score</th>
               <th class="px-3 py-2 font-semibold text-right">Actions</th>
             </tr>
           </thead>
@@ -33,6 +40,12 @@ import type { StudentScore } from '~~/types/studentScore';
              <td class="px-3 py-2 text-slate-700">
                 {{ row.student_full_name ?? '—' }}
               </td>
+              <td class="px-3 py-2">
+                <div class="font-medium text-slate-800">
+                  {{ row.inserted_date }}
+                </div>
+              </td>
+
               <td class="px-3 py-2">
                 <div class="font-medium text-slate-800">
                   {{ row.student_dibel_score }}
