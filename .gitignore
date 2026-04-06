@@ -25,3 +25,4 @@ logs
 server/db/admin
 
 /app/generated/prisma
+Fluxfile

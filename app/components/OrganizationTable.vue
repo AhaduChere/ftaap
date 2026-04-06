@@ -134,6 +134,7 @@ const organizations = ref([]);
 const teachers = ref([]);
 const search = ref('');
 const sortOrder = ref('alpha_asc');
+const { $supabase } = useNuxtApp();
 
 function teacherCount(orgId) {
   return teachers.value.filter((t) => t.organization_id === orgId).length;
@@ -161,8 +162,15 @@ function openAddModal() {
 async function submitAdd() {
   addError.value = '';
   try {
+    const {
+      data: { session },
+    } = await $supabase.auth.getSession();
+
     const data = await $fetch('/api/organization', {
       method: 'POST',
+      headers: {
+        Authorization: `Bearer ${session.access_token}`,
+      },
       body: { org_name: newOrgName.value },
     });
     if (data.success) {
@@ -192,8 +200,15 @@ function editOrg(org) {
 async function submitEdit() {
   editError.value = '';
   try {
+    const {
+      data: { session },
+    } = await $supabase.auth.getSession();
+
     const res = await $fetch('/api/organization', {
       method: 'PUT',
+      headers: {
+        Authorization: `Bearer ${session.access_token}`,
+      },
       body: { id: editingOrg.value.id, org_name: editOrgName.value },
     });
     if (res.success) {
@@ -212,8 +227,15 @@ async function submitEdit() {
 async function deleteOrg(id) {
   if (!confirm('Are you sure you want to delete this organization?')) return;
   try {
+    const {
+      data: { session },
+    } = await $supabase.auth.getSession();
+
     const res = await $fetch('/api/organizations', {
       method: 'DELETE',
+      headers: {
+        Authorization: `Bearer ${session.access_token}`,
+      },
       body: { id },
     });
     if (res.success) {
@@ -229,7 +251,15 @@ async function deleteOrg(id) {
 
 onMounted(async () => {
   try {
-    const data = await $fetch('/api/admin');
+    const {
+      data: { session },
+    } = await $supabase.auth.getSession();
+
+    const data = await $fetch('/api/admin', {
+      headers: {
+        Authorization: `Bearer ${session.access_token}`,
+      },
+    });
     if (data.success) {
       organizations.value = data.Organizations;
       teachers.value = data.Teachers;

@@ -38,11 +38,20 @@ const userdata = ref({});
 
 // NOTE: Grabs current user info and avatar
 onMounted(async () => {
+  const {
+    data: { session },
+  } = await $supabase.auth.getSession();
+
   try {
     user.value = await $supabase.auth.getUser();
     const id = user.value.data.user.id;
 
-    const data = await $fetch(`/api/user/${id}`);
+    const data = await $fetch(`/api/user/${id}`, {
+      headers: {
+        Authorization: `Bearer ${session.access_token}`,
+      },
+    });
+
     if (data.success) {
       userdata.value = data.User;
     }

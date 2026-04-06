@@ -229,6 +229,7 @@ const search_T = ref('');
 const sortOrder_T = ref('alpha_asc');
 const teacherData = ref({});
 const organizations = ref([]);
+const { $supabase } = useNuxtApp();
 
 // NOTE: Search and sort functionality
 const filteredTeachers = computed(() => {
@@ -274,7 +275,15 @@ async function loadTeacherData(list) {
   const entries = await Promise.all(
     list.map(async (t) => {
       try {
-        const data = await $fetch(`/api/teacher/${t.teacher_id}`);
+        const {
+          data: { session },
+        } = await $supabase.auth.getSession();
+
+        const data = await $fetch(`/api/teacher/${t.teacher_id}`, {
+          headers: {
+            Authorization: `Bearer ${session.access_token}`,
+          },
+        });
         const students = data.StudentInfo ?? [];
         return [
           t.teacher_id,
@@ -297,7 +306,15 @@ async function loadTeacherData(list) {
 async function deleteTeacher(id) {
   if (!confirm('Are you sure you want to delete this teacher? ')) return;
   try {
-    const res = await $fetch(`/api/teacher/${id}`, { method: 'DELETE' });
+    const {
+      data: { session },
+    } = await $supabase.auth.getSession();
+    const res = await $fetch(`/api/teacher/${id}`, {
+      method: 'DELETE',
+      headers: {
+        Authorization: `Bearer ${session.access_token}`,
+      },
+    });
     if (res.success) {
       teachers.value = teachers.value.filter((t) => t.teacher_id !== id);
       teacherData.value = Object.fromEntries(Object.entries(teacherData.value).filter(([key]) => key !== String(id)));
@@ -343,8 +360,15 @@ async function createUser() {
     organization: organization.value,
   };
   try {
+    const {
+      data: { session },
+    } = await $supabase.auth.getSession();
+
     const data = await $fetch('/api/user', {
       method: 'POST',
+      headers: {
+        Authorization: `Bearer ${session.access_token}`,
+      },
       body: payload,
     });
     if (data.success) {
@@ -360,7 +384,15 @@ async function createUser() {
 }
 
 async function reloadTeachers() {
-  const data = await $fetch('/api/admin');
+  const {
+    data: { session },
+  } = await $supabase.auth.getSession();
+
+  const data = await $fetch('/api/admin', {
+    headers: {
+      Authorization: `Bearer ${session.access_token}`,
+    },
+  });
   if (data.success) {
     teachers.value = data.Teachers;
     await loadTeacherData(data.Teachers);
@@ -369,7 +401,15 @@ async function reloadTeachers() {
 
 onMounted(async () => {
   try {
-    const data = await $fetch('/api/admin');
+    const {
+      data: { session },
+    } = await $supabase.auth.getSession();
+
+    const data = await $fetch('/api/admin', {
+      headers: {
+        Authorization: `Bearer ${session.access_token}`,
+      },
+    });
     if (data.success) {
       teachers.value = data.Teachers;
       organizations.value = data.Organizations;
@@ -396,13 +436,21 @@ const unassignedStudents = computed(() => allStudents.value.filter((s) => s.teac
 const allStudents = ref([]);
 
 async function editTeacher(teacher) {
+  const {
+    data: { session },
+  } = await $supabase.auth.getSession();
+
   editingTeacher.value = teacher;
   editFirst.value = teacher.teacher_fname;
   editLast.value = teacher.teacher_lname;
   editingStudents.value = [...(teacherData.value[teacher.teacher_id]?.students ?? [])];
   editError.value = '';
 
-  const adminData = await $fetch('/api/admin');
+  const adminData = await $fetch('/api/admin', {
+    headers: {
+      Authorization: `Bearer ${session.access_token}`,
+    },
+  });
   allStudents.value = adminData.Students ?? [];
 
   editForm.value = true;
@@ -425,8 +473,14 @@ async function unassignStudent(studentId) {
 async function submitEditTeacher() {
   editError.value = '';
   try {
+    const {
+      data: { session },
+    } = await $supabase.auth.getSession();
     const res = await $fetch(`/api/teacher/${editingTeacher.value.teacher_id}`, {
       method: 'PUT',
+      headers: {
+        Authorization: `Bearer ${session.access_token}`,
+      },
       body: {
         teacher_fname: editFirst.value,
         teacher_lname: editLast.value,

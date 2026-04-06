@@ -236,11 +236,18 @@ const admins = ref([]);
 const teachers = ref([]);
 const organizations = ref([]);
 const loading = ref(true);
+const { $supabase } = useNuxtApp();
+const {
+  data: { session },
+} = await $supabase.auth.getSession();
 
 onMounted(async () => {
   try {
     const data = await $fetch('/api/admin', {
       method: 'GET',
+      headers: {
+        Authorization: `Bearer ${session.access_token}`,
+      },
     });
     if (data.success) {
       students.value = data.Students;
@@ -308,6 +315,10 @@ async function createStudent() {
   try {
     const data = await $fetch('/api/students/student', {
       method: 'POST',
+      headers: {
+        Authorization: `Bearer ${session.access_token}`,
+      },
+
       body: payload,
     });
     if (data.id) {
@@ -334,6 +345,9 @@ async function createOrg() {
   try {
     const data = await $fetch('/api/organization', {
       method: 'POST',
+      headers: {
+        Authorization: `Bearer ${session.access_token}`,
+      },
       body: { org_name: org_name.value },
     });
 
@@ -379,6 +393,9 @@ async function createUser() {
   try {
     const data = await $fetch('/api/user', {
       method: 'POST',
+      headers: {
+        Authorization: `Bearer ${session.access_token}`,
+      },
       body: payload,
     });
 

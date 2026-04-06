@@ -18,18 +18,26 @@ const { $supabase } = useNuxtApp();
 
 // NOTE: Checks if user is an admin
 onMounted(async () => {
-  const { data: userdata } = await $supabase.auth.getUser();
+  const {
+    data: { session },
+  } = await $supabase.auth.getSession();
+  if (!session) {
+    admin.value = false;
+    loading.value = false;
+    return;
+  }
+
   const data = await $fetch('/api/admin', {
     method: 'POST',
+    headers: {
+      Authorization: `Bearer ${session.access_token}`,
+    },
     body: {
-      userId: userdata.user.id,
+      userId: session.user.id,
     },
   });
-  if (data.isAdmin) {
-    admin.value = !!data.isAdmin;
-  } else {
-    admin.value = false;
-  }
+
+  admin.value = !!data.isAdmin;
   loading.value = false;
 });
 </script>

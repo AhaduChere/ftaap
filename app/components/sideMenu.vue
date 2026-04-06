@@ -2,7 +2,7 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { watch, onMounted, onBeforeUnmount } from 'vue';
 const { $supabase } = useNuxtApp();
-const supabase = $supabase as SupabaseClient
+const supabase = $supabase as SupabaseClient;
 
 const emit = defineEmits(['close']);
 const props = defineProps({ isOpen: Boolean });
@@ -48,12 +48,17 @@ async function logout() {
 }
 
 onMounted(async () => {
-  const { data: userdata } = await supabase.auth.getUser();
-  
+  const {
+    data: { session },
+  } = await $supabase.auth.getSession();
+
   const data = await $fetch('/api/admin', {
     method: 'POST',
+    headers: {
+      Authorization: `Bearer ${session.access_token}`,
+    },
     body: {
-      userId: userdata?.user.id,
+      userId: session.user.id,
     },
   });
   if (data.isAdmin) {
@@ -125,8 +130,8 @@ onMounted(async () => {
             </div>
           </li>
 
-           <!--Students' Scores-->
-           <li>
+          <!--Students' Scores-->
+          <li>
             <div class="px-4 py-3 font-semibold text-lg text-[#e2fafc] border-b border-white/30 no-select">Grades</div>
             <div class="text-[#e2fafc]">
               <NuxtLink
@@ -135,7 +140,10 @@ onMounted(async () => {
                 @click="closeMenu">
                 Progress Tracker
               </NuxtLink>
-              <NuxtLink to="/gradebook" class="block px-8 py-2 border-b border-white/20 hover:bg-[#205a5f] cursor-pointer" @click="closeMenu">
+              <NuxtLink
+                to="/gradebook"
+                class="block px-8 py-2 border-b border-white/20 hover:bg-[#205a5f] cursor-pointer"
+                @click="closeMenu">
                 Gradebook
               </NuxtLink>
             </div>
@@ -145,11 +153,7 @@ onMounted(async () => {
           <li>
             <div class="px-4 py-3 font-semibold text-lg text-[#e2fafc] border-b border-white/30 no-select">Settings</div>
             <div class="text-[#e2fafc]">
-              
-              <NuxtLink
-                to="/Account"
-                class="block px-8 py-2 border-b border-white/20 hover:bg-[#205a5f] cursor-pointer"
-                @click="closeMenu">
+              <NuxtLink to="/Account" class="block px-8 py-2 border-b border-white/20 hover:bg-[#205a5f] cursor-pointer" @click="closeMenu">
                 Account
               </NuxtLink>
               <div class="px-8 py-2 border-b border-white/20 hover:bg-[#205a5f] cursor-pointer" @click="closeMenu">Notifications</div>
@@ -161,7 +165,13 @@ onMounted(async () => {
       <!-- Footer -->
       <div class="border-t border-white/40 px-4 py-3 flex items-center justify-between text-[#e2fafc]">
         <span class="text-sm">FAST Track Academy</span>
-        <Icon name="material-symbols-light:logout" class="text-2xl cursor-pointer" title="Logout" @click="logout" />
+        <button @click="logout">
+          <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24">
+            <path
+              fill="currentColor"
+              d="M5.616 20q-.691 0-1.153-.462T4 18.384V5.616q0-.691.463-1.153T5.616 4h6.403v1H5.616q-.231 0-.424.192T5 5.616v12.769q0 .23.192.423t.423.192h6.404v1zm10.846-4.461l-.702-.72l2.319-2.319H9.192v-1h8.887l-2.32-2.32l.702-.718L20 12z" />
+          </svg>
+        </button>
       </div>
     </div>
   </Transition>
