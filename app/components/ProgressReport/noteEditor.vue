@@ -22,35 +22,41 @@
 </template>
 
 <script setup lang="ts">
-const emit = defineEmits(['close', 'update:studentNotes'])
+const emit = defineEmits(['close', 'update:studentNotes']);
+const { $supabase } = useNuxtApp();
 
 const props = defineProps<{ studentNotes: string | null | undefined; studentScoreId: number | undefined }>();
-const newNotes = ref('')
+const newNotes = ref('');
 
 watch(
   () => props.studentNotes,
   (val) => {
-    newNotes.value = val ?? ''
+    newNotes.value = val ?? '';
   },
   { immediate: true }
-)
+);
 
-function closeAndUpdate(){
-  emit('close')
-  emit('update:studentNotes', newNotes.value)
+function closeAndUpdate() {
+  emit('close');
+  emit('update:studentNotes', newNotes.value);
 }
 async function postStudentNotes() {
   try {
+    const {
+      data: { session },
+    } = await $supabase.auth.getSession();
+
     const response = await fetch(`/api/teacherDashboard/studentNotes/${props.studentScoreId}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ updatedNotes: newNotes.value}),
+      Authorization: `Bearer ${session.access_token}`,
+      body: JSON.stringify({ updatedNotes: newNotes.value }),
     });
 
     const data = await response.json();
 
     if (data) {
-      emit('update:studentNotes', newNotes.value)
+      emit('update:studentNotes', newNotes.value);
       emit('close');
     }
   } catch (err) {

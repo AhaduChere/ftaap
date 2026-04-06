@@ -69,7 +69,14 @@
     //get the students for corresponding teacher or all students if admin
     async function getStudents(id:string): Promise<Student[]> {
       try {
-        const response = await fetch(`/api/studentsByTeacher/${id}`);
+        const {
+          data: { session },
+        } = await $supabase.auth.getSession();
+        const response = await fetch(`/api/studentsByTeacher/${id}`,{
+          headers: {
+           Authorization: `Bearer ${session.access_token}`,
+          },
+        });
         const body = await response.json();
 
         if(body.success === true){
@@ -106,7 +113,15 @@
     //get all students scores
     async function getStudentsScore(): Promise<StudentScore[]> {
         try {
-            const response = await fetch(`/api/teacherDashboard/studentScores/${selectedStudentId.value}`)
+          const {
+            data: { session },
+          } = await $supabase.auth.getSession();
+
+            const response = await fetch(`/api/teacherDashboard/studentScores/${selectedStudentId.value}`, {
+              headers: {
+               Authorization: `Bearer ${session.access_token}`,
+              },
+            })
             const scores = await response.json()
 
             const mostRecentThree = [...scores]

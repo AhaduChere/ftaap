@@ -58,7 +58,15 @@ async function loadOrganizations() {
   orgsPending.value = true
   orgsError.value = null
   try {
-    const rows = await $fetch<OrganizationOption[]>('/api/organizations')
+  const {
+    data: { session },
+  } = await $supabase.auth.getSession();
+
+    const rows = await $fetch<OrganizationOption[]>('/api/organizations', {
+    headers: {
+      Authorization: `Bearer ${session.access_token}`,
+    },
+})
     organizations.value = Array.isArray(rows) ? rows : []
   } catch (e: any) {
     orgsError.value = e?.data?.message ?? e?.message ?? 'Failed to load organizations.'
