@@ -1,0 +1,5 @@
+url = "http://localhost:3000"
+
+[req.admin]
+path = "/api/admin"
+method = "GET"
