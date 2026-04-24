@@ -1,13 +1,10 @@
 // NotificationsControls.vue
 // Filter and sorting controls for the notifications page.
-// This component handles:
-// - search input for filtering by student name
-// - sorting by date, student name, or level
-// - filtering by level (all, red, yellow, green)
-// - filtering by read status
+// Matches StudentsControls style exactly.
 
 <script setup lang="ts">
-defineProps<{
+
+const props = defineProps<{
   search: string
   sortMode: string
   levelFilter: string
@@ -32,8 +29,8 @@ const emit = defineEmits<{
         :value="search"
         @input="emit('update:search', ($event.target as HTMLInputElement).value)"
         type="text"
-        placeholder="Student name…"
-        class="w-56 rounded-md border border-slate-300 px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#2e777e]"
+        placeholder="Name…"
+        class="w-64 rounded-md border border-slate-300 px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#2e777e]"
       />
     </div>
 
@@ -52,7 +49,7 @@ const emit = defineEmits<{
       </select>
     </div>
 
-    <!-- Level filter -->
+    <!-- Level -->
     <div class="flex flex-col">
       <label class="text-xs font-semibold text-slate-600 mb-1">Level</label>
       <select
@@ -67,7 +64,7 @@ const emit = defineEmits<{
       </select>
     </div>
 
-    <!-- Status filter -->
+    <!-- Status -->
     <div class="flex flex-col">
       <label class="text-xs font-semibold text-slate-600 mb-1">Status</label>
       <select

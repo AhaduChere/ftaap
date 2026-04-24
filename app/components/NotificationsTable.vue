@@ -1,9 +1,6 @@
 // NotificationsTable.vue
 // Table component for displaying all notifications.
-// This component handles:
-// - rendering notification rows in a scrollable table
-// - showing student name, message, level badge, date, and read status
-// - showing empty state when no notifications available
+// Matches StudentsTable style exactly.
 
 <script setup lang="ts">
 import { format } from 'date-fns'
@@ -11,6 +8,10 @@ import type { AppNotification } from '~/composables/useNotifications'
 
 defineProps<{
   rows: AppNotification[]
+}>()
+
+const emit = defineEmits<{
+  (e: 'markAsRead', id: number): void
 }>()
 
 const levelLabel: Record<string, string> = {
@@ -43,6 +44,7 @@ function formatDate(date: string) {
             <th class="px-3 py-2 font-semibold">Level</th>
             <th class="px-3 py-2 font-semibold">Date</th>
             <th class="px-3 py-2 font-semibold">Status</th>
+            <th class="px-3 py-2 font-semibold text-right">Actions</th>
           </tr>
         </thead>
 
@@ -53,17 +55,8 @@ function formatDate(date: string) {
             class="hover:bg-slate-50/60"
             :class="{ 'opacity-50': row.read }"
           >
-            <!-- Student name -->
-            <td class="px-3 py-2 font-medium text-slate-800">
-              {{ row.name }}
-            </td>
-
-            <!-- Message -->
-            <td class="px-3 py-2 text-slate-700">
-              {{ row.message }}
-            </td>
-
-            <!-- Level badge -->
+            <td class="px-3 py-2 font-medium text-slate-800">{{ row.name }}</td>
+            <td class="px-3 py-2 text-slate-700">{{ row.message }}</td>
             <td class="px-3 py-2">
               <span
                 class="inline-block rounded-full px-2 py-0.5 text-xs font-semibold"
@@ -72,13 +65,7 @@ function formatDate(date: string) {
                 {{ levelLabel[row.level] ?? row.level }}
               </span>
             </td>
-
-            <!-- Date -->
-            <td class="px-3 py-2 text-slate-500 whitespace-nowrap">
-              {{ formatDate(row.created_at) }}
-            </td>
-
-            <!-- Read status -->
+            <td class="px-3 py-2 text-slate-500 whitespace-nowrap">{{ formatDate(row.created_at) }}</td>
             <td class="px-3 py-2">
               <span
                 class="inline-block rounded-full px-2 py-0.5 text-xs font-semibold"
@@ -87,11 +74,22 @@ function formatDate(date: string) {
                 {{ row.read ? 'Read' : 'Unread' }}
               </span>
             </td>
+            <td class="px-3 py-2">
+              <div class="flex justify-end">
+                <button
+                  v-if="!row.read"
+                  type="button"
+                  class="inline-flex items-center px-2.5 py-1 text-xs font-medium rounded-full border border-[#2e777e] text-[#2e777e] hover:bg-[#e6f4f5] transition"
+                  @click="emit('markAsRead', row.id)"
+                >
+                  Mark as read
+                </button>
+              </div>
+            </td>
           </tr>
 
-          <!-- Empty state -->
           <tr v-if="rows.length === 0">
-            <td colspan="5" class="text-center py-6 text-xs text-slate-500 italic">
+            <td colspan="6" class="text-center py-6 text-xs text-slate-500 italic">
               No notifications to display.
             </td>
           </tr>
