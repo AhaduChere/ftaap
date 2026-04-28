@@ -39,7 +39,7 @@ onBeforeUnmount(() => {
     </a>
     <!--<h1 class="text-[#e2fafc] text-center">FAST Track Academy Student Progress Tracking</h1>-->
     <div class="h-full flex items-center justify-end pr-4 text-[#e2fafc]">
-      <span class="text-sm font-mono tracking-wide">{{ time || '00:00 --' }}</span>
+      <span class="text-sm font-mono tracking-wide">{{ time || '00:00 xx' }}</span>
     </div>
   </div>
 
