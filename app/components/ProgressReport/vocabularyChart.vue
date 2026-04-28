@@ -120,6 +120,12 @@ try {
 </script>
 
 <style scoped>
+@media (min-width: 1300px) {
+  .chart-container{
+      height: 17vh;
+  }
+}
+
 @media (min-width: 1500px) {
   .chart-container{
       height: 23vh;
